@@ -1,0 +1,3 @@
+<area shape="rect" id="node3" href="$dma__driver_8c.html#3f30990836753fe014b8acab8704172c" title="This function enables one DMA channel sub module." alt="" coords="168,5,312,33">
+<area shape="rect" id="node5" href="$dma__driver_8c.html#28ff4b28fd9895e28b123153052b0437" title="This function configures the necessary registers for a block transfer." alt="" coords="179,55,301,83">
+<area shape="rect" id="node7" href="$dma__driver_8c.html#b3d1ea8bae209c7c7d4a9f46d636868c" title="This function sends a manual transfer request to the channel." alt="" coords="175,106,305,134">
