@@ -16,6 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+import usb.core
+import usb.util
+
 class CommandMessage:
     def __init__(self, commandType, data):
         self.commandType = commandType
@@ -33,12 +36,17 @@ class CommandMessage:
 
 class UsbConnection:
     def __init__(self):
-        pass
+        self.vendorId = 0x0000
+        self.productId = 0x0000
+        self.connected = False
 
     def connect(self):
         pass
 
     def disconnect(self):
+        pass
+
+    def scan(self):
         pass
 
     def readStatus(self):

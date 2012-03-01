@@ -1,6 +1,6 @@
 # Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
-# This file is part of the Matunus project (part of the orcacopter project)
+# This file is part of the Matunus project (part of the Orcacopter project)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class StatusLabel(QtGui.QFrame):
         self.setPalette(palette)
         self.setMinimumHeight(20)
         self.setMaximumHeight(50)
-        self.setMinimumWidth(100)
+        self.setMinimumWidth(50)
         self.setGeometry(0, 0, 200, 20)
         self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)
         self.setLineWidth(3)

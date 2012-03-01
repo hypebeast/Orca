@@ -32,6 +32,9 @@ class ServoControlWidget(QtGui.QWidget):
     def __init__(self):
         super(ServoControlWidget, self).__init__()
 
+        self.minValue = 0
+        self.maxValue = 250
+
         self.createUi()
 
     def createUi(self):
@@ -77,4 +80,20 @@ class ServoControlWidget(QtGui.QWidget):
         self.setPositionServo.display(value)
 
     def startMoveServo(self):
-        pass
+        try:
+            position = int(self.leServoPosition.displayText())
+        except:
+            return
+
+        if not self.checkValue(position):
+            return
+
+        self.setPositionServo.display(str(position))
+        self.dialServo.setValue(position)
+        print position
+
+    def checkValue(self, value):
+        if value < self.minValue or value > self.maxValue:
+            return False
+        else:
+            return True

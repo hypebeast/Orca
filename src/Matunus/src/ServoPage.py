@@ -1,6 +1,6 @@
 # Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
-# This file is part of the Matunus project (part of the orcacopter project)
+# This file is part of the Matunus project (part of the Orcacopter project)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ class ServoPage(QtGui.QWidget):
 
     def createUi(self):
         mainLayout = QtGui.QVBoxLayout()
-
 
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor(111, 88, 100))

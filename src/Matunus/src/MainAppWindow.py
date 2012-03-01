@@ -11,7 +11,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -32,11 +32,39 @@ except ImportError:
 
 import sys
 
+from usb_connection import UsbConnection
 from MainPage import MainPage
 from ServoPage import ServoPage
 from EnginePage import EnginePage
 from ReceiverPage import ReceiverPage
 from FlyModePage import FlyModePage
+
+
+class SelectControllerDialog(QtGui.QDialog):
+    def __init__(self):
+        super(SelectControllerDialog, self).__init__()
+
+        layout = QtGui.QVBoxLayout()
+        self.cbController = QtGui.QComboBox()
+        self.cbController.addItem("Test Controller")
+        layout.addWidget(self.cbController)
+        hBox = QtGui.QHBoxLayout()
+        bOk = QtGui.QPushButton("&Ok")
+        bOk.clicked.connect(self.okClicked)
+        hBox.addWidget(bOk)
+        bCancel = QtGui.QPushButton("&Cancel")
+        bCancel.clicked.connect(self.cancelClicked)
+        hBox.addWidget(bCancel)
+        hBox.insertStretch(0)
+        layout.addItem(hBox)
+        layout.addStretch()
+        self.setLayout(layout)
+
+    def okClicked(self):
+        pass
+
+    def cancelClicked(self):
+        pass
 
 
 class MainAppWindow(QtGui.QMainWindow):
@@ -50,6 +78,8 @@ class MainAppWindow(QtGui.QMainWindow):
         self.resize(800, 600)
         self.setWindowTitle("Matunus")
         self.statusBar().showMessage("Ready", 5000)
+
+        self.usbConnection = UsbConnection()
 
         # Status flags
         self.connected = False
@@ -72,7 +102,10 @@ class MainAppWindow(QtGui.QMainWindow):
         self.lConnectionStatus = QtGui.QLabel("Here goes the status...")
         topLayout.addWidget(self.lConnectionStatus)
         topLayout.insertSpacing(2, 70)
-        topLayout.addStretch()
+        topLayout.insertStretch(5)
+        self.bSelectController = QtGui.QPushButton("Select Controller...")
+        self.bSelectController.clicked.connect(self.selectControllerClicked)
+        topLayout.addWidget(self.bSelectController)
         self.topGroupBox.setLayout(topLayout)
         self.mainLayout.addWidget(self.topGroupBox)
 
@@ -86,7 +119,7 @@ class MainAppWindow(QtGui.QMainWindow):
         self.enginePage = EnginePage()
         self.mainContainer.addTab(self.enginePage, "Engine")
         self.flyModePage = FlyModePage()
-        self.mainContainer.addTab(self.flyModePage, "Fly Mode")
+        self.mainContainer.addTab(self.flyModePage, "Flight Mode")
         self.mainLayout.addWidget(self.mainContainer)
 
         widget = QtGui.QWidget()
@@ -117,9 +150,17 @@ class MainAppWindow(QtGui.QMainWindow):
 
     def connectToController(self):
         print "Connecting to controller..."
+        self.statusBar().showMessage("Connecting to controller...", 2000)
+
 
     def disconnectFromController(self):
         print "Disconnecting from controller..."
+
+    def selectControllerClicked(self):
+        print "Select controller clicked"
+        dialog = SelectControllerDialog()
+        dialog.setModal(True)
+        dialog.show()
 
 
 class App():
