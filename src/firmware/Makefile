@@ -231,7 +231,7 @@ AVRDUDE_FUSES =
 
 #---------------- Programming Options (bootloader) ----------------
 BATCHISP_PORT = /dev/ttyUSB0
-BATCHISP_HARDWARE = RS232
+BATCHISP_HARDWARE = USB
 BATCHISP_BAUDRATE = 115200
 
 BATCHISP_WRITE_FLASH = loadbuffer $(TARGET).hex
