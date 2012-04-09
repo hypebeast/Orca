@@ -32,9 +32,10 @@ from ServoControlWidget import ServoControlWidget
 
 
 class ServoPage(QtGui.QWidget):
-    def __init__(self):
+    def __init__(self, serial=None):
         super(ServoPage, self).__init__()
 
+        self.serial_connection = serial
         self.createUi()
 
     def createUi(self):
@@ -45,66 +46,24 @@ class ServoPage(QtGui.QWidget):
 
         # Servo 1
         groupBox1 = QtGui.QGroupBox("Servo 1")
-        self.servo1Control = ServoControlWidget()
+        groupBox1.setMinimumHeight(70)
+        self.servo1Control = ServoControlWidget(self.serial_connection)
         hBox = QtGui.QHBoxLayout()
-        hBox.setMargin(0)
+        hBox.setMargin(2)
         hBox.addWidget(self.servo1Control)
         groupBox1.setLayout(hBox)
         mainLayout.addWidget(groupBox1)
 
         # Servo 2
         groupBox2 = QtGui.QGroupBox("Servo 2")
-        self.servo2Control = ServoControlWidget()
+        groupBox2.setMinimumHeight(70)
+        self.servo2Control = ServoControlWidget(self.serial_connection)
         hBox = QtGui.QHBoxLayout()
-        hBox.setMargin(0)
+        hBox.setMargin(2)
         hBox.addWidget(self.servo2Control)
         groupBox2.setLayout(hBox)
         mainLayout.addWidget(groupBox2)
-
-        # Servo 3
-        groupBox3 = QtGui.QGroupBox("Servo 3")
-        self.servo3Control = ServoControlWidget()
-        hBox = QtGui.QHBoxLayout()
-        hBox.setMargin(0)
-        hBox.addWidget(self.servo3Control)
-        groupBox3.setLayout(hBox)
-        mainLayout.addWidget(groupBox3)
-
-        # Servo 4
-        groupBox4 = QtGui.QGroupBox("Servo 4")
-        self.servo4Control = ServoControlWidget()
-        hBox = QtGui.QHBoxLayout()
-        hBox.setMargin(0)
-        hBox.addWidget(self.servo4Control)
-        groupBox4.setLayout(hBox)
-        mainLayout.addWidget(groupBox4)
-
-        # Servo 5
-        groupBox5 = QtGui.QGroupBox("Servo 5")
-        self.servo5Control = ServoControlWidget()
-        hBox = QtGui.QHBoxLayout()
-        hBox.setMargin(0)
-        hBox.addWidget(self.servo5Control)
-        groupBox5.setLayout(hBox)
-        mainLayout.addWidget(groupBox5)
-
-        # Servo 6
-        groupBox6 = QtGui.QGroupBox("Servo 6")
-        self.servo6Control = ServoControlWidget()
-        hBox = QtGui.QHBoxLayout()
-        hBox.setMargin(0)
-        hBox.addWidget(self.servo6Control)
-        groupBox6.setLayout(hBox)
-        mainLayout.addWidget(groupBox6)
-
-        # Servo 7
-        groupBox7 = QtGui.QGroupBox("Servo 7")
-        self.servo7Control = ServoControlWidget()
-        hBox = QtGui.QHBoxLayout()
-        hBox.setMargin(0)
-        hBox.addWidget(self.servo7Control)
-        groupBox7.setLayout(hBox)
-        mainLayout.addWidget(groupBox7)
+        mainLayout.addStretch()
 
         self.setLayout(mainLayout)
 

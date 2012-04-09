@@ -28,12 +28,17 @@ except ImportError:
     import sys
     sys.exit(2)
 
+from serial_api import CommandMessage, CommandType
+
+
 class ServoControlWidget(QtGui.QWidget):
-    def __init__(self):
+    def __init__(self, serial=None):
         super(ServoControlWidget, self).__init__()
 
+        self.serial_connection = serial
+
         self.minValue = 0
-        self.maxValue = 250
+        self.maxValue = 180
 
         self.createUi()
 
@@ -42,7 +47,7 @@ class ServoControlWidget(QtGui.QWidget):
         palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor(111, 88, 100))
 
         layout = QtGui.QHBoxLayout()
-        layout.setMargin(1)
+        layout.setMargin(2)
         lActualPosition = QtGui.QLabel("Actual Pos:")
         layout.addWidget(lActualPosition)
         self.actualPositionServo = QtGui.QLCDNumber()
@@ -61,8 +66,8 @@ class ServoControlWidget(QtGui.QWidget):
         lMove1 = QtGui.QLabel("Move")
         layout.addWidget(lMove1)
         self.dialServo = QtGui.QDial()
-        self.dialServo.setMinimum(0)
-        self.dialServo.setMaximum(250)
+        self.dialServo.setMinimum(-90)
+        self.dialServo.setMaximum(90)
         self.dialServo.setSingleStep(1)
         self.dialServo.setWrapping(False)
         self.dialServo.valueChanged.connect(self.dialServoValueChanged)
@@ -81,7 +86,7 @@ class ServoControlWidget(QtGui.QWidget):
 
     def startMoveServo(self):
         try:
-            position = int(self.leServoPosition.displayText())
+            position = self.leServoPosition.displayText()
         except:
             return
 
@@ -90,7 +95,12 @@ class ServoControlWidget(QtGui.QWidget):
 
         self.setPositionServo.display(str(position))
         self.dialServo.setValue(position)
-        print position
+
+        command = CommandMessage(CommandType.SETSERVOPOS)
+        command.addArgument(str(1))
+        command.addArgument(position)
+        self.serial_connection.writeCommand(command)
+
 
     def checkValue(self, value):
         if value < self.minValue or value > self.maxValue:

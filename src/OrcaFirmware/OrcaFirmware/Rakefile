@@ -1,0 +1,42 @@
+require 'rake'
+require 'Open3'
+
+desc "Use batchisp to program the controller"
+
+task :batchisp do
+    executable = "batchisp"
+    device = "ATXMEGA128A1"
+    hardware = "RS232"
+    port = "COM6"
+    baudrate = "115200"
+    output_dir = "Debug"
+    #hex_file = File.join(output_dir, "OrcaFirmware.hex")
+    hex_file = "Debug\\OrcaFirmware.hex"
+
+    command = executable +
+                " -device " + device +
+                " -hardware " + hardware +
+                " -port " + port +
+                " -baudrate " + baudrate +
+                " -operation onfail abort " +
+                " memory flash " +
+                " erase f " +
+                " blankcheck " +
+                " loadbuffer " + hex_file +
+                " program verify "
+                " start reset 0"  
+
+    # Execute the command
+    puts "Start programming \"" + device + "\"" " with \"" + hex_file + "\"...\n"
+    
+    Open3.popen3(command) do |stdin, stdout, stderr|
+        t = Thread.new(stdout) do |tout|
+            while (line = tout.gets)
+                puts line
+            end
+        end
+        t.join
+    end
+end
+
+task :default => 'batchisp'

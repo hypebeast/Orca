@@ -43,7 +43,7 @@ class StatusLabel(QtGui.QFrame):
         self.setMinimumWidth(50)
         self.setGeometry(0, 0, 200, 20)
         self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)
-        self.setLineWidth(3)
+        self.setLineWidth(1)
 
         layout = QtGui.QHBoxLayout()
         layout.setMargin(6)

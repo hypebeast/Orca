@@ -2,26 +2,56 @@
  * shell.c
  *
  * Created: 25.03.2012 21:22:48
- *  Author: Sebastian Ruml <sebastian.ruml@gmail.com>
+ * Author: Sebastian Ruml <sebastian.ruml@gmail.com>
  */
 
 #include "serial_api.h"
 
 
-#define CMD_BUFFER_LENGTH 64
+#define ARRAY_SIZE(a)	(sizeof(a)/sizeof(a[0]))
+#define CMD_BUFFER_LENGTH 128
 
+/* This structure represents an input buffer for incoming commands */
 static struct {
 	char buff[CMD_BUFFER_LENGTH];
 	unsigned int index;
 	unsigned int match;
 } command_buff;
 
-/* API commands */
+/************************************************************************/
+/* API command definitions                                              */
+/************************************************************************/
+
+/* Test API command */
 static void test_command(int argc, char **argv);
+
+/* All LEDs on */
+static void leds_on(int argc, char **argv);
+
+/* All LEDs off */
+static void leds_off(int argc, char **argv);
+
+/* This function parses all servo commands*/
+static void execute_servo_command(int argc, char **argv);
+
+/* Set new servo position */
+static void serial_set_servo_pos(int argc, char **argv);
+
+/* Get the actual position of a servo */
+static void serial_get_servo_pos(int argc, char **argv);
 
 /* Enabled API commands */
 struct api_command commands[] = {
-	{ "test",		test_command}
+	{ "test",		test_command },
+	{ "ledsoff",	leds_off },
+	{ "ledson",		leds_on},
+	{ "SERVO",		execute_servo_command}
+};
+
+/* Enabled servo API commands */
+struct api_command servo_commands[] = {
+	{ "POS", serial_set_servo_pos},
+	{ "GETPOS", serial_get_servo_pos}	
 };
 
 
@@ -32,7 +62,85 @@ struct api_command commands[] = {
 /* Test API command */
 static void test_command(int argc, char **argv)
 {
-	// TODO
+	char tx_buffer[] = "Test Command";
+		for (int i = 0; i < 14; i++) {
+			usart_putchar(USART_SERIAL_API, tx_buffer[i]);
+		}
+}
+
+static void leds_on(int argc, char **argv)
+{
+	gpio_set_pin_low(LED0);
+	gpio_set_pin_low(LED1);
+	gpio_set_pin_low(LED2);
+	gpio_set_pin_low(LED3);
+	gpio_set_pin_low(LED4);
+	gpio_set_pin_low(LED5);
+	gpio_set_pin_low(LED6);
+	gpio_set_pin_low(LED7);
+}
+
+static void leds_off(int argc, char **argv)
+{
+	gpio_set_pin_high(LED0);
+	gpio_set_pin_high(LED1);
+	gpio_set_pin_high(LED2);
+	gpio_set_pin_high(LED3);
+	gpio_set_pin_high(LED4);
+	gpio_set_pin_high(LED5);
+	gpio_set_pin_high(LED6);
+	gpio_set_pin_high(LED7);
+}
+
+/**
+* \brief This function parses all servo commands
+*/
+static void execute_servo_command(int argc, char **argv)
+{
+	uint16_t nl = strlen(argv[1]);
+	uint16_t cl;
+	
+	for (int i = 0; i < ARRAY_SIZE(servo_commands); i++) {
+		cl = strlen(servo_commands[i].name);
+		
+		if (cl == nl && servo_commands[i].function != NULL &&
+			!strncmp(argv[1], servo_commands[i].name, nl)) {
+			servo_commands[i].function(argc, argv);		
+		}
+	}
+}
+
+/**
+* \brief This function sets a new position for a servo.
+*/
+static void serial_set_servo_pos(int argc, char **argv)
+{
+	if (argc != 4)
+		return;
+		
+	uint16_t servo_nr = 0;
+	uint16_t position = 0;
+
+	servo_nr = atoi(argv[2]);
+	position = atoi(argv[3]);
+	
+	// Set the new position
+	set_servo_pos(servo_nr, position);
+}
+
+/**
+* \brief This function returns the actual position of a servo.
+*/
+static void serial_get_servo_pos(int argc, char **argv)
+{
+	if (argc != 2)
+		return;
+		
+	uint16_t servo_nr = atoi(argv[1]);
+	uint16_t position = get_servo_pos(servo_nr);	
+	
+	//char cmd_buffer[] = "getservopos";
+	//char tx_buffer[] = strtol(position);
 }
 
 /**
@@ -40,9 +148,6 @@ static void test_command(int argc, char **argv)
 */
 void serial_api_init(void)
 {
-	// Initialize system clock
-	sysclk_init();
-	
 	// USART options
 	static usart_rs232_options_t USART_SERIAL_OPTIONS = {
 		.baudrate = USART_SERIAL_API_BAUDRATE,
@@ -58,11 +163,43 @@ void serial_api_init(void)
 }
 
 /**
+* This method checks if the given character is a whitespace character.
+*/
+static char is_whitespace(char c)
+{
+	return (c == ' ' || c == '\t' || c == '\r' || c == '\n');
+}
+
+/**
 * This method parses an received command.
 */
 void parse_command(void)
 {
-	// TODO	
+	uint8_t i;
+	char *argv[16];
+	int argc = 0;
+	char *in_arg = NULL;
+	
+	for (i = 0; i < command_buff.index; i++) {
+		if (is_whitespace(command_buff.buff[i]) && argc == 0)
+			continue;
+		
+		if (is_whitespace(command_buff.buff[i])) {
+			if (in_arg) {
+				command_buff.buff[i] = '\0';
+				in_arg = NULL;
+			}
+		} else if (!in_arg) {
+			in_arg = &command_buff.buff[i];
+			argv[argc] = in_arg;
+			argc++;
+		}
+	}
+	
+	command_buff.buff[i] = '\0';
+	
+	if (argc > 0)
+		execute_command(argc, argv);
 }
 
 /**
@@ -70,7 +207,19 @@ void parse_command(void)
 */
 void execute_command(int argc, char **argv)
 {
-	// TODO
+	unsigned int i;
+	unsigned int nl = strlen(argv[0]);
+	unsigned int cl;
+	
+	for (i = 0; i < ARRAY_SIZE(commands); i++) {
+		cl = strlen(commands[i].name);
+		
+		if (cl == nl && commands[i].function != NULL &&
+			!strncmp(argv[0], commands[i].name, nl)) {
+			commands[i].function(argc, argv);
+			//usart_putchar(USART_SERIAL_API, '\n');		
+		}
+	}
 }
 
 /**
@@ -79,14 +228,6 @@ void execute_command(int argc, char **argv)
 void serial_api_task(void)
 {
 	uint8_t received_byte = usart_getchar(USART_SERIAL_API);
-	
-	// Just for testing
-	if (received_byte == '\r') {
-		char tx_buffer[] = "\n\rHello from Orca!";
-		for (int i = 0; i < 16; i++) {
-			usart_putchar(USART_SERIAL_API, tx_buffer[i]);
-		}
-	}
 	
 	// Process the received byte
 	switch (received_byte) {

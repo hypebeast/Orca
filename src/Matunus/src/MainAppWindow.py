@@ -31,14 +31,15 @@ except ImportError:
     sys.exit(2)
 
 import sys
+import serial
 
-from usb_connection import UsbConnection
 from MainPage import MainPage
 from ServoPage import ServoPage
 from EnginePage import EnginePage
 from ReceiverPage import ReceiverPage
 from FlyModePage import FlyModePage
-
+from serial_api import SerialAPI
+from serial_api import CommandMessage, CommandType
 
 class SelectControllerDialog(QtGui.QDialog):
     def __init__(self):
@@ -71,18 +72,20 @@ class MainAppWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainAppWindow, self).__init__()
 
+        # Serial connection
+        self.comPortsWindows = {'COM1' : 1, 'COM2' : 2, 'COM3' : 3, 'COM4' : 4,'COM5' : 5,
+                         'COM6' : 6, 'COM7' : 7, 'COM8' : 8, 'COM9' : 9, 'COM10' : 10,
+                         'COM11' : 11, 'COM12' : 12, 'COM13' : 13, 'COM14' : 14, 'COM15' : 15}
+        self.comPortsLinux = {'/dev/ttys1'}
+        self.serial = SerialAPI(5, 9600)
+
         self.createUi()
         self.createActions()
         self.createMenus()
 
-        self.resize(800, 600)
+        self.resize(700, 600)
         self.setWindowTitle("Matunus")
         self.statusBar().showMessage("Ready", 5000)
-
-        self.usbConnection = UsbConnection()
-
-        # Status flags
-        self.connected = False
 
         self.updateUi()
 
@@ -103,9 +106,17 @@ class MainAppWindow(QtGui.QMainWindow):
         topLayout.addWidget(self.lConnectionStatus)
         topLayout.insertSpacing(2, 70)
         topLayout.insertStretch(5)
-        self.bSelectController = QtGui.QPushButton("Select Controller...")
-        self.bSelectController.clicked.connect(self.selectControllerClicked)
-        topLayout.addWidget(self.bSelectController)
+        lComPort = QtGui.QLabel("Com Port: ")
+        topLayout.addWidget(lComPort)
+        self.cbComPort = QtGui.QComboBox()
+        comNames = self.comPortsWindows.keys()
+        comNames.sort()
+        for name in comNames:
+            self.cbComPort.addItem(name)
+        #self.bSelectController = QtGui.QPushButton("Select Controller...")
+        #self.bSelectController.clicked.connect(self.selectControllerClicked)
+        #topLayout.addWidget(self.bSelectController)
+        topLayout.addWidget(self.cbComPort)
         self.topGroupBox.setLayout(topLayout)
         self.mainLayout.addWidget(self.topGroupBox)
 
@@ -114,7 +125,7 @@ class MainAppWindow(QtGui.QMainWindow):
         self.mainContainer.addTab(self.mainPage, "Main")
         self.receiverPage = ReceiverPage()
         self.mainContainer.addTab(self.receiverPage, "Receiver")
-        self.servoPage = ServoPage()
+        self.servoPage = ServoPage(self.serial)
         self.mainContainer.addTab(self.servoPage, "Servo")
         self.enginePage = EnginePage()
         self.mainContainer.addTab(self.enginePage, "Engine")
@@ -138,7 +149,7 @@ class MainAppWindow(QtGui.QMainWindow):
         self.exitAction.triggered.connect(QtGui.qApp.quit)
 
     def updateUi(self):
-        if self.connected:
+        if self.serial.connected:
             self.lConnectionStatus.setText("<b>Connected</b>")
             self.bConnect.setEnabled(False)
             self.bDisconnect.setEnabled(True)
@@ -152,9 +163,19 @@ class MainAppWindow(QtGui.QMainWindow):
         print "Connecting to controller..."
         self.statusBar().showMessage("Connecting to controller...", 2000)
 
+        self.serial.connect()
+        #self.serial.writeCommand(CommandMessage(CommandType.LEDSON))
+        self.statusBar().showMessage("Connected!", 2000)
+        self.updateUi()
 
     def disconnectFromController(self):
         print "Disconnecting from controller..."
+
+        if self.serial is not None and self.serial.connected:
+            #self.serial.writeCommand(CommandMessage(CommandType.LEDSOFF))
+            self.serial.disconnect()
+            self.statusBar().showMessage("Disconnected!", 2000)
+            self.updateUi()
 
     def selectControllerClicked(self):
         print "Select controller clicked"

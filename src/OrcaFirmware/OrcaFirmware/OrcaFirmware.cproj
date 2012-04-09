@@ -12,10 +12,10 @@
       <framework-data>
         <options>
           <option id="common.boards" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="common.services.delay" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.services.basic.gpio" value="Add" config="" content-id="Atmel.ASF" />
           <option id="xmega.drivers.ioport" value="Add" config="" content-id="Atmel.ASF" />
           <option id="xmega.drivers.usart" value="Add" config="" content-id="Atmel.ASF" />
-          <option id="common.services.delay" value="Add" config="" content-id="Atmel.ASF" />
           <option id="xmega.services.pwm" value="Add" config="" content-id="Atmel.ASF" />
         </options>
         <files>

@@ -1,10 +1,3 @@
-/*
- * shell.h
- *
- * Created: 25.03.2012 21:22:36
- *  Author: Sebastian Ruml <sebastian.ruml@gmail.com>
- */ 
-
 /**
  * \file serial_api.h
  *
@@ -15,12 +8,14 @@
  */
 
 
-#ifndef SHELL_H_
-#define SHELL_H_
+#ifndef SERIALAPI_H_
+#define SERIALAPI_H_
 
 #include <string.h>
+#include <asf.h>
+#include <stdlib.h>
 
-#include "asf.h"
+#include "servo.h"
 
 #define USART_SERIAL_API	             &USARTC0
 #define USART_SERIAL_API_BAUDRATE		 9600
@@ -28,6 +23,9 @@
 #define USART_SERIAL_PARITY              USART_PMODE_DISABLED_gc
 #define USART_SERIAL_STOP_BIT            false
 
+/**
+* This struct defines an API command
+*/
 struct api_command {
 	char *name;
 	void (*function)(int argc, char **argv);
@@ -38,4 +36,4 @@ void serial_api_task(void);
 void parse_command(void);
 void execute_command(int argc, char **argv);
 
-#endif /* SHELL_H_ */
+#endif /* SERIALAPI_H_ */
