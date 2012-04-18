@@ -48,6 +48,7 @@ class ServoControlWidget(QtGui.QWidget):
 
         layout = QtGui.QHBoxLayout()
         layout.setMargin(2)
+        layout.addSpacing(5)
         lActualPosition = QtGui.QLabel("Actual Pos:")
         layout.addWidget(lActualPosition)
         self.actualPositionServo = QtGui.QLCDNumber()
@@ -55,23 +56,13 @@ class ServoControlWidget(QtGui.QWidget):
         self.actualPositionServo.setPalette(palette)
         self.actualPositionServo.setSegmentStyle(QtGui.QLCDNumber.Filled)
         layout.addWidget(self.actualPositionServo)
-        lSetPosition = QtGui.QLabel("Set Pos:")
-        layout.addWidget(lSetPosition)
-        self.setPositionServo = QtGui.QLCDNumber()
-        self.setPositionServo.setMaximumHeight(25)
-        self.setPositionServo.setPalette(palette)
-        self.setPositionServo.setSegmentStyle(QtGui.QLCDNumber.Filled)
-        layout.addWidget(self.setPositionServo)
         layout.insertSpacing(4, 40)
+        self.positionBar = QtGui.QProgressBar()
+        self.positionBar.setMinimum(self.minValue)
+        self.positionBar.setMaximum(self.maxValue)
+        layout.addWidget(self.positionBar)
         lMove1 = QtGui.QLabel("Move")
         layout.addWidget(lMove1)
-        self.dialServo = QtGui.QDial()
-        self.dialServo.setMinimum(-90)
-        self.dialServo.setMaximum(90)
-        self.dialServo.setSingleStep(1)
-        self.dialServo.setWrapping(False)
-        self.dialServo.valueChanged.connect(self.dialServoValueChanged)
-        layout.addWidget(self.dialServo)
         self.leServoPosition = QtGui.QLineEdit()
         self.leServoPosition.setMaximumWidth(50)
         layout.addWidget(self.leServoPosition)
@@ -81,24 +72,19 @@ class ServoControlWidget(QtGui.QWidget):
         layout.addStretch()
         self.setLayout(layout)
 
-    def dialServoValueChanged(self, value):
-        self.setPositionServo.display(value)
-
     def startMoveServo(self):
         try:
             position = self.leServoPosition.displayText()
         except:
             return
 
-        if not self.checkValue(position):
+        if not self.checkValue(float(position)):
             return
 
-        self.setPositionServo.display(str(position))
-        self.dialServo.setValue(position)
-
+        print "Position: " + position
         command = CommandMessage(CommandType.SETSERVOPOS)
         command.addArgument(str(1))
-        command.addArgument(position)
+        command.addArgument(str(position))
         self.serial_connection.writeCommand(command)
 
 

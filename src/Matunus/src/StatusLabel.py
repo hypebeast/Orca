@@ -31,6 +31,9 @@ except ImportError:
 
 
 class StatusLabel(QtGui.QFrame):
+    """
+    This class implements a status label for use in HMI applications.
+    """
     def __init__(self):
         super(StatusLabel, self).__init__()
         palette = QtGui.QPalette()
@@ -39,7 +42,7 @@ class StatusLabel(QtGui.QFrame):
         self.setAutoFillBackground(True)
         self.setPalette(palette)
         self.setMinimumHeight(20)
-        self.setMaximumHeight(50)
+        #self.setMaximumHeight(50)
         self.setMinimumWidth(50)
         self.setGeometry(0, 0, 200, 20)
         self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)

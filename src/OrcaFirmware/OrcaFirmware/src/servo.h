@@ -12,15 +12,23 @@
 #define SERVO_H_
 
 #include <asf.h>
+#include <sysclk.h>
 #include "pwm.h"
 
 #define SERVO1_TIMER TCC1
-#define SERVO_TIMER_OVERFLOW_PERIOD_IN_MS 20
-#define SERVO_TIMER_OVERFLOW_PERIOD 39999 // 20ms (2^16Hz / 50 = 20ms)
-#define CONVERSION_FACTOR (1.0f/180.0f)
+#define SERVO_F_CPU 2000000.0f // TODO: Remove this constant!
+#define SERVO_TIMER_OVERFLOW_PERIOD 20 // PWM period (in ms)
+#define SERVO_PRESCALER_VALUE 1 // Prescaler value
+#define SERVO_TICK_DURATION ((1.0f/(SERVO_F_CPU * SERVO_PRESCALER_VALUE)) * 1000) // Time for one tick (in ms)
+#define SERVO_PWM_TOP_VALUE ((SERVO_TIMER_OVERFLOW_PERIOD/ SERVO_TICK_DURATION) - 1) // PRESCALER = 1
+#define SERVO_LOWER_PULSE_WIDTH 0.49f // in ms
+#define SERVO_UPPER_PULSE_WIDTH 2.35f // in ms
+#define SERVO_PULSE_WIDTH_OFFSET SERVO_LOWER_PULSE_WIDTH
+#define SERVO_PULSE_WIDTH (SERVO_UPPER_PULSE_WIDTH - SERVO_LOWER_PULSE_WIDTH)
+#define SERVO_TICKS_PER_DEGREE (SERVO_PULSE_WIDTH/180.0f)
 
 void servo_init(void);
 void set_servo_pos(uint16_t servo_nr, uint16_t pos);
-uint16_t get_servo_pos(uint16_t servo_nr);
+uint16_t get_servo_pos(uint8_t servo_nr);
 
 #endif /* SERVO_H_ */

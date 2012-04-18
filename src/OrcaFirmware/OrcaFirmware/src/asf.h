@@ -66,6 +66,9 @@
 // From module: Interrupt management - XMEGA implementation
 #include <interrupt.h>
 
+// From module: NVM - Non Volatile Memory
+#include <nvm.h>
+
 // From module: PMIC - Programmable Multi-level Interrupt Controller
 #include <pmic.h>
 

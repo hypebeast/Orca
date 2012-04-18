@@ -20,6 +20,7 @@
 
 
 # This is only needed for Python v2 but is harmless for Python v3.
+import os
 import sip
 sip.setapi('QVariant', 2)
 
@@ -73,11 +74,16 @@ class MainAppWindow(QtGui.QMainWindow):
         super(MainAppWindow, self).__init__()
 
         # Serial connection
-        self.comPortsWindows = {'COM1' : 1, 'COM2' : 2, 'COM3' : 3, 'COM4' : 4,'COM5' : 5,
-                         'COM6' : 6, 'COM7' : 7, 'COM8' : 8, 'COM9' : 9, 'COM10' : 10,
-                         'COM11' : 11, 'COM12' : 12, 'COM13' : 13, 'COM14' : 14, 'COM15' : 15}
-        self.comPortsLinux = {'/dev/ttys1'}
-        self.serial = SerialAPI(5, 9600)
+        if os.name == 'nt':
+            self.comPortsWindows = {'COM1' : 1, 'COM2' : 2, 'COM3' : 3, 'COM4' : 4,'COM5' : 5,
+                                    'COM6' : 6, 'COM7' : 7, 'COM8' : 8, 'COM9' : 9, 'COM10' : 10,
+                                    'COM11' : 11, 'COM12' : 12, 'COM13' : 13, 'COM14' : 14, 'COM15' : 15}
+            self.comPortsLinux = {'/dev/ttys1'}
+            self.serial = SerialAPI(5, 9600)
+        elif os.name == 'posix':
+            pass
+        else:
+            raise NotImplementedError("Sorry no implementation for your platform (%s) available." % sys.platform)
 
         self.createUi()
         self.createActions()
@@ -130,7 +136,7 @@ class MainAppWindow(QtGui.QMainWindow):
         self.enginePage = EnginePage()
         self.mainContainer.addTab(self.enginePage, "Engine")
         self.flyModePage = FlyModePage()
-        self.mainContainer.addTab(self.flyModePage, "Flight Mode")
+        self.mainContainer.addTab(self.flyModePage, "Flight Control")
         self.mainLayout.addWidget(self.mainContainer)
 
         widget = QtGui.QWidget()
@@ -157,7 +163,6 @@ class MainAppWindow(QtGui.QMainWindow):
             self.lConnectionStatus.setText("<b>Disconnected</b>")
             self.bConnect.setEnabled(True)
             self.bDisconnect.setEnabled(False)
-            self.mainPage.setSystemStatus("Disconnected")
 
     def connectToController(self):
         print "Connecting to controller..."
@@ -167,6 +172,8 @@ class MainAppWindow(QtGui.QMainWindow):
         #self.serial.writeCommand(CommandMessage(CommandType.LEDSON))
         self.statusBar().showMessage("Connected!", 2000)
         self.updateUi()
+        self.mainPage.setSystemStatus("Ready")
+        self.mainPage.setSystemMessage("Connected to the controller")
 
     def disconnectFromController(self):
         print "Disconnecting from controller..."
@@ -176,6 +183,8 @@ class MainAppWindow(QtGui.QMainWindow):
             self.serial.disconnect()
             self.statusBar().showMessage("Disconnected!", 2000)
             self.updateUi()
+            self.mainPage.setSystemStatus("Off")
+            self.mainPage.setSystemMessage("Disconnected from the controller")
 
     def selectControllerClicked(self):
         print "Select controller clicked"

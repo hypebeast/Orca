@@ -15,6 +15,7 @@
 #include "serial_api.h"
 #include "servo.h"
 
+// TODO: Remove this function. Just for testing!
 void init_orca()
 {
 	ioport_configure_pin(IOPORT_CREATE_PIN(PORTC, 4), (IOPORT_DIR_OUTPUT | IOPORT_INIT_HIGH));

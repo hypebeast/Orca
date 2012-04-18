@@ -32,7 +32,7 @@ static void leds_on(int argc, char **argv);
 static void leds_off(int argc, char **argv);
 
 /* This function parses all servo commands*/
-static void execute_servo_command(int argc, char **argv);
+static void process_servo_command(int argc, char **argv);
 
 /* Set new servo position */
 static void serial_set_servo_pos(int argc, char **argv);
@@ -45,7 +45,7 @@ struct api_command commands[] = {
 	{ "test",		test_command },
 	{ "ledsoff",	leds_off },
 	{ "ledson",		leds_on},
-	{ "SERVO",		execute_servo_command}
+	{ "SERVO",		process_servo_command}
 };
 
 /* Enabled servo API commands */
@@ -63,9 +63,9 @@ struct api_command servo_commands[] = {
 static void test_command(int argc, char **argv)
 {
 	char tx_buffer[] = "Test Command";
-		for (int i = 0; i < 14; i++) {
-			usart_putchar(USART_SERIAL_API, tx_buffer[i]);
-		}
+	for (int i = 0; i < 14; i++) {
+		usart_putchar(USART_SERIAL_API, tx_buffer[i]);
+	}
 }
 
 static void leds_on(int argc, char **argv)
@@ -95,7 +95,7 @@ static void leds_off(int argc, char **argv)
 /**
 * \brief This function parses all servo commands
 */
-static void execute_servo_command(int argc, char **argv)
+static void process_servo_command(int argc, char **argv)
 {
 	uint16_t nl = strlen(argv[1]);
 	uint16_t cl;
@@ -220,6 +220,20 @@ void execute_command(int argc, char **argv)
 			//usart_putchar(USART_SERIAL_API, '\n');		
 		}
 	}
+}
+
+/**
+* \brief This function writes the given data to the serial connection.
+*/
+void send_command(char *data)
+{
+	uint16_t cl = strlen(data);
+	
+	for (int i = 0; i < cl; i++) {
+		usart_putchar(USART_SERIAL_API, data[i]);
+	}
+	
+	usart_putchar(USART_SERIAL_API, '\n');
 }
 
 /**
