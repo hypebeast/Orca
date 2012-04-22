@@ -16,15 +16,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+__author__ = 'Sebastian Ruml'
+
 import serial
 import threading
-import time
 import sys
 
 
 NEWLINE_CONVERISON_MAP = ('\n', '\r', '\r\n')
 LF_MODES = ('LF', 'CR', 'CR/LF')
-NEWLINECHARACTER = '\r'
+NEWLINECHARACTER = '\r\n'
 
 DEFAULT_PORT = None
 DEFAULT_BAUDRATE = 9600
@@ -35,6 +36,7 @@ DEFAULT_XONXOFF = True
 DEFAULT_RTS = None
 DEFUALT_DTR = None
 
+STATUS_QUERIES = {"SERVO GETPOS": 0}
 
 if sys.version_info >= (3, 0):
     def character(b):
@@ -65,7 +67,7 @@ class CommandMessage:
         for arg in self.data:
             message = message + " " + arg
 
-        #message = message + NEWLINECHARACTER
+        message = message + NEWLINECHARACTER
         return message
 
 

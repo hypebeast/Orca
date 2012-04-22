@@ -25,6 +25,7 @@ from src import MainAppWindow
 
 __appName__ = 'Matunus'
 __version__ = '0.1.0'
+__author__ = 'Sebastian Ruml'
 
 # Check that at least Python 2.7 is running
 if sys.version_info < (2, 7):

@@ -1,3 +1,5 @@
+__author__ = 'Sebastian Ruml'
+
 # Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
 # This file is part of the Matunus project (part of the orcacopter project)

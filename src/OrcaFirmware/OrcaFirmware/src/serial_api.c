@@ -15,6 +15,7 @@
 static struct {
 	char buff[CMD_BUFFER_LENGTH];
 	unsigned int index;
+	bool cr_received;
 	unsigned int match;
 } command_buff;
 
@@ -125,7 +126,7 @@ static void serial_set_servo_pos(int argc, char **argv)
 	position = atoi(argv[3]);
 	
 	// Set the new position
-	set_servo_pos(servo_nr, position);
+	servo_set_pos_degree(servo_nr, position);
 }
 
 /**
@@ -137,10 +138,8 @@ static void serial_get_servo_pos(int argc, char **argv)
 		return;
 		
 	uint16_t servo_nr = atoi(argv[1]);
-	uint16_t position = get_servo_pos(servo_nr);	
-	
-	//char cmd_buffer[] = "getservopos";
-	//char tx_buffer[] = strtol(position);
+	uint16_t position = servo_get_pos_degree(servo_nr);	
+	//sprintf()
 }
 
 /**
@@ -160,6 +159,7 @@ void serial_api_init(void)
 	usart_init_rs232(USART_SERIAL_API, &USART_SERIAL_OPTIONS);
 	
 	command_buff.index = 0;
+	command_buff.cr_received = false;
 }
 
 /**
@@ -245,13 +245,22 @@ void serial_api_task(void)
 	
 	// Process the received byte
 	switch (received_byte) {
+		// LF received
 		case '\n':
-		case '\r':
-			if (command_buff.index > 0) {
-				parse_command();
-				command_buff.index = 0;
-				memset(command_buff.buff, 0, sizeof(command_buff.buff));
+			if (command_buff.cr_received)
+			{
+				if (command_buff.index > 0) {
+					parse_command();
+					command_buff.index = 0;
+					command_buff.cr_received = false;
+					memset(command_buff.buff, 0, sizeof(command_buff.buff));
+				}
 			}
+			break;
+			
+		// CR receiced
+		case '\r':
+			command_buff.cr_received = true;
 			break;
 			
 		case '\b':

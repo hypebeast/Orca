@@ -1,3 +1,5 @@
+__author__ = 'Sebastian Ruml'
+
 # Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
 # This file is part of the Matunus project (part of the orcacopter project)
@@ -29,14 +31,16 @@ except ImportError:
     sys.exit(2)
 
 from serial_api import CommandMessage, CommandType
+from PositionBar import PositionBar
 
 
 class ServoControlWidget(QtGui.QWidget):
-    def __init__(self, serial=None):
+    def __init__(self, serial=None, servo_nr=1):
         super(ServoControlWidget, self).__init__()
 
         self.serial_connection = serial
 
+        self.servo_nr = servo_nr
         self.minValue = 0
         self.maxValue = 180
 
@@ -49,19 +53,24 @@ class ServoControlWidget(QtGui.QWidget):
         layout = QtGui.QHBoxLayout()
         layout.setMargin(2)
         layout.addSpacing(5)
-        lActualPosition = QtGui.QLabel("Actual Pos:")
+        lActualPosition = QtGui.QLabel("<b>Actual Pos</b>")
         layout.addWidget(lActualPosition)
+        layout.addSpacing(10)
         self.actualPositionServo = QtGui.QLCDNumber()
         self.actualPositionServo.setMaximumHeight(25)
         self.actualPositionServo.setPalette(palette)
         self.actualPositionServo.setSegmentStyle(QtGui.QLCDNumber.Filled)
         layout.addWidget(self.actualPositionServo)
-        layout.insertSpacing(4, 40)
-        self.positionBar = QtGui.QProgressBar()
-        self.positionBar.setMinimum(self.minValue)
-        self.positionBar.setMaximum(self.maxValue)
+        layout.addSpacing(5)
+        self.positionBar = PositionBar()
+        self.positionBar.setMinimumWidth(200)
+        self.positionBar.setMinimumHeight(15)
+        self.positionBar.setMaximumHeight(30)
+        self.positionBar.setValue(0)
+        self.positionBar.setBarColor(QtGui.QColor(0,0,255))
         layout.addWidget(self.positionBar)
-        lMove1 = QtGui.QLabel("Move")
+        layout.addSpacing(50)
+        lMove1 = QtGui.QLabel("<b>Move</b>")
         layout.addWidget(lMove1)
         self.leServoPosition = QtGui.QLineEdit()
         self.leServoPosition.setMaximumWidth(50)
@@ -81,6 +90,8 @@ class ServoControlWidget(QtGui.QWidget):
         if not self.checkValue(float(position)):
             return
 
+        self.positionBar.setValue(int(position))
+        self.actualPositionServo.display(position)
         print "Position: " + position
         command = CommandMessage(CommandType.SETSERVOPOS)
         command.addArgument(str(1))

@@ -18,6 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+__author__ = 'Sebastian Ruml'
 
 # This is only needed for Python v2 but is harmless for Python v3.
 import os
@@ -32,15 +33,16 @@ except ImportError:
     sys.exit(2)
 
 import sys
-import serial
 
 from MainPage import MainPage
 from ServoPage import ServoPage
 from EnginePage import EnginePage
 from ReceiverPage import ReceiverPage
-from FlyModePage import FlyModePage
+from ConfigurationPage import ConfigurationPage
+from FlightControlPage import FlightControlPage
+from GpsPage import GpsPage
+from AttitudePage import AttitudePage
 from serial_api import SerialAPI
-from serial_api import CommandMessage, CommandType
 
 class SelectControllerDialog(QtGui.QDialog):
     def __init__(self):
@@ -89,29 +91,24 @@ class MainAppWindow(QtGui.QMainWindow):
         self.createActions()
         self.createMenus()
 
-        self.resize(700, 600)
+        self.resize(700, 700)
         self.setWindowTitle("Matunus")
-        self.statusBar().showMessage("Ready", 5000)
+        self.statusBar().showMessage("Ready", 3000)
 
         self.updateUi()
 
     def createUi(self):
         self.mainLayout = QtGui.QVBoxLayout()
 
-        self.topGroupBox = QtGui.QGroupBox("Connect to Controller")
+        self.topGroupBox = QtGui.QGroupBox("Control")
         topLayout = QtGui.QHBoxLayout()
         self.bConnect = QtGui.QPushButton("Connect")
         self.bConnect.clicked.connect(self.connectToController)
         topLayout.addWidget(self.bConnect)
-        self.bDisconnect = QtGui.QPushButton("Disconnect")
-        self.bDisconnect.clicked.connect(self.disconnectFromController)
-        topLayout.addWidget(self.bDisconnect)
-        lStatus = QtGui.QLabel("Status: ")
-        topLayout.addWidget(lStatus)
-        self.lConnectionStatus = QtGui.QLabel("Here goes the status...")
-        topLayout.addWidget(self.lConnectionStatus)
-        topLayout.insertSpacing(2, 70)
-        topLayout.insertStretch(5)
+        topLayout.addSpacing(15)
+        self.bStartStop = QtGui.QPushButton("Start")
+        topLayout.addWidget(self.bStartStop)
+        topLayout.addStretch()
         lComPort = QtGui.QLabel("Com Port: ")
         topLayout.addWidget(lComPort)
         self.cbComPort = QtGui.QComboBox()
@@ -126,17 +123,37 @@ class MainAppWindow(QtGui.QMainWindow):
         self.topGroupBox.setLayout(topLayout)
         self.mainLayout.addWidget(self.topGroupBox)
 
+        # Status Bar
+        self.lStatusBarLabel = QtGui.QLabel()
+        self.statusBar().addPermanentWidget(self.lStatusBarLabel, 0)
+
+        # Pages
+        self.pages = []
         self.mainContainer = QtGui.QTabWidget()
         self.mainPage = MainPage()
+        self.pages.append(self.mainPage)
         self.mainContainer.addTab(self.mainPage, "Main")
         self.receiverPage = ReceiverPage()
+        self.pages.append(self.receiverPage)
         self.mainContainer.addTab(self.receiverPage, "Receiver")
         self.servoPage = ServoPage(self.serial)
+        self.pages.append(self.servoPage)
         self.mainContainer.addTab(self.servoPage, "Servo")
         self.enginePage = EnginePage()
+        self.pages.append(self.enginePage)
         self.mainContainer.addTab(self.enginePage, "Engine")
-        self.flyModePage = FlyModePage()
-        self.mainContainer.addTab(self.flyModePage, "Flight Control")
+        self.attitudePage = AttitudePage()
+        self.pages.append(self.attitudePage)
+        self.mainContainer.addTab(self.attitudePage, "Attitude")
+        self.gpsPage = GpsPage()
+        self.pages.append(self.gpsPage)
+        self.mainContainer.addTab(self.gpsPage, "GPS")
+        self.flightControlPage = FlightControlPage()
+        self.pages.append(self.flightControlPage)
+        self.mainContainer.addTab(self.flightControlPage, "Flight Control")
+        self.configurationPage = ConfigurationPage()
+        self.pages.append(self.configurationPage)
+        self.mainContainer.addTab(self.configurationPage, "Configuration")
         self.mainLayout.addWidget(self.mainContainer)
 
         widget = QtGui.QWidget()
@@ -145,46 +162,47 @@ class MainAppWindow(QtGui.QMainWindow):
 
     def createMenus(self):
         self.fileMenu = self.menuBar().addMenu("&File")
+        self.settingsMenu = self.menuBar().addMenu("&Settings")
         self.helpMenu = self.menuBar().addMenu("&Help")
         self.fileMenu.addAction(self.exitAction)
+        self.settingsMenu.addAction(self.settingsAction)
 
     def createActions(self):
         self.exitAction = QtGui.QAction("&Exit", self)
         self.exitAction.setShortcut('Ctrl+Q')
         self.exitAction.setStatusTip("Exit application")
         self.exitAction.triggered.connect(QtGui.qApp.quit)
+        self.settingsAction = QtGui.QAction("&Settings", self)
+        self.settingsAction.setShortcut('Ctrl+S')
+        self.settingsAction.setStatusTip("Settings")
 
     def updateUi(self):
         if self.serial.connected:
-            self.lConnectionStatus.setText("<b>Connected</b>")
-            self.bConnect.setEnabled(False)
-            self.bDisconnect.setEnabled(True)
+            self.lStatusBarLabel.setText("<b>Connected</b>")
         else:
-            self.lConnectionStatus.setText("<b>Disconnected</b>")
-            self.bConnect.setEnabled(True)
-            self.bDisconnect.setEnabled(False)
+            self.lStatusBarLabel.setText("<b>Disconnected</b>")
 
     def connectToController(self):
-        print "Connecting to controller..."
-        self.statusBar().showMessage("Connecting to controller...", 2000)
+        if not self.serial.connected:
+            self.statusBar().showMessage("Connecting to controller...", 2000)
 
-        self.serial.connect()
-        #self.serial.writeCommand(CommandMessage(CommandType.LEDSON))
-        self.statusBar().showMessage("Connected!", 2000)
-        self.updateUi()
-        self.mainPage.setSystemStatus("Ready")
-        self.mainPage.setSystemMessage("Connected to the controller")
-
-    def disconnectFromController(self):
-        print "Disconnecting from controller..."
-
-        if self.serial is not None and self.serial.connected:
+            self.serial.connect()
+            #self.serial.writeCommand(CommandMessage(CommandType.LEDSON))
+            self.statusBar().showMessage("Connected!", 2000)
+            self.lStatusBarLabel.setText("<b>Connected</b>")
+            self.updateUi()
+            self.mainPage.setSystemStatus("Ready")
+            self.mainPage.setSystemMessage("Connected to the controller")
+            self.bConnect.setText("<b>Disconnect</b>")
+        elif self.serial.connected:
             #self.serial.writeCommand(CommandMessage(CommandType.LEDSOFF))
             self.serial.disconnect()
             self.statusBar().showMessage("Disconnected!", 2000)
+            self.lStatusBarLabel.setText("<b>Connected</b>")
             self.updateUi()
             self.mainPage.setSystemStatus("Off")
             self.mainPage.setSystemMessage("Disconnected from the controller")
+            self.bConnect.setText("<b>Connect</b>")
 
     def selectControllerClicked(self):
         print "Select controller clicked"

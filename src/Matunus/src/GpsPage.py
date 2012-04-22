@@ -9,13 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+__author__ = 'sruml'
 
 # This is only needed for Python v2 but is harmless for Python v3.
 import sip
@@ -28,7 +29,11 @@ except ImportError:
     import sys
     sys.exit(2)
 
-
-class FlyModePage(QtGui.QWidget):
+class GpsPage(QtGui.QWidget):
     def __init__(self):
-        super(FlyModePage, self).__init__()
+        super(GpsPage, self).__init__()
+
+        self.createUi()
+
+    def createUi(self):
+        pass

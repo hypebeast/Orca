@@ -1,3 +1,5 @@
+__author__ = 'Sebastian Ruml'
+
 # Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
 # This file is part of the Matunus project (part of the Orcacopter project)
@@ -56,6 +58,12 @@ class StatusLabel(QtGui.QFrame):
         layout.addWidget(self.label)
 
         self.text = ""
+
+    def setBackgroundColor(self, color):
+        pass
+
+    def setTextColor(self, color):
+        pass
 
     def setText(self, text):
         self.text = text

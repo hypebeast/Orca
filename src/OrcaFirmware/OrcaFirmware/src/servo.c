@@ -9,6 +9,7 @@
 
 #include "servo.h"
 
+
 volatile uint16_t servo_compare_period[2];
 
 
@@ -23,13 +24,21 @@ static void servo1_cca_overflow_callback()
 }
 
 /**
+* \brief Calculates and sets the right frequency for the timer.
+*/
+void servo_set_frequency()
+{
+	// TODO
+	uint32_t cpu_hz = sysclk_get_cpu_hz();
+}
+
+/**
 * \brief This function initializes the servo subsystem.
 *
 */
 void servo_init()
 {	
 	servo_compare_period[0] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;
-	//servo_compare_period[0] = 945;
 	servo_compare_period[1] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;
 	
 	// Enable timer/counter TCC0
@@ -56,7 +65,7 @@ void servo_init()
 /**
 * \brief This function sets the position for servo 1 or 2.
 */
-void set_servo_pos(uint16_t servo_nr, uint16_t pos)
+void servo_set_pos_degree(uint8_t servo_nr, float pos)
 {
 	if (pos < 0 || pos > 180)
 		return;
@@ -76,7 +85,7 @@ void set_servo_pos(uint16_t servo_nr, uint16_t pos)
 /**
 * \brief This function returns the actual position of a servo in degrees.
 */
-uint16_t get_servo_pos(uint8_t servo_nr)
+uint16_t servo_get_pos_degree(uint8_t servo_nr)
 {
 	float pos = 0;
 	
