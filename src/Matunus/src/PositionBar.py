@@ -33,7 +33,7 @@ class PositionBar(QtGui.QWidget):
     def __init__(self):
         super(PositionBar, self).__init__()
 
-        self.value = 75
+        self.value = 0
         self.maxValue = 180
         self.minValue = 0
 
@@ -126,7 +126,7 @@ class PositionBar(QtGui.QWidget):
         p6 = QtCore.QPoint(cursorXStart, cursorYStart - self.cursorHeight)
         qp.drawPolygon(p4, p5, p6)
 
-        # Draw the connecting line
+        # Draw the connection line
         pen = QtGui.QPen()
         pen.setStyle(QtCore.Qt.SolidLine)
         pen.setBrush(self.cursorColor)

@@ -258,7 +258,7 @@ void serial_api_task(void)
 			}
 			break;
 			
-		// CR receiced
+		// CR received
 		case '\r':
 			command_buff.cr_received = true;
 			break;
