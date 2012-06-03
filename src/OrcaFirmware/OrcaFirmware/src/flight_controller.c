@@ -15,7 +15,7 @@
  */ 
 
 #include "flight_controller.h"
-#include "orca_board.h"
+#include "user_board.h"
 #include "system_info.h"
 
 void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FLIGHT_CONTROLLER_t *flightController)

@@ -10,7 +10,7 @@
 #define ORCA_INIT_H_
 
 #include<stdint.h>
-#include"orca_board.h"
+#include"user_board.h"
 
 void orca_board_init(BOARD_CONFIG_t *board);
 

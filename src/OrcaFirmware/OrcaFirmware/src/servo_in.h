@@ -10,7 +10,7 @@
 #define SERVO_IN_H_
 
 #include<stdint.h>
-#include "orca_board.h"
+#include "user_board.h"
 
 #define SERVO_IN_DEFAULT_VALUE			0x00		/*!< brief Inittialisation default servo value */		
 

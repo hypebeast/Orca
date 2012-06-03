@@ -71,26 +71,12 @@ static void test_command(int argc, char **argv)
 
 static void leds_on(int argc, char **argv)
 {
-	gpio_set_pin_low(LED0);
-	gpio_set_pin_low(LED1);
-	gpio_set_pin_low(LED2);
-	gpio_set_pin_low(LED3);
-	gpio_set_pin_low(LED4);
-	gpio_set_pin_low(LED5);
-	gpio_set_pin_low(LED6);
-	gpio_set_pin_low(LED7);
+
 }
 
 static void leds_off(int argc, char **argv)
 {
-	gpio_set_pin_high(LED0);
-	gpio_set_pin_high(LED1);
-	gpio_set_pin_high(LED2);
-	gpio_set_pin_high(LED3);
-	gpio_set_pin_high(LED4);
-	gpio_set_pin_high(LED5);
-	gpio_set_pin_high(LED6);
-	gpio_set_pin_high(LED7);
+
 }
 
 /**

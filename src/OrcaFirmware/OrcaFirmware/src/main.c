@@ -17,9 +17,9 @@
 #include <osc.h>
 
 //just for test
-#include "orca_board.h"
+#include "user_board.h"
 #include "orca_init.h"
-#include"servo_in.h"
+#include "servo_in.h"
 #include "servo.h"
 #include "flight_controller.h"
 
@@ -43,7 +43,7 @@ int main (void)
 	Stat_LED_ON();
 	Err_LED_ON();
 	
-	servo_set_pos_degree(1,180);
+	servo_set_pos_degree(1,90);
 	while(1)
 	{
 		// Process incoming api commands
