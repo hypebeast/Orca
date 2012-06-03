@@ -16,7 +16,7 @@
 #include <stdlib.h>
 
 #include "servo.h"
-#include "orca_board.h"
+#include "user_board.h"
 
 #define USART_SERIAL_API	             BOARD_USART_USB_INTERFACE
 #define USART_SERIAL_API_BAUDRATE		 9600
