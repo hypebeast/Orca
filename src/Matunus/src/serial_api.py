@@ -27,7 +27,7 @@ NEWLINE_CONVERISON_MAP = ('\n', '\r', '\r\n')
 LF_MODES = ('LF', 'CR', 'CR/LF')
 NEWLINECHARACTER = '\r\n'
 
-DEFAULT_PORT = None
+DEFAULT_PORT = 0
 DEFAULT_BAUDRATE = 9600
 DEFAULT_PARITY = serial.PARITY_NONE
 DEFAULT_BYTESIZE = serial.EIGHTBITS
@@ -45,6 +45,13 @@ else:
     def character(b):
         return b
 
+class SerialError(Exception):
+    def __init__(self, msg):
+        Exception.__init__(self)
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
 
 class CommandType:
     TEST = "test"
@@ -72,8 +79,12 @@ class CommandMessage:
 
 
 class SerialAPI:
-    def __init__(self, port="0", baudrate=DEFAULT_BAUDRATE, parity=DEFAULT_PARITY, bytesize=DEFAULT_BYTESIZE,
-                 stopbits=DEFAULT_STOPBITS, xonxoff=DEFAULT_XONXOFF):
+    def __init__(self, port=DEFAULT_PORT,
+                 baudrate=DEFAULT_BAUDRATE,
+                 parity=DEFAULT_PARITY,
+                 bytesize=DEFAULT_BYTESIZE,
+                 stopbits=DEFAULT_STOPBITS,
+                 xonxoff=DEFAULT_XONXOFF):
         self.serial_connection = None
         self.port = port
         self.baudrate = baudrate
@@ -104,12 +115,20 @@ class SerialAPI:
             self.serial_connection = None
 
         try:
-            self.serial_connection = serial.serial_for_url(self.port, self.baudrate, parity=self.parity,
-                bytesize=self.bytesize, xonxoff=self.xonxoff, rtscts=False, dsrdtr=False, timeout=1)
+            self.serial_connection = serial.serial_for_url(self.port,
+                                            self.baudrate,
+                                            parity=self.parity,
+                                            bytesize=self.bytesize,
+                                            xonxoff=self.xonxoff,
+                                            rtscts=False,
+                                            dsrdtr=False,
+                                            timeout=1)
             #self.serial_connection = serial.Serial(self.port)
             self.connected = True
-        except:
-            raise
+        except serial.SerialException as ex:
+            #errors = [ error.msg for error in ex.strerror ]
+            #errors = ";".join(errors)
+            raise SerialError("Could not connect to COM Port %s: %s" % (self.port, ex.strerror))
 
         # Start reader thread
         self.start_reader()
@@ -122,6 +141,18 @@ class SerialAPI:
             self.serial_connection.close()
             self.serial_connection = None
             self.connected = False
+
+    def set_port(self, port):
+        if port is None:
+            return
+
+        self.port = port
+
+    def set_baudrate(self, baudrate):
+        if baudrate is None or baudrate < 0:
+            return
+
+        self.baudrate = baudrate
 
     def writeCommand(self, command):
         if self.serial_connection is None or not self.connected:

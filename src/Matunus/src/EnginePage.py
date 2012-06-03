@@ -28,7 +28,64 @@ except ImportError:
     import sys
     sys.exit(2)
 
+from EngineControlWidget import EngineControlWidget
+from EngineControlWidget import Engines
+
 
 class EnginePage(QtGui.QWidget):
-    def __init__(self):
+    def __init__(self, serial=None):
         super(EnginePage, self).__init__()
+
+        if serial is None:
+        	raise Exception()
+
+        self.serial_connection = serial
+
+        # Create the GUI
+        self.create_ui()
+
+    def create_ui(self):
+    	mainLayout = QtGui.QVBoxLayout()
+
+        # Engine 1 (left)
+        groupBox1 = QtGui.QGroupBox("Engine 1 (Left)")
+        groupBox1.setMinimumHeight(70)
+        self.engine_left_control = EngineControlWidget(self.serial_connection, Engines.EngineLeft)
+        hBox = QtGui.QHBoxLayout()
+        hBox.setMargin(2)
+        hBox.addWidget(self.engine_left_control)
+        groupBox1.setLayout(hBox)
+        mainLayout.addWidget(groupBox1)
+
+        # Engine 2 (right)
+        groupBox2 = QtGui.QGroupBox("Engine 2 (Right)")
+        groupBox2.setMinimumHeight(70)
+        self.engine_right_control = EngineControlWidget(self.serial_connection, Engines.EngineRight)
+        hBox = QtGui.QHBoxLayout()
+        hBox.setMargin(2)
+        hBox.addWidget(self.engine_right_control)
+        groupBox2.setLayout(hBox)
+        mainLayout.addWidget(groupBox2)
+
+        # Engine 3 (tail)
+        groupBox3 = QtGui.QGroupBox("Engine 3 (Tail)")
+        groupBox3.setMinimumHeight(70)
+        self.engine_tail_control = EngineControlWidget(self.serial_connection, Engines.EngineTail)
+        hBox = QtGui.QHBoxLayout()
+        hBox.setMargin(2)
+        hBox.addWidget(self.engine_tail_control)
+        groupBox3.setLayout(hBox)
+        mainLayout.addWidget(groupBox3)
+
+        # All engines
+        groupBox4 = QtGui.QGroupBox("All Engines")
+        groupBox4.setMinimumHeight(150)
+        mainLayout.addWidget(groupBox4)
+
+        # Configuration
+        groupBox5 = QtGui.QGroupBox("Configuration")
+        groupBox5.setMinimumHeight(100)
+        mainLayout.addWidget(groupBox5)
+        mainLayout.addStretch()
+
+        self.setLayout(mainLayout)

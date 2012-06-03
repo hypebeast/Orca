@@ -43,6 +43,9 @@ from FlightControlPage import FlightControlPage
 from GpsPage import GpsPage
 from AttitudePage import AttitudePage
 from serial_api import SerialAPI
+from serial_api import SerialError
+from SettingsDialog import SettingsDialog
+
 
 class SelectControllerDialog(QtGui.QDialog):
     def __init__(self):
@@ -77,21 +80,47 @@ class MainAppWindow(QtGui.QMainWindow):
 
         # Serial connection
         if os.name == 'nt':
-            self.comPortsWindows = {'COM1' : 1, 'COM2' : 2, 'COM3' : 3, 'COM4' : 4,'COM5' : 5,
-                                    'COM6' : 6, 'COM7' : 7, 'COM8' : 8, 'COM9' : 9, 'COM10' : 10,
-                                    'COM11' : 11, 'COM12' : 12, 'COM13' : 13, 'COM14' : 14, 'COM15' : 15}
-            self.comPortsLinux = {'/dev/ttys1'}
-            self.serial = SerialAPI(5, 9600)
+            self.comPorts = [{'name': u"COM1", "value": 0},
+                             {'name': u"COM2", "value": 1},
+                             {'name': u"COM3", "value": 2},
+                             {'name': u"COM4", "value": 3},
+                             {'name': u"COM5", "value": 4},
+                             {'name': u"COM6", "value": 5},
+                             {'name': u"COM7", "value": 6},
+                             {'name': u"COM8", "value": 7},
+                             {'name': u"COM9", "value": 8},
+                             {'name': u"COM10", "value": 9},
+                             {'name': u"COM11", "value": 10},
+                             {'name': u"COM12", "value": 11},
+                             {'name': u"COM13", "value": 12},
+                             {'name': u"COM14", "value": 13},
+                             {'name': u"COM15", "value": 14}]
         elif os.name == 'posix':
-            pass
+            self.comPorts = [{"name": u"/dev/ttys0", "value": 0},
+                             {"name": u"/dev/ttys1", "value": 1},
+                             {"name": u"/dev/ttys2", "value": 2},
+                             {"name": u"/dev/ttys3", "value": 3},
+                             {"name": u"/dev/ttys4", "value": 4},
+                             {"name": u"/dev/ttys5", "value": 5},
+                             {"name": u"/dev/ttys6", "value": 6},
+                             {"name": u"/dev/ttys7", "value": 7},
+                             {"name": u"/dev/ttys8", "value": 8},
+                             {"name": u"/dev/ttys9", "value": 9},
+                             {"name": u"/dev/ttys10", "value": 10},
+                             ]
         else:
             raise NotImplementedError("Sorry no implementation for your platform (%s) available." % sys.platform)
+
+        self.serial_connection = SerialAPI()
+        self.serial_connection.set_port(0)
+
+        # TODO: Loading configuration
 
         self.createUi()
         self.createActions()
         self.createMenus()
 
-        self.resize(700, 700)
+        self.resize(750, 700)
         self.setWindowTitle("Matunus")
         self.statusBar().showMessage("Ready", 3000)
 
@@ -106,16 +135,17 @@ class MainAppWindow(QtGui.QMainWindow):
         self.bConnect.clicked.connect(self.connectToController)
         topLayout.addWidget(self.bConnect)
         topLayout.addSpacing(15)
-        self.bStartStop = QtGui.QPushButton("Start")
-        topLayout.addWidget(self.bStartStop)
+        #self.bStartStop = QtGui.QPushButton("Start")
+        #topLayout.addWidget(self.bStartStop)
         topLayout.addStretch()
         lComPort = QtGui.QLabel("Com Port: ")
         topLayout.addWidget(lComPort)
         self.cbComPort = QtGui.QComboBox()
-        comNames = self.comPortsWindows.keys()
-        comNames.sort()
-        for name in comNames:
-            self.cbComPort.addItem(name)
+        #comNames = self.comPortsWindows.keys()
+        #comNames.sort()
+        for comPort in self.comPorts:
+            self.cbComPort.addItem(comPort["name"])
+        self.cbComPort.currentIndexChanged.connect(self.comPortChanged)
         #self.bSelectController = QtGui.QPushButton("Select Controller...")
         #self.bSelectController.clicked.connect(self.selectControllerClicked)
         #topLayout.addWidget(self.bSelectController)
@@ -133,24 +163,24 @@ class MainAppWindow(QtGui.QMainWindow):
         self.mainPage = MainPage()
         self.pages.append(self.mainPage)
         self.mainContainer.addTab(self.mainPage, "Main")
+        self.flightControlPage = FlightControlPage()
+        self.pages.append(self.flightControlPage)
+        self.mainContainer.addTab(self.flightControlPage, "Flight Control")
+        self.enginePage = EnginePage(self.serial_connection)
+        self.pages.append(self.enginePage)
+        self.mainContainer.addTab(self.enginePage, "Engine")
+        self.servoPage = ServoPage(self.serial_connection)
+        self.pages.append(self.servoPage)
+        self.mainContainer.addTab(self.servoPage, "Servo")
         self.receiverPage = ReceiverPage()
         self.pages.append(self.receiverPage)
         self.mainContainer.addTab(self.receiverPage, "Receiver")
-        self.servoPage = ServoPage(self.serial)
-        self.pages.append(self.servoPage)
-        self.mainContainer.addTab(self.servoPage, "Servo")
-        self.enginePage = EnginePage()
-        self.pages.append(self.enginePage)
-        self.mainContainer.addTab(self.enginePage, "Engine")
         self.attitudePage = AttitudePage()
         self.pages.append(self.attitudePage)
         self.mainContainer.addTab(self.attitudePage, "Attitude")
         self.gpsPage = GpsPage()
         self.pages.append(self.gpsPage)
         self.mainContainer.addTab(self.gpsPage, "GPS")
-        self.flightControlPage = FlightControlPage()
-        self.pages.append(self.flightControlPage)
-        self.mainContainer.addTab(self.flightControlPage, "Flight Control")
         self.configurationPage = ConfigurationPage()
         self.pages.append(self.configurationPage)
         self.mainContainer.addTab(self.configurationPage, "Configuration")
@@ -175,32 +205,46 @@ class MainAppWindow(QtGui.QMainWindow):
         self.settingsAction = QtGui.QAction("&Settings", self)
         self.settingsAction.setShortcut('Ctrl+S')
         self.settingsAction.setStatusTip("Settings")
+        self.settingsAction.triggered.connect(self.showSettingsDialog)
 
     def updateUi(self):
-        if self.serial.connected:
+        if self.serial_connection.connected:
             self.lStatusBarLabel.setText("<b>Connected</b>")
+            self.cbComPort.setEnabled(False)
         else:
             self.lStatusBarLabel.setText("<b>Disconnected</b>")
+            self.cbComPort.setEnabled(True)
 
     def connectToController(self):
-        if not self.serial.connected:
+        if not self.serial_connection.connected:
             self.statusBar().showMessage("Connecting to controller...", 2000)
 
-            self.serial.connect()
-            #self.serial.writeCommand(CommandMessage(CommandType.LEDSON))
-            self.statusBar().showMessage("Connected!", 2000)
-            self.lStatusBarLabel.setText("<b>Connected</b>")
-            self.updateUi()
-            self.mainPage.setSystemStatus("Ready")
-            self.mainPage.setSystemMessage("Connected to the controller")
-            self.bConnect.setText("<b>Disconnect</b>")
-        elif self.serial.connected:
-            #self.serial.writeCommand(CommandMessage(CommandType.LEDSOFF))
-            self.serial.disconnect()
+            try:    
+                self.serial_connection.connect()
+
+                #self.serial_connection.writeCommand(CommandMessage(CommandType.LEDSON))
+                self.statusBar().showMessage("Connected!", 2000)
+                self.lStatusBarLabel.setText("<b>Connected</b>")
+                self.updateUi()
+                self.mainPage.setSystemStatus("Ready")
+                self.mainPage.setSystemMessage("Connected to the controller")
+                self.bConnect.setText("<b>Disconnect</b>")
+            except SerialError as ex:
+                msgBox = QtGui.QMessageBox()
+                msgBox.setWindowTitle("Serial Error")
+                msgBox.setText("Can't connect to the controller")
+                msgBox.setInformativeText(ex.msg)
+                msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
+                msgBox.setIcon(QtGui.QMessageBox.Warning)
+                msgBox.exec_()
+            
+        elif self.serial_connection.connected:
+            #self.serial_connection.writeCommand(CommandMessage(CommandType.LEDSOFF))
+            self.serial_connection.disconnect()
             self.statusBar().showMessage("Disconnected!", 2000)
             self.lStatusBarLabel.setText("<b>Connected</b>")
             self.updateUi()
-            self.mainPage.setSystemStatus("Off")
+            self.mainPage.setSystemStatus("Not Connected")
             self.mainPage.setSystemMessage("Disconnected from the controller")
             self.bConnect.setText("<b>Connect</b>")
 
@@ -209,6 +253,13 @@ class MainAppWindow(QtGui.QMainWindow):
         dialog = SelectControllerDialog()
         dialog.setModal(True)
         dialog.show()
+
+    def comPortChanged(self, index):
+        self.serial_connection.set_port(self.comPorts[index]["value"])
+
+    def showSettingsDialog(self):
+        dlg = SettingsDialog()
+        dlg.exec_()
 
 
 class App():

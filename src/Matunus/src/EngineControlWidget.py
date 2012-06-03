@@ -34,15 +34,21 @@ from serial_api import CommandMessage, CommandType
 from PositionBar import PositionBar
 
 
-class ServoControlWidget(QtGui.QWidget):
-    def __init__(self, serial=None, servo_nr=1):
-        super(ServoControlWidget, self).__init__()
+class Engines:
+    EngineLeft = 0
+    EngineRight = 1
+    EngineTail = 2
+
+
+class EngineControlWidget(QtGui.QWidget):
+    def __init__(self, serial=None, engine_nr=Engines.EngineLeft):
+        super(EngineControlWidget, self).__init__()
 
         self.serial_connection = serial
 
-        self.servo_nr = servo_nr
+        self.engine_nr = engine_nr
         self.minValue = 0
-        self.maxValue = 180
+        self.maxValue = 100
 
         self.createUi()
 
@@ -54,20 +60,21 @@ class ServoControlWidget(QtGui.QWidget):
         layout.setMargin(2)
         layout.addSpacing(5)
         
-        lActualPosition = QtGui.QLabel("<b>Current Pos</b>")
-        layout.addWidget(lActualPosition)
-        layout.addSpacing(10)
-
-        self.actualPositionServo = QtGui.QLCDNumber()
-        self.actualPositionServo.setMaximumHeight(25)
-        self.actualPositionServo.setPalette(palette)
-        self.actualPositionServo.setSegmentStyle(QtGui.QLCDNumber.Filled)
-        layout.addWidget(self.actualPositionServo)
-        layout.addSpacing(30)
-
-        lMove1 = QtGui.QLabel("<b>Setpoint</b>")
-        layout.addWidget(lMove1)
+        lCurrentVelocity = QtGui.QLabel("<b>Current Velocity</b>")
+        layout.addWidget(lCurrentVelocity)
+        layout.addSpacing(5)
         
+        self.currentVelocity = QtGui.QLCDNumber()
+        self.currentVelocity.setMaximumHeight(25)
+        self.currentVelocity.setPalette(palette)
+        self.currentVelocity.setSegmentStyle(QtGui.QLCDNumber.Filled)
+        layout.addWidget(self.currentVelocity)
+        layout.addSpacing(30)
+        
+        lSetpoint = QtGui.QLabel("<b>Setpoint</b>")
+        layout.addWidget(lSetpoint)
+        layout.addSpacing(5)
+
         self.positionBar = PositionBar()
         self.positionBar.setMinimumWidth(200)
         self.positionBar.setMinimumHeight(15)
@@ -75,20 +82,22 @@ class ServoControlWidget(QtGui.QWidget):
         self.positionBar.setValue(0)
         self.positionBar.setBarColor(QtGui.QColor(0,0,255))
         layout.addWidget(self.positionBar)
-        #layout.addSpacing(50)
+        #layout.addSpacing(5)
         
+
         self.leServoPosition = QtGui.QLineEdit()
         self.leServoPosition.setMaximumWidth(50)
         layout.addWidget(self.leServoPosition)
         layout.addSpacing(30)
+
+        self.bStartEngine = QtGui.QPushButton("Start")
+        self.bStartEngine.clicked.connect(self.startEngine)
+        layout.addWidget(self.bStartEngine)
         
-        self.startServo = QtGui.QPushButton("Start")
-        self.startServo.clicked.connect(self.startMoveServo)
-        layout.addWidget(self.startServo)
         layout.addStretch()
         self.setLayout(layout)
 
-    def startMoveServo(self):
+    def startEngine(self):
         try:
             position = self.leServoPosition.displayText()
         except:

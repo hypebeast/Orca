@@ -47,7 +47,7 @@ class ServoPage(QtGui.QWidget):
         palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor(111, 88, 100))
 
         # Servo 1
-        groupBox1 = QtGui.QGroupBox("Servo 1")
+        groupBox1 = QtGui.QGroupBox("Servo 1 (Left)")
         groupBox1.setMinimumHeight(70)
         self.servo1Control = ServoControlWidget(self.serial_connection)
         hBox = QtGui.QHBoxLayout()
@@ -57,7 +57,7 @@ class ServoPage(QtGui.QWidget):
         mainLayout.addWidget(groupBox1)
 
         # Servo 2
-        groupBox2 = QtGui.QGroupBox("Servo 2")
+        groupBox2 = QtGui.QGroupBox("Servo 2 (Right)")
         groupBox2.setMinimumHeight(70)
         self.servo2Control = ServoControlWidget(self.serial_connection)
         hBox = QtGui.QHBoxLayout()
@@ -65,6 +65,12 @@ class ServoPage(QtGui.QWidget):
         hBox.addWidget(self.servo2Control)
         groupBox2.setLayout(hBox)
         mainLayout.addWidget(groupBox2)
+        #mainLayout.addStretch()
+
+        # Configuration
+        groupBox3 = QtGui.QGroupBox("Configuration")
+        groupBox3.setMinimumHeight(200)
+        mainLayout.addWidget(groupBox3)
         mainLayout.addStretch()
 
         self.setLayout(mainLayout)
