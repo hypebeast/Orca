@@ -16,8 +16,9 @@
 #include <stdlib.h>
 
 #include "servo.h"
+#include "orca_board.h"
 
-#define USART_SERIAL_API	             &USARTC0
+#define USART_SERIAL_API	             BOARD_USART_USB_INTERFACE
 #define USART_SERIAL_API_BAUDRATE		 9600
 #define USART_SERIAL_CHAR_LENGTH         USART_CHSIZE_8BIT_gc
 #define USART_SERIAL_PARITY              USART_PMODE_DISABLED_gc

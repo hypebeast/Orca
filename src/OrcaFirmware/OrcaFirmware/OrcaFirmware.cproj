@@ -261,6 +261,15 @@
     <Compile Include="src\asf\xmega\drivers\nvm\nvm.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\servo_in.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\servo_in.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\system_info.h">
+      <SubType>compile</SubType>
+    </Compile>
     <None Include="src\asf\xmega\drivers\nvm\nvm.h">
       <SubType>compile</SubType>
     </None>
@@ -277,6 +286,15 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\flight_controller.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\orca_board.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\orca_init.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\orca_init.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\receiver.c">
