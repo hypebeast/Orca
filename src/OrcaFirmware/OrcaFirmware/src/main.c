@@ -9,7 +9,6 @@
  * Include header files for all drivers that have been imported from
  * Atmel Software Framework (ASF).
  */
-#define CONFIG_SYSCLK_SOURCE    SYSCLK_SRC_RC32MHZ
 
 #include <asf.h>
 #include <pmic.h>
@@ -47,17 +46,10 @@ int main (void)
 	servo_set_pos_degree(1,180);
 	while(1)
 	{
-		nop();
-	}
-	
-	// Initialize the serial interface
-	//serial_api_init();
-	
-	/*while (true) {
-		
 		// Process incoming api commands
 		serial_api_task();
-	} */
+	}
+	
 }
 
 void orca_init()
@@ -83,6 +75,9 @@ void orca_init()
 	/* flight controller subsystem init */
 	flight_controller_init(&board, &servoIn, &flightController);
 
+	/* Initialize the serial interface */
+	serial_api_init();
+	
 	//tc_enable(&TCC0);
 	//tc_set_overflow_interrupt_callback(&TCC0, ISR_system_timer);
 	//tc_set_wgm(&TCC0, TC_WG_NORMAL);
