@@ -1,14 +1,7 @@
-/*
- * orca_board.h
- *
- * Created: 07.04.2012 18:08:20
- *  Author: f-ruml
- */ 
-
 /**
  * \file orca_board.h
  *
- * \brief Header file for board definitons
+ * \brief Header file for board definitions.
  *
  * Copyright (c) 2012 Fabian Ruml <fabian.ruml@gmail.com>
  *
