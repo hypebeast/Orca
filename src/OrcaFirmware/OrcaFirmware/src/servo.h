@@ -16,10 +16,10 @@
 #include "pwm.h"
 
 #define SERVO1_TIMER TCC1
-#define SERVO_F_CPU 2000000.0f // TODO: Remove this constant!
+#define SERVO_F_CPU 32000000.0f // TODO: Remove this constant!
 #define SERVO_TIMER_OVERFLOW_PERIOD 20 // PWM period (in ms)
-#define SERVO_PRESCALER_VALUE 1 // Prescaler value
-#define SERVO_TICK_DURATION ((1.0f/(SERVO_F_CPU * SERVO_PRESCALER_VALUE)) * 1000) // Time for one tick (in ms)
+#define SERVO_PRESCALER_VALUE 8 // Prescaler value
+#define SERVO_TICK_DURATION ((1.0f * SERVO_PRESCALER_VALUE/SERVO_F_CPU ) * 1000) // Time for one tick (in ms)
 #define SERVO_PWM_TOP_VALUE ((SERVO_TIMER_OVERFLOW_PERIOD/ SERVO_TICK_DURATION) - 1) // PRESCALER = 1
 #define SERVO_LOWER_PULSE_WIDTH 0.49f // in ms
 #define SERVO_UPPER_PULSE_WIDTH 2.35f // in ms

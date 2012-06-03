@@ -1,9 +1,3 @@
-/*
- * orca_board.h
- *
- * Created: 07.04.2012 18:08:20
- *  Author: f-ruml
- */ 
 
 /**
  * \file orca_board.h
@@ -19,18 +13,39 @@
 
 /*! \brief Define the no operation macro. */
 #define nop()   do { __asm__ __volatile__ ("nop"); } while (0)
+
+
+//#define CONFIG_SYSCLK_SOURCE          SYSCLK_SRC_RC2MHZ
+#define CONFIG_SYSCLK_SOURCE        SYSCLK_SRC_RC32MHZ
+//#define CONFIG_SYSCLK_SOURCE        SYSCLK_SRC_RC32KHZ
+//#define CONFIG_SYSCLK_SOURCE        SYSCLK_SRC_XOSC
+//#define CONFIG_SYSCLK_SOURCE        SYSCLK_SRC_PLL
 	
 //---------------------------------------------------------------------
 //	GPIO Connections Of PWM Servo Output
+// Servo Output mapping :
+// *Servo 1 -> EDF left
+// *Servo 2 -> EDF right
+// *Servo 3 -> Servo left
+// *Servo 4 -> Servo right
+// *Servo 5 -> EDF rear
+// *Servo 6 -> Out 6
 //---------------------------------------------------------------------
-//#define BOARD_SERVO_OUT_1_PIN		PIN4_bm					/*!< \brief PWM Servo 1 Out PIN*/
-//#define BOARD_SERVO_OUT_1_PORT		&PORTC					/*!< \brief PWM Servo 1 Out PORT*/
-#define BOARD_SERVO_OUT_1_GPIO		IOPORT_CREATE_PIN(PORTC, 4)		/*!< \brief PWM Servo 1 Out */
-#define BOARD_SERVO_OUT_2_GPIO		IOPORT_CREATE_PIN(PORTC, 5)		/*!< \brief PWM Servo 2 Out */
-#define BOARD_SERVO_OUT_3_GPIO		IOPORT_CREATE_PIN(PORTD, 4)		/*!< \brief PWM Servo 3 Out */
-#define BOARD_SERVO_OUT_4_GPIO		IOPORT_CREATE_PIN(PORTD, 5)		/*!< \brief PWM Servo 4 Out */
-#define BOARD_SERVO_OUT_5_GPIO		IOPORT_CREATE_PIN(PORTE, 4)		/*!< \brief PWM Servo 5 Out */
-#define BOARD_SERVO_OUT_6_GPIO		IOPORT_CREATE_PIN(PORTE, 5)		/*!< \brief PWM Servo 6 Out */
+//#define BOARD_SERVO_OUT_1_PIN		PIN4_bm							/*!< \brief PWM Servo 1 Out PIN*/
+//#define BOARD_SERVO_OUT_1_PORT		&PORTC						/*!< \brief PWM Servo 1 Out PORT*/
+
+//#define BOARD_SERVO_OUT_1_GPIO		IOPORT_CREATE_PIN(PORTC, 4)		/*!< \brief PWM Servo 1 Out */
+//#define BOARD_SERVO_OUT_2_GPIO		IOPORT_CREATE_PIN(PORTC, 5)		/*!< \brief PWM Servo 2 Out */
+//#define BOARD_SERVO_OUT_3_GPIO		IOPORT_CREATE_PIN(PORTD, 4)		/*!< \brief PWM Servo 3 Out */
+//#define BOARD_SERVO_OUT_4_GPIO		IOPORT_CREATE_PIN(PORTD, 5)		/*!< \brief PWM Servo 4 Out */
+//#define BOARD_SERVO_OUT_5_GPIO		IOPORT_CREATE_PIN(PORTE, 4)		/*!< \brief PWM Servo 5 Out */
+
+#define BOARD_SERVO_OUT_EDF_LEFT_GPIO		IOPORT_CREATE_PIN(PORTC, 4)		/*!< \brief PWM EDF Left Out */
+#define BOARD_SERVO_OUT_EDF_RIGHT_GPIO		IOPORT_CREATE_PIN(PORTC, 5)		/*!< \brief PWM EDF Right Out */
+#define BOARD_SERVO_OUT_SERVO_LEFT			IOPORT_CREATE_PIN(PORTD, 4)		/*!< \brief PWM Servo Left Out */
+#define BOARD_SERVO_OUT_SERVO_RIGHT			IOPORT_CREATE_PIN(PORTD, 5)		/*!< \brief PWM Servo Right Out */
+#define BOARD_SERVO_OUT_EDF_REAR			IOPORT_CREATE_PIN(PORTE, 4)		/*!< \brief PWM Servo EDF Rear Out */
+#define BOARD_SERVO_OUT_6_GPIO				IOPORT_CREATE_PIN(PORTE, 5)		/*!< \brief PWM Servo 6 Out */
 
 //---------------------------------------------------------------------
 //	GPIO Connections Of Servo Input
@@ -58,7 +73,9 @@
 #define BOARD_LED_ERR_GPIO		IOPORT_CREATE_PIN(PORTK, 7)		/*!< \brief Error LED */
 #define BOARD_LED_STAT_GPIO		IOPORT_CREATE_PIN(PORTK, 6)		/*!< \brief State LED */
 #define Stat_LED_ON()			ioport_set_pin_high(BOARD_LED_STAT_GPIO)
+#define Stat_LED_OFF()			ioport_set_pin_low(BOARD_LED_STAT_GPIO)
 #define Err_LED_ON()			ioport_set_pin_high(BOARD_LED_ERR_GPIO)
+#define Err_LED_OFF()			ioport_set_pin_low(BOARD_LED_ERR_GPIO)
 
 
 //---------------------------------------------------------------------
