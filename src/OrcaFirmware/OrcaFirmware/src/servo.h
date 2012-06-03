@@ -15,6 +15,9 @@
 #include <sysclk.h>
 #include "pwm.h"
 
+#define SERVO_LEFT 0
+#define SERVO_RIGHT 1
+
 #define SERVO1_TIMER TCC1
 #define SERVO_F_CPU 32000000.0f // TODO: Remove this constant!
 #define SERVO_TIMER_OVERFLOW_PERIOD 20 // PWM period (in ms)
@@ -39,5 +42,7 @@ void servo_set_frequency(void);
 void servo_set_pos_degree(uint8_t servo_nr, float pos);
 uint16_t servo_get_pos_degree(uint8_t servo_nr);
 void servo_set_pos_pulse_width(uint8_t servo_nr, uint16_t duration);
+void servo_set_pos_ticks(uint8_t servo_nr, uint16_t pos);
+uint16_t servo_get_pos_ticks(uint8_t servo_nr);
 
 #endif /* SERVO_H_ */

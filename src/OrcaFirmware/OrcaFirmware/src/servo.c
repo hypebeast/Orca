@@ -94,3 +94,20 @@ uint16_t servo_get_pos_degree(uint8_t servo_nr)
 	
 	return pos;
 }
+
+/**
+* \brief This function sets a new position for the given servo. The new position
+* is given in ticks (microseconds).
+*/
+void servo_set_pos_ticks(uint8_t servo_nr, uint16_t pos)
+{
+	// TODO
+}
+
+/**
+* This function returns the current position of the specified servo in ticks (microseconds).
+*/
+uint16_t servo_get_pos_ticks(uint8_t servo_nr)
+{
+	// TODO
+}
