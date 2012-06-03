@@ -59,7 +59,7 @@ void servo_init()
 	tc_set_overflow_interrupt_level(&SERVO1_TIMER, TC_INT_LVL_LO);
 	
 	// Set the clock source
-	tc_write_clock_source(&SERVO1_TIMER, TC_CLKSEL_DIV1_gc);
+	tc_write_clock_source(&SERVO1_TIMER, TC_CLKSEL_DIV8_gc);
 }
 
 /**
