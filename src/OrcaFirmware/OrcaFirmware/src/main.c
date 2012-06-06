@@ -17,6 +17,7 @@
 #include <osc.h>
 
 //just for test
+#include "system_info.h"
 #include "user_board.h"
 #include "orca_init.h"
 #include "servo_in.h"
@@ -47,7 +48,8 @@ int main (void)
 	while(1)
 	{
 		// Process incoming api commands
-		serial_api_task();
+		//serial_api_task();
+		servo_set_pos_ticks(1,servoIn.servo1);
 	}
 	
 }
@@ -83,13 +85,14 @@ void orca_init()
 	//tc_set_wgm(&TCC0, TC_WG_NORMAL);
 	//tc_write_period(&TCC0, 1000);
 	//tc_set_overflow_interrupt_level(&TCC0, TC_INT_LVL_HI);
-	cpu_irq_enable();
+
 
 	
 	/* enable interrupts */
 	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
 	pmic_init();
-	sei();
+	cpu_irq_enable();
+
 	
 	//tc_write_clock_source(&TCC0, TC_CLKSEL_DIV1_gc);
 }

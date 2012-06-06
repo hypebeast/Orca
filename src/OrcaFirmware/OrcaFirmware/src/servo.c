@@ -101,7 +101,17 @@ uint16_t servo_get_pos_degree(uint8_t servo_nr)
 */
 void servo_set_pos_ticks(uint8_t servo_nr, uint16_t pos)
 {
-	// TODO
+	//if (pos < 500 || pos > 2500)
+	//return;
+		
+	// Calculate the pulse width for the given position
+		servo_compare_period[servo_nr-1] = pos * 4;
+	if (servo_nr == 1) {
+		tc_write_cc(&SERVO1_TIMER, TC_CCA, servo_compare_period[servo_nr-1]);
+	}
+	else {
+		tc_write_cc(&SERVO1_TIMER, TC_CCB, servo_compare_period[servo_nr-1]);
+	}	
 }
 
 /**

@@ -166,7 +166,6 @@
 #define BOARD_MODE_TRANSMITTER		(0x01<<0)
 
 
-
 /*! Board struct */
 typedef struct BOARD_CONFIG {
 	uint8_t extensionBoards;					/*!< brief used extension boards */	
