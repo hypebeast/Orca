@@ -26,7 +26,7 @@
 
 /* global variables */
 BOARD_CONFIG_t board;  						/*!< \brief board module */
-SERVO_IN_t servoIn;							/*!< \brief servo in module */
+SERVO_IN_t servoIn;							/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;		/*!< \brief flight controller module */
 
  static void ISR_system_timer(void)
@@ -37,6 +37,7 @@ FLIGHT_CONTROLLER_t flightController;		/*!< \brief flight controller module */
 int main (void)
 {
 
+
 	// Initialize all basic board functions
 	orca_init();
 	
@@ -44,12 +45,12 @@ int main (void)
 	Stat_LED_ON();
 	Err_LED_ON();
 	
-	servo_set_pos_degree(1,90);
 	while(1)
 	{
 		// Process incoming api commands
 		//serial_api_task();
-		servo_set_pos_ticks(1,servoIn.servo1);
+		flight_controller_task(&flightController);
+		
 	}
 	
 }

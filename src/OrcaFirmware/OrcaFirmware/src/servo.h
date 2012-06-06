@@ -19,6 +19,8 @@
 #define SERVO_RIGHT 1
 
 #define SERVO1_TIMER TCC1
+#define SERVO3_TIMER TCD1
+#define SERVO5_TIMER TCE1
 #define SERVO_F_CPU 32000000.0f // TODO: Remove this constant!
 #define SERVO_TIMER_OVERFLOW_PERIOD 20 // PWM period (in ms)
 #define SERVO_PRESCALER_VALUE 8 // Prescaler value

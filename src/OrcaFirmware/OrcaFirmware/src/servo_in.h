@@ -13,7 +13,7 @@
 #include "user_board.h"
 #include "system_info.h"
 
-#define SERVO_IN_USED_TIMER				TCC0					/*!< brief Used Timer Module for Servo In counting */
+#define SERVO_IN_USED_TIMER				TCF0					/*!< brief Used Timer Module for Servo In counting */
 #define SERVO_IN_DEFAULT_VALUE			0x00					/*!< brief Inittialisation default servo value */
 #define SERVO_IN_ISR_LVL				PORT_INT0LVL_HI_gc		/*!< brief Servo Input ISR Level */		
 #define SERVO_IN_WRONG_VALUE_ERR_LVL	ERR_LVL_LOW
