@@ -12,27 +12,6 @@
 
 volatile uint16_t servo_compare_period[6];
 
-
-static void servo1_overflow_callback()
-{
-
-}
-
-static void servo3_overflow_callback()
-{
-
-}
-
-static void servo5_overflow_callback()
-{
-
-}
-
-static void servo1_cca_overflow_callback()
-{
-	
-}
-
 /**
 * \brief Calculates and sets the right frequency for the timer.
 */
@@ -55,16 +34,15 @@ void servo_init()
 	servo_compare_period[4] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;
 	servo_compare_period[5] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;	
 	
-	// Enable timer/counter TCC0
+	// Enable timers/counters TCC1, TCD1, TCE1
 	tc_enable(&SERVO1_TIMER);
 	tc_enable(&SERVO3_TIMER);
 	tc_enable(&SERVO5_TIMER);
 	
 	// Set the callback function for overflow interrupt
-	tc_set_overflow_interrupt_callback(&SERVO1_TIMER, servo1_overflow_callback);
-	tc_set_overflow_interrupt_callback(&SERVO3_TIMER, servo3_overflow_callback);
-	tc_set_overflow_interrupt_callback(&SERVO5_TIMER, servo5_overflow_callback);
-
+	//tc_set_overflow_interrupt_callback(&SERVO1_TIMER, servo1_overflow_callback);
+	//tc_set_overflow_interrupt_callback(&SERVO3_TIMER, servo3_overflow_callback);
+	//tc_set_overflow_interrupt_callback(&SERVO5_TIMER, servo5_overflow_callback);
 	
 	// Set the waveform
 	tc_set_wgm(&SERVO1_TIMER, TC_WG_SS);
@@ -76,10 +54,12 @@ void servo_init()
 	tc_write_cc(&SERVO1_TIMER, TC_CCA, servo_compare_period[0]);
 	tc_write_cc(&SERVO1_TIMER, TC_CCB, servo_compare_period[1]);
 	tc_enable_cc_channels(&SERVO1_TIMER, (enum tc_cc_channel_mask_enable_t)TC_CCAEN | TC_CCBEN);
+	
 	tc_write_period(&SERVO3_TIMER, SERVO_PWM_TOP_VALUE);
 	tc_write_cc(&SERVO3_TIMER, TC_CCA, servo_compare_period[2]);
 	tc_write_cc(&SERVO3_TIMER, TC_CCB, servo_compare_period[3]);
 	tc_enable_cc_channels(&SERVO3_TIMER, (enum tc_cc_channel_mask_enable_t)TC_CCAEN | TC_CCBEN);
+	
 	tc_write_period(&SERVO5_TIMER, SERVO_PWM_TOP_VALUE);
 	tc_write_cc(&SERVO5_TIMER, TC_CCA, servo_compare_period[4]);
 	tc_write_cc(&SERVO5_TIMER, TC_CCB, servo_compare_period[5]);
@@ -136,10 +116,10 @@ uint16_t servo_get_pos_degree(uint8_t servo_nr)
 void servo_set_pos_ticks(uint8_t servo_nr, uint16_t pos)
 {
 	if (pos < 500 || pos > 2500)
-	return;
+		return;
 		
 	// Calculate the pulse width for the given position
-		servo_compare_period[servo_nr-1] = pos * 4;
+	servo_compare_period[servo_nr-1] = pos * 4;
 	if (servo_nr == 1) {
 		tc_write_cc(&SERVO1_TIMER, TC_CCA, servo_compare_period[servo_nr-1]);
 	}

@@ -36,8 +36,6 @@ FLIGHT_CONTROLLER_t flightController;		/*!< \brief flight controller module */
  
 int main (void)
 {
-
-
 	// Initialize all basic board functions
 	orca_init();
 	
@@ -49,10 +47,8 @@ int main (void)
 	{
 		// Process incoming api commands
 		//serial_api_task();
-		flight_controller_task(&flightController);
-		
+		flight_controller_task(&flightController);		
 	}
-	
 }
 
 void orca_init()
