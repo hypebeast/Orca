@@ -120,6 +120,7 @@ void servo_set_pos_ticks(uint8_t servo_nr, uint16_t pos)
 		
 	// Calculate the pulse width for the given position
 	servo_compare_period[servo_nr-1] = pos * 4;
+
 	if (servo_nr == 1) {
 		tc_write_cc(&SERVO1_TIMER, TC_CCA, servo_compare_period[servo_nr-1]);
 	}

@@ -227,12 +227,17 @@ void send_command(char *data)
 */
 void serial_api_task(void)
 {
-	uint8_t received_byte = usart_getchar(USART_SERIAL_API);
+	//uint8_t received_byte = usart_getchar(USART_SERIAL_API);
+	uint8_t received_byte;
 	
-	// Process the received byte
-	switch (received_byte) {
-		// LF received
-		case '\n':
+	if (usart_rx_is_complete(USART_SERIAL_API))
+	{
+		received_byte = (uint8_t) (USART_SERIAL_API)->DATA;
+
+		// Process the received byte
+		switch (received_byte) {
+			// LF received
+			case '\n':
 			if (command_buff.cr_received)
 			{
 				if (command_buff.index > 0) {
@@ -244,18 +249,19 @@ void serial_api_task(void)
 			}
 			break;
 			
-		// CR received
-		case '\r':
+			// CR received
+			case '\r':
 			command_buff.cr_received = true;
 			break;
 			
-		case '\b':
+			case '\b':
 			break;
 			
-		default:
+			default:
 			if (command_buff.index < CMD_BUFFER_LENGTH - 1) {
 				command_buff.buff[command_buff.index] = received_byte;
 				command_buff.index++;
 			}
+		}
 	}
 }

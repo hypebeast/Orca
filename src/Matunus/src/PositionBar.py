@@ -133,3 +133,13 @@ class PositionBar(QtGui.QWidget):
         pen.setWidth(1)
         qp.setPen(pen)
         qp.drawLine(p3, p6)
+
+    def mouseMoveEvent(self, event):
+        print event.pos().x()
+        print event.pos().y()
+
+    def mousePressEvent(self, event):
+        pass
+
+    def mouseReleaseEvent(self, event):
+        pass
