@@ -54,9 +54,9 @@ class ServoControlWidget(QtGui.QWidget):
         layout.setMargin(2)
         layout.addSpacing(5)
         
-        lActualPosition = QtGui.QLabel("<b>Current Pos</b>")
+        lActualPosition = QtGui.QLabel("<b>Current Position</b>")
         layout.addWidget(lActualPosition)
-        layout.addSpacing(10)
+        layout.addSpacing(5)
 
         self.actualPositionServo = QtGui.QLCDNumber()
         self.actualPositionServo.setMaximumHeight(25)
@@ -67,6 +67,7 @@ class ServoControlWidget(QtGui.QWidget):
 
         lMove1 = QtGui.QLabel("<b>Setpoint</b>")
         layout.addWidget(lMove1)
+        layout.addSpacing(5)
         
         self.positionBar = PositionBar()
         self.positionBar.setMinimumWidth(200)
@@ -74,6 +75,7 @@ class ServoControlWidget(QtGui.QWidget):
         self.positionBar.setMaximumHeight(30)
         self.positionBar.setValue(0)
         self.positionBar.setBarColor(QtGui.QColor(0,0,255))
+        self.positionBar.valueChanged.connect(self.positionBarValueChanged)
         layout.addWidget(self.positionBar)
         #layout.addSpacing(50)
         
@@ -111,3 +113,6 @@ class ServoControlWidget(QtGui.QWidget):
             return False
         else:
             return True
+
+    def positionBarValueChanged(self, value):
+        self.leServoPosition.setText(str(value))

@@ -13,8 +13,9 @@
 #include <asf.h>
 #include <pmic.h>
 #include <pll.h>
-#include "serial_api.h"
 #include <osc.h>
+
+#include "serial_api.h"
 
 //just for test
 #include "system_info.h"
@@ -45,8 +46,10 @@ int main (void)
 	
 	while(1)
 	{
-		// Process incoming api commands
+		// Process incoming API commands
 		serial_api_task();
+
+		// Flight controller
 		flight_controller_task(&flightController);		
 	}
 }

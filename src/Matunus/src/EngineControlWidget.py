@@ -81,9 +81,9 @@ class EngineControlWidget(QtGui.QWidget):
         self.positionBar.setMaximumHeight(30)
         self.positionBar.setValue(0)
         self.positionBar.setBarColor(QtGui.QColor(0,0,255))
+        self.positionBar.valueChanged.connect(self.positionBarValueChanged)
         layout.addWidget(self.positionBar)
         #layout.addSpacing(5)
-        
 
         self.leServoPosition = QtGui.QLineEdit()
         self.leServoPosition.setMaximumWidth(50)
@@ -120,3 +120,6 @@ class EngineControlWidget(QtGui.QWidget):
             return False
         else:
             return True
+
+    def positionBarValueChanged(self, value):
+        self.leServoPosition.setText(str(value))

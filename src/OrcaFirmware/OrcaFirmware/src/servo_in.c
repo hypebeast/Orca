@@ -46,7 +46,7 @@ TC0_t *tc = &SERVO_IN_USED_TIMER;
 void servo_in_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo)
 {
 	if(!(board->mode & BOARD_MODE_TRANSMITTER))
-	return;
+		return;
 	
 	servo->servo1 = SERVO_IN_DEFAULT_VALUE;
 	servo->servo2 = SERVO_IN_DEFAULT_VALUE;

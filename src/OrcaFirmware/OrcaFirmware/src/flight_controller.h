@@ -15,6 +15,7 @@
 //	Supported Flight Controller Modes
 //---------------------------------------------------------------------
 #define FLIGHT_CONTROLLER_MODE_RC		(0x01<<0)		/*!< brief External RC controlled */
+#define FLIGHT_CONTROLLER_MODE_AUTOMATIC (0x01<<1)		/*!< brief Automatic mode */
 
 //---------------------------------------------------------------------
 //	General Servo Definitions
