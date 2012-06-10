@@ -26,5 +26,8 @@ class BoardStatus(Subject):
 	"""
 	This class holds the status of the board.
 	"""
+	Servo1Position = 0
+	Servo2Position = 0
+	
 	def __init__(self):
 		pass

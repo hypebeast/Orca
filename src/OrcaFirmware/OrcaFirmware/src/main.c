@@ -50,7 +50,7 @@ int main (void)
 		serial_api_task();
 
 		// Flight controller
-		flight_controller_task(&flightController);		
+		//flight_controller_task(&flightController);		
 	}
 }
 

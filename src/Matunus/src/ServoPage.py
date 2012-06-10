@@ -49,7 +49,7 @@ class ServoPage(QtGui.QWidget):
         # Servo 1
         groupBox1 = QtGui.QGroupBox("Servo 1 (Left)")
         groupBox1.setMinimumHeight(70)
-        self.servo1Control = ServoControlWidget(self.serial_connection)
+        self.servo1Control = ServoControlWidget(self.serial_connection, servo_nr=1)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.servo1Control)
@@ -59,7 +59,7 @@ class ServoPage(QtGui.QWidget):
         # Servo 2
         groupBox2 = QtGui.QGroupBox("Servo 2 (Right)")
         groupBox2.setMinimumHeight(70)
-        self.servo2Control = ServoControlWidget(self.serial_connection)
+        self.servo2Control = ServoControlWidget(self.serial_connection, servo_nr=2)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.servo2Control)

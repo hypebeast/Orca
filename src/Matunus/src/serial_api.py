@@ -22,6 +22,8 @@ import serial
 import threading
 import sys
 
+from logger import Logger
+
 
 NEWLINE_CONVERISON_MAP = ('\n', '\r', '\r\n')
 LF_MODES = ('LF', 'CR', 'CR/LF')
@@ -36,7 +38,6 @@ DEFAULT_XONXOFF = True
 DEFAULT_RTS = None
 DEFUALT_DTR = None
 
-STATUS_QUERIES = {"SERVO GETPOS": 0}
 
 if sys.version_info >= (3, 0):
     def character(b):
@@ -44,6 +45,7 @@ if sys.version_info >= (3, 0):
 else:
     def character(b):
         return b
+
 
 class SerialError(Exception):
     def __init__(self, msg):
@@ -53,18 +55,26 @@ class SerialError(Exception):
     def __str__(self):
         return self.msg
 
+
 class CommandType:
-    TEST = "test"
     LEDSON = "ledson"
     LEDSOFF = "ledsoff"
     SETSERVOPOS = "SERVO POS"
     READSERVOPOS = "SERVO GETPOS"
 
 
+class ResponseStatus:
+    IDLE = 0
+    RECEIVING = 1
+    CR_RECEIVED = 2
+    FINSIHED = 3
+    RESPONSE_FINISHED = 4
+
+
 class CommandMessage:
-    def __init__(self, commandType, arguments=[]):
+    def __init__(self, commandType):
         self.commandType = commandType
-        self.data = arguments
+        self.data = []
 
     def addArgument(self, argument):
         self.data.append(argument)
@@ -72,10 +82,9 @@ class CommandMessage:
     def getMessage(self):
         message = self.commandType
         for arg in self.data:
-            message = message + " " + arg
+            message = message + ' ' + arg
 
-        message = message + NEWLINECHARACTER
-        return message
+        return message + NEWLINECHARACTER
 
 
 class SerialAPI:
@@ -96,6 +105,13 @@ class SerialAPI:
 
         self.receiver_thread = None
         self.reader_alive = False
+        self.newResponse = False
+        self.responseStatus = ResponseStatus.IDLE
+        self.responseBuffer = []
+
+        self.status_queries = [{"query": "SERVO GETPOS", "args": ["1"], "data": 0}]
+
+        self._logger = Logger()
 
     def start_reader(self):
         """Start reader thread"""
@@ -159,7 +175,6 @@ class SerialAPI:
             return
 
         self.serial_connection.write(command.getMessage())
-        self.serial_connection.write(NEWLINECHARACTER)
         self.serial_connection.flush()
 
     def scan(self):
@@ -168,13 +183,49 @@ class SerialAPI:
     def reader(self):
         try:
             while self.connected and self.reader_alive:
-                data = character(self.serial_connection.read(1))
+                #data = character(self.serial_connection.read(1))
+                data = self.serial_connection.read(1)
+                print "Data: " + data
+
+                if data != '':
+                    print "Received data: " + data
+
+                    if self.responseStatus == ResponseStatus.IDLE:
+                        self.responseStatus = ResponseStatus.RECEIVING
+                        self.responseBuffer = []
+                        self.responseBuffer.append(data)
+                    elif self.responseStatus == ResponseStatus.RECEIVING:
+                        if data == '\r':
+                            self.responseStatus = ResponseStatus.CR_RECEIVED
+                        else:
+                            self.responseBuffer.append(data)
+                    elif self.responseStatus == ResponseStatus.CR_RECEIVED:
+                        if data == '\n':
+                            self.responseStatus = ResponseStatus.RESPONSE_FINISHED
+                    elif self.responseStatus == ResponseStatus.RESPONSE_FINISHED:
+                        self.responseStatus = ResponseStatus.IDLE
+                        self.processResponse(data)
+
         except serial.SerialException, e:
             self.reader_alive = False
             raise
+
+    def processResponse(self, data):
+        pass
 
     def readStatus(self):
         """
         This method reads the current status from the controller
         """
-        pass
+        for i in range(0, len(self.status_queries)):
+            query = self.status_queries[i]
+
+            command = CommandMessage(query["query"])
+            for arg in query["args"]:
+                command.addArgument(arg)
+
+            #self._logger.debug("Execute query: " + command.getMessage())
+            print "Execute query: " + command.getMessage()
+            self.writeCommand(command)
+
+            #self._logger.info("Query: %s Data: %s" % (query["query"], query["data"]))

@@ -41,6 +41,7 @@ class PositionBar(QtGui.QWidget):
         self.value = 0
         self.maxValue = 180
         self.minValue = 0
+        self._moveable = True
 
         self.HORIZONTAL = 0
         self.VERTICAL = 1
@@ -92,6 +93,9 @@ class PositionBar(QtGui.QWidget):
 
     def getBarWidth(self):
         return self.size().width() - 2*self.boarderSize
+
+    def setMoveable(self, value):
+        self._moveable = value
 
     def paintEvent(self, e):
         qp = QtGui.QPainter()
@@ -152,7 +156,7 @@ class PositionBar(QtGui.QWidget):
         qp.drawLine(p3, p6)
 
     def mouseMoveEvent(self, event):
-        if self.isCursorClicked:
+        if self.isCursorClicked and self._moveable:
             cursorPosX = event.pos().x()
 
             # Check bounds
@@ -170,6 +174,7 @@ class PositionBar(QtGui.QWidget):
             # Emit signal
             self.valueChanged.emit(self.value)
 
+            # Repaint the widget
             self.repaint()
 
     def mousePressEvent(self, event):

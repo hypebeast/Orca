@@ -36,6 +36,6 @@ void serial_api_init(void);
 void serial_api_task(void);
 void parse_command(void);
 void execute_command(int argc, char **argv);
-void send_command(char *data);
+void write_command(char *data);
 
 #endif /* SERIALAPI_H_ */

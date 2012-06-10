@@ -48,6 +48,7 @@ from serial_api import SerialAPI
 from serial_api import SerialError
 from SettingsDialog import SettingsDialog
 from BoardStatus import BoardStatus
+from logger import Logger
 
 
 class SelectControllerDialog(QtGui.QDialog):
@@ -116,6 +117,10 @@ class MainAppWindow(QtGui.QMainWindow):
 
         # TODO: Loading configuration
         
+        # Initialize logger
+        self._logger = Logger()
+        self._logger.info("Starting Matunus...")
+
         # Board status data
         self.boardStatus = BoardStatus()
         
@@ -123,9 +128,11 @@ class MainAppWindow(QtGui.QMainWindow):
         self.serial_connection = SerialAPI()
         self.serial_connection.set_port(0)
 
+        # Create UI
         self.createUi()
         self.createActions()
         self.createMenus()
+        self.connectToSignals()
 
         self.resize(750, 700)
         self.setWindowTitle("Matunus")
@@ -133,9 +140,11 @@ class MainAppWindow(QtGui.QMainWindow):
 
         # Add serial reader thread
         self.serialReaderThread = Thread(target=self.updateBoardStatus)
-        self.serialReaderThreadAlive = False
+        self.statusReaderAlive = False
 
         self.updateUi()
+
+        self._logger.info("Startup done!")
 
     def createUi(self):
         self.mainLayout = QtGui.QVBoxLayout()
@@ -211,6 +220,9 @@ class MainAppWindow(QtGui.QMainWindow):
         self.settingsAction.setStatusTip("Settings")
         self.settingsAction.triggered.connect(self.showSettingsDialog)
 
+    def connectToSignals(self):
+        pass
+
     def updateUi(self):
         if self.serial_connection.connected:
             self.lStatusBarLabel.setText("<b>Connected</b>")
@@ -225,6 +237,9 @@ class MainAppWindow(QtGui.QMainWindow):
 
             try:    
                 self.serial_connection.connect()
+
+                # Start reading board status
+                self.startStatusReader()
 
                 #self.serial_connection.writeCommand(CommandMessage(CommandType.LEDSON))
                 self.statusBar().showMessage("Connected!", 2000)
@@ -243,8 +258,12 @@ class MainAppWindow(QtGui.QMainWindow):
                 msgBox.exec_()
             
         elif self.serial_connection.connected:
-            #self.serial_connection.writeCommand(CommandMessage(CommandType.LEDSOFF))
+            # Stop reading board status
+            self.stopStatusReader()
+
+            # Disconnect
             self.serial_connection.disconnect()
+
             self.statusBar().showMessage("Disconnected!", 2000)
             self.lStatusBarLabel.setText("<b>Connected</b>")
             self.updateUi()
@@ -265,22 +284,20 @@ class MainAppWindow(QtGui.QMainWindow):
         dlg = SettingsDialog()
         dlg.exec_()
 
-    def startBoardReaderThread(self):
-        self.serialReaderThreadAlive = True
+    def startStatusReader(self):
+        self.statusReaderAlive = True
         self.serialReaderThread = Thread(target=self.updateBoardStatus)
         self.serialReaderThread.setDaemon(True)
         self.serialReaderThread.start()
 
-    def stopBoardReaderThread(self):
-        if self.serialReaderThreadAlive:
-            self.serialReaderThreadAlive = False
-            self.serialReaderThread.join()
+    def stopStatusReader(self):
+        self.statusReaderAlive = False
+        self.serialReaderThread.join()
 
     def updateBoardStatus(self):
-        if self.serialReaderThreadAlive:
-            self.boardStatus = self.serial_connection.read_status()
-
-            time.sleep(1000)
+        while self.statusReaderAlive:
+            self.boardStatus = self.serial_connection.readStatus()
+            time.sleep(5)
 
 
 class App():
