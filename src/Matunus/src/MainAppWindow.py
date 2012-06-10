@@ -33,6 +33,8 @@ except ImportError:
     sys.exit(2)
 
 import sys
+from threading import Thread
+import time
 
 from MainPage import MainPage
 from ServoPage import ServoPage
@@ -45,6 +47,7 @@ from AttitudePage import AttitudePage
 from serial_api import SerialAPI
 from serial_api import SerialError
 from SettingsDialog import SettingsDialog
+from BoardStatus import BoardStatus
 
 
 class SelectControllerDialog(QtGui.QDialog):
@@ -111,10 +114,14 @@ class MainAppWindow(QtGui.QMainWindow):
         else:
             raise NotImplementedError("Sorry no implementation for your platform (%s) available." % sys.platform)
 
+        # TODO: Loading configuration
+        
+        # Board status data
+        self.boardStatus = BoardStatus()
+        
+        # Serial connection
         self.serial_connection = SerialAPI()
         self.serial_connection.set_port(0)
-
-        # TODO: Loading configuration
 
         self.createUi()
         self.createActions()
@@ -123,6 +130,10 @@ class MainAppWindow(QtGui.QMainWindow):
         self.resize(750, 700)
         self.setWindowTitle("Matunus")
         self.statusBar().showMessage("Ready", 3000)
+
+        # Add serial reader thread
+        self.serialReaderThread = Thread(target=self.updateBoardStatus)
+        self.serialReaderThreadAlive = False
 
         self.updateUi()
 
@@ -135,20 +146,13 @@ class MainAppWindow(QtGui.QMainWindow):
         self.bConnect.clicked.connect(self.connectToController)
         topLayout.addWidget(self.bConnect)
         topLayout.addSpacing(15)
-        #self.bStartStop = QtGui.QPushButton("Start")
-        #topLayout.addWidget(self.bStartStop)
         topLayout.addStretch()
         lComPort = QtGui.QLabel("Com Port: ")
         topLayout.addWidget(lComPort)
         self.cbComPort = QtGui.QComboBox()
-        #comNames = self.comPortsWindows.keys()
-        #comNames.sort()
         for comPort in self.comPorts:
             self.cbComPort.addItem(comPort["name"])
         self.cbComPort.currentIndexChanged.connect(self.comPortChanged)
-        #self.bSelectController = QtGui.QPushButton("Select Controller...")
-        #self.bSelectController.clicked.connect(self.selectControllerClicked)
-        #topLayout.addWidget(self.bSelectController)
         topLayout.addWidget(self.cbComPort)
         self.topGroupBox.setLayout(topLayout)
         self.mainLayout.addWidget(self.topGroupBox)
@@ -228,7 +232,7 @@ class MainAppWindow(QtGui.QMainWindow):
                 self.updateUi()
                 self.mainPage.setSystemStatus("Ready")
                 self.mainPage.setSystemMessage("Connected to the controller")
-                self.bConnect.setText("<b>Disconnect</b>")
+                self.bConnect.setText("Disconnect")
             except SerialError as ex:
                 msgBox = QtGui.QMessageBox()
                 msgBox.setWindowTitle("Serial Error")
@@ -246,7 +250,7 @@ class MainAppWindow(QtGui.QMainWindow):
             self.updateUi()
             self.mainPage.setSystemStatus("Not Connected")
             self.mainPage.setSystemMessage("Disconnected from the controller")
-            self.bConnect.setText("<b>Connect</b>")
+            self.bConnect.setText("Connect")
 
     def selectControllerClicked(self):
         print "Select controller clicked"
@@ -260,6 +264,23 @@ class MainAppWindow(QtGui.QMainWindow):
     def showSettingsDialog(self):
         dlg = SettingsDialog()
         dlg.exec_()
+
+    def startBoardReaderThread(self):
+        self.serialReaderThreadAlive = True
+        self.serialReaderThread = Thread(target=self.updateBoardStatus)
+        self.serialReaderThread.setDaemon(True)
+        self.serialReaderThread.start()
+
+    def stopBoardReaderThread(self):
+        if self.serialReaderThreadAlive:
+            self.serialReaderThreadAlive = False
+            self.serialReaderThread.join()
+
+    def updateBoardStatus(self):
+        if self.serialReaderThreadAlive:
+            self.boardStatus = self.serial_connection.read_status()
+
+            time.sleep(1000)
 
 
 class App():

@@ -346,7 +346,7 @@ void nvm_read_device_serial(struct nvm_device_serial *storage);
 #ifndef CONFIG_NVM_IGNORE_XMEGA_A3_D3_REVB_ERRATA
 #  if XMEGA_A3 || XMEGA_D3
 #    error This NVM driver does not support rev B of XMEGA A3/D3 devices. \
-     Set CONFIG_NVM_IGNORE_XMEGA_A3_D3_REVB_ERRATA to disable this message
+     Set CONFIG_NVM_IGNORE_XMEGA_A3_D3_REVB_ERRATA to disable this system_message
 #  endif
 #endif
 

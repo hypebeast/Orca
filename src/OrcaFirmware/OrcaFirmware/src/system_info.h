@@ -16,7 +16,7 @@
 /*! \enum message
  * All information, error and state messages.
  */
-enum message{
+enum system_message{
 	SYSTEM_INFO_FALSE						=0x0000,	/*!< brief */
 	SYSTEM_INFO_TRUE						=0x0001,	/*!< brief */
 	/* Flight Controller */
@@ -35,6 +35,6 @@ enum errlvl{
 	ERR_LVL_HIGH	/*!< brief notice Error, restart! */
 };
 
-void process_info_command(enum message infocode,enum errlvl errorlvl);
+void process_info_command(enum system_message infocode,enum errlvl errorlvl);
  
 #endif /* SYSTEM_INFO_H_ */

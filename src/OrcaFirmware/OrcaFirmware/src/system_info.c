@@ -35,7 +35,7 @@
 *
 *  \return  ---
 ***************************************************************************/
- void process_info_command(enum message infocode,enum errlvl errorlvl)
+ void process_info_command(enum system_message infocode,enum errlvl errorlvl)
  {
  	
  	/* This is just logging message */
