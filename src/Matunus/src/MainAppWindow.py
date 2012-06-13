@@ -26,7 +26,7 @@ import sip
 sip.setapi('QVariant', 2)
 
 try:
-    from PyQt4 import QtGui
+    from PyQt4 import QtGui, QtCore
 except ImportError:
     print "No PyQt found!"
     import sys
@@ -37,18 +37,17 @@ from threading import Thread
 import time
 
 from MainPage import MainPage
-from ServoPage import ServoPage
-from EnginePage import EnginePage
-from ReceiverPage import ReceiverPage
 from ConfigurationPage import ConfigurationPage
 from FlightControlPage import FlightControlPage
 from GpsPage import GpsPage
 from AttitudePage import AttitudePage
+from FlightDisplay import FlightDisplay
 from serial_api import SerialAPI
 from serial_api import SerialError
 from SettingsDialog import SettingsDialog
 from BoardStatus import BoardStatus
 from logger import Logger
+import defs
 
 
 class SelectControllerDialog(QtGui.QDialog):
@@ -115,6 +114,9 @@ class MainAppWindow(QtGui.QMainWindow):
         else:
             raise NotImplementedError("Sorry no implementation for your platform (%s) available." % sys.platform)
 
+        # App definitions
+        self.appDefs = defs.AppDefs()
+
         # TODO: Loading configuration
         
         # Initialize logger
@@ -134,7 +136,7 @@ class MainAppWindow(QtGui.QMainWindow):
         self.createMenus()
         self.connectToSignals()
 
-        self.resize(750, 700)
+        self.resize(1000, 750)
         self.setWindowTitle("Matunus")
         self.statusBar().showMessage("Ready", 3000)
 
@@ -149,7 +151,8 @@ class MainAppWindow(QtGui.QMainWindow):
     def createUi(self):
         self.mainLayout = QtGui.QVBoxLayout()
 
-        self.topGroupBox = QtGui.QGroupBox("Control")
+        self.topGroupBox = QtGui.QGroupBox("Connection")
+        self.topGroupBox.setMaximumHeight(70)
         topLayout = QtGui.QHBoxLayout()
         self.bConnect = QtGui.QPushButton("Connect")
         self.bConnect.clicked.connect(self.connectToController)
@@ -173,30 +176,40 @@ class MainAppWindow(QtGui.QMainWindow):
         # Pages
         self.pages = []
         self.mainContainer = QtGui.QTabWidget()
+        self.mainContainer.setTabPosition(QtGui.QTabWidget.South)
+        self.mainContainer.setTabShape(QtGui.QTabWidget.Rounded)
+
         self.mainPage = MainPage()
         self.pages.append(self.mainPage)
-        self.mainContainer.addTab(self.mainPage, "Main")
+        icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "config.png"))
+        self.mainContainer.addTab(self.mainPage, icon, "Home")
+
+        self.flightDisplay = FlightDisplay()
+        self.pages.append(self.flightDisplay)
+        icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "flight_display.png"))
+        self.mainContainer.addTab(self.flightDisplay, icon, "Flight Display")
+
         self.flightControlPage = FlightControlPage()
         self.pages.append(self.flightControlPage)
-        self.mainContainer.addTab(self.flightControlPage, "Flight Control")
-        self.enginePage = EnginePage(self.serial_connection)
-        self.pages.append(self.enginePage)
-        self.mainContainer.addTab(self.enginePage, "Engine")
-        self.servoPage = ServoPage(self.serial_connection)
-        self.pages.append(self.servoPage)
-        self.mainContainer.addTab(self.servoPage, "Servo")
-        self.receiverPage = ReceiverPage()
-        self.pages.append(self.receiverPage)
-        self.mainContainer.addTab(self.receiverPage, "Receiver")
-        self.attitudePage = AttitudePage()
-        self.pages.append(self.attitudePage)
-        self.mainContainer.addTab(self.attitudePage, "Attitude")
-        self.gpsPage = GpsPage()
-        self.pages.append(self.gpsPage)
-        self.mainContainer.addTab(self.gpsPage, "GPS")
-        self.configurationPage = ConfigurationPage()
+        icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "joystick.png"))
+        self.mainContainer.addTab(self.flightControlPage, icon, "Flight Control")
+        
+        #self.receiverPage = ReceiverPage()
+        #self.pages.append(self.receiverPage)
+        #self.mainContainer.addTab(self.receiverPage, "Receiver")
+        
+        #self.attitudePage = AttitudePage()
+        #self.pages.append(self.attitudePage)
+        #self.mainContainer.addTab(self.attitudePage, "Attitude")
+        
+        #self.gpsPage = GpsPage()
+        #self.pages.append(self.gpsPage)
+        #self.mainContainer.addTab(self.gpsPage, "GPS")
+        
+        self.configurationPage = ConfigurationPage(self.serial_connection)
         self.pages.append(self.configurationPage)
-        self.mainContainer.addTab(self.configurationPage, "Configuration")
+        icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "config.png"))
+        self.mainContainer.addTab(self.configurationPage, icon, "Configuration")
         self.mainLayout.addWidget(self.mainContainer)
 
         widget = QtGui.QWidget()
@@ -297,11 +310,17 @@ class MainAppWindow(QtGui.QMainWindow):
     def updateBoardStatus(self):
         while self.statusReaderAlive:
             self.boardStatus = self.serial_connection.readStatus()
+
+            # Update all observers
+            self.boardStatus.notify()
             time.sleep(5)
 
 
 class App():
     def __init__(self, options= None, args=None):
+        """
+        Run the app.
+        """
         app = QtGui.QApplication(sys.argv)
         mainWin = MainAppWindow()
         mainWin.show()

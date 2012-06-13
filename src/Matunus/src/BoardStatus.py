@@ -19,15 +19,20 @@
 __author__ = 'Sebastian Ruml'
 
 
-from Subject import Subject
+from Subject import Observable
 
 
-class BoardStatus(Subject):
+class BoardStatus(Observable):
 	"""
 	This class holds the status of the board.
 	"""
-	Servo1Position = 0
-	Servo2Position = 0
-	
+	ServoLeftValue = 0
+	ServoRightValue = 0
+	EngineLeftValue = 0
+	EngineRightValue = 0
+	EngineRearValue = 0
+
+	ControllerMode  = 0
+
 	def __init__(self):
 		pass

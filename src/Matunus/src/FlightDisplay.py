@@ -18,22 +18,50 @@
 
 __author__ = 'Sebastian Ruml'
 
+
+import os
+
 # This is only needed for Python v2 but is harmless for Python v3.
 import sip
 sip.setapi('QVariant', 2)
 
 try:
-    from PyQt4 import QtGui
+    from PyQt4 import QtGui, QtSvg, QtCore
 except ImportError:
     print "No PyQt found!"
     import sys
     sys.exit(2)
 
-class AttitudePage(QtGui.QWidget):
+import defs
+
+class FlightDisplay(QtGui.QWidget):
     def __init__(self):
-        super(AttitudePage, self).__init__()
+        super(FlightDisplay, self).__init__()
+
+        self.appDefs = defs.AppDefs()
 
         self.createUi()
 
     def createUi(self):
+        self.mainLayout = QtGui.QVBoxLayout()
+        self.mainLayout.setMargin(0)
+
+        backgroundFile = os.path.join(self.appDefs.ArtworkPath, "grey_background.svg")
+        background = QtSvg.QSvgWidget(backgroundFile)
+        background.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        print "Background: " + str(background.size().height())
+        background.setGeometry(0, 0, self.width(), self.height())
+        background.updateGeometry()
+        background.resize(self.width(), self.height())
+        self.mainLayout.addWidget(background)
+
+        #textEdit = QtGui.QTextEdit()
+        #self.mainLayout.addWidget(textEdit)
+
+        self.setLayout(self.mainLayout)
+
+    def paintEvent(self, e):
         pass
+
+    def sizeHint(self):
+        return QtCore.QSize(1000, 600)

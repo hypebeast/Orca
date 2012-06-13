@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -17,7 +17,6 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 __author__ = 'Sebastian Ruml'
-
 
 # This is only needed for Python v2 but is harmless for Python v3.
 import sip
@@ -30,32 +29,11 @@ except ImportError:
     import sys
     sys.exit(2)
 
-from ReceiverStatusPage import ReceiverStatusPage
-from FlightModeSettingsPage import FlightModeSettingsPage
-
-class ReceiverPage(QtGui.QWidget):
+class StabilizationPage(QtGui.QWidget):
     def __init__(self):
-        super(ReceiverPage, self).__init__()
+        super(StabilizationPage, self).__init__()
 
-        self.createUI()
+        self.createUi()
 
-    def createUI(self):
-    	mainLayout = QtGui.QVBoxLayout()
-    	mainLayout.setMargin(0)
-    	#mainLayout.addSpacing(5)
-
-        tabWidget = QtGui.QTabWidget()
-        tabWidget.setTabPosition(QtGui.QTabWidget.North)
-        tabWidget.setTabShape(QtGui.QTabWidget.Rounded)
-        mainLayout.addWidget(tabWidget)
-
-        page = ReceiverStatusPage()
-        tabWidget.addTab(page, "Status")
-
-        page = FlightModeSettingsPage()
-        tabWidget.addTab(page, "Flight Mode Settings")
-
-    	self.setLayout(mainLayout)
-
-    def update(self, data):
+    def createUi(self):
         pass

@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -19,21 +19,10 @@
 __author__ = 'Sebastian Ruml'
 
 
-class Subject(object):
-	def __init__(self):
-		self._observers = []
-
-	def attach(self, observer):
-		if not observer in self._observers:
-			self._observers.append(observer)
-
-	def detach(self, observer):
-		try:
-			self._observers.remove(observer)
-		except ValueError:
-			pass
-
-	def notifiy(self, modifier=None):
-		for observer in self._observers:
-			if modifier != observer:
-				observer.update()
+class Servo(object):
+	"""
+	This class represents an servo. It's used to control and retrieve
+	the status a servo.
+	"""
+    def __init__(self):
+        pass

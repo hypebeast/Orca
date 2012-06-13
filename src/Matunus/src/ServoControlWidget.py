@@ -38,6 +38,9 @@ class ServoControlWidget(QtGui.QWidget):
     def __init__(self, serial=None, servo_nr=1):
         super(ServoControlWidget, self).__init__()
 
+        if serial is None:
+            raise Exception
+
         self.serial_connection = serial
 
         self.servo_nr = servo_nr
@@ -54,7 +57,7 @@ class ServoControlWidget(QtGui.QWidget):
         layout.setMargin(2)
         layout.addSpacing(5)
         
-        lActualPosition = QtGui.QLabel("<b>Current Position</b>")
+        lActualPosition = QtGui.QLabel("<b>Current Value</b>")
         layout.addWidget(lActualPosition)
         layout.addSpacing(5)
 
@@ -99,6 +102,12 @@ class ServoControlWidget(QtGui.QWidget):
         command.addArgument(str(position))
         self.serial_connection.writeCommand(command)
 
+    def setMinValue(self, value):
+        self.minValue = value
+
+    def setMaxValue(self, value):
+        self.maxValue = value
+    
     def checkValue(self, value):
         if value < self.minValue or value > self.maxValue:
             return False

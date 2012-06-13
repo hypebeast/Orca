@@ -33,3 +33,8 @@ except ImportError:
 class FlightControlPage(QtGui.QWidget):
     def __init__(self):
         super(FlightControlPage, self).__init__()
+
+        self.createUI()
+
+    def createUI(self):
+		pass
