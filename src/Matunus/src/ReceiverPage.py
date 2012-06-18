@@ -32,6 +32,8 @@ except ImportError:
 
 from ReceiverStatusPage import ReceiverStatusPage
 from FlightModeSettingsPage import FlightModeSettingsPage
+from RcInputPage import RcInputPage
+
 
 class ReceiverPage(QtGui.QWidget):
     def __init__(self):
@@ -51,6 +53,9 @@ class ReceiverPage(QtGui.QWidget):
 
         page = ReceiverStatusPage()
         tabWidget.addTab(page, "Status")
+
+        page = RcInputPage(self)
+        tabWidget.addTab(page, "RC Input")
 
         page = FlightModeSettingsPage()
         tabWidget.addTab(page, "Flight Mode Settings")

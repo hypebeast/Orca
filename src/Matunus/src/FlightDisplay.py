@@ -34,6 +34,9 @@ except ImportError:
 
 import defs
 
+from LinearDialGadget import LinearDialGadget
+
+
 class FlightDisplay(QtGui.QWidget):
     def __init__(self):
         super(FlightDisplay, self).__init__()
@@ -43,25 +46,49 @@ class FlightDisplay(QtGui.QWidget):
         self.createUi()
 
     def createUi(self):
-        self.mainLayout = QtGui.QVBoxLayout()
-        self.mainLayout.setMargin(0)
+        self.view = QtGui.QGraphicsView()
+        self.scene = QtGui.QGraphicsScene()
 
-        backgroundFile = os.path.join(self.appDefs.ArtworkPath, "grey_background.svg")
-        background = QtSvg.QSvgWidget(backgroundFile)
-        background.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        print "Background: " + str(background.size().height())
-        background.setGeometry(0, 0, self.width(), self.height())
-        background.updateGeometry()
-        background.resize(self.width(), self.height())
-        self.mainLayout.addWidget(background)
+        #self.view.setRenderHint(QtGui.QPainter.Antialiasing)
+        #self.view.setTransformationAnchor(QtGui.QGraphicsView.AnchorUnderMouse)
+        #self.view.setResizeAnchor(QtGui.QGraphicsView.AnchorViewCenter)
+        #self.view.setScene(self.scene)
 
-        #textEdit = QtGui.QTextEdit()
-        #self.mainLayout.addWidget(textEdit)
+        #brush = QtGui.QBrush(QtCore.Qt.darkGray)
+        #self.view.setBackgroundBrush(brush)
+        
+        #self.view.setParent(self, QtCore.Qt.FramelessWindowHint)
 
-        self.setLayout(self.mainLayout)
+        mainLayout = QtGui.QVBoxLayout()
+
+        layout = QtGui.QHBoxLayout()
+        self.vertBar = LinearDialGadget()
+        layout.addWidget(self.vertBar)
+        layout.addStretch()
+        mainLayout.addLayout(layout)
+
+        mainLayout.addStretch()
+        self.setLayout(mainLayout)
 
     def paintEvent(self, e):
-        pass
+        qp = QtGui.QPainter()
+        qp.begin(self)
+        self.drawBackground(qp)
+        qp.end()
 
-    def sizeHint(self):
-        return QtCore.QSize(1000, 600)
+    def drawBackground(self, qp):
+        size = self.size()
+        width = size.width()
+        height = size.height()
+
+        # Draw the background
+        qp.setBrush(QtGui.QColor(128, 128, 128))
+        qp.drawRect(0, 0, width, height)
+
+    def resizeEvent(self, event):
+        pass
+        #width = self.size().width()
+        #height = self.size().height()
+
+        #self.view.setSceneRect(0,0, width, height)
+        #self.view.resize(width, height)

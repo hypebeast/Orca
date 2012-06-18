@@ -22,7 +22,7 @@ __author__ = 'Sebastian Ruml'
 class Servo(object):
 	"""
 	This class represents an servo. It's used to control and retrieve
-	the status a servo.
+	the status of a servo.
 	"""
     def __init__(self):
         pass

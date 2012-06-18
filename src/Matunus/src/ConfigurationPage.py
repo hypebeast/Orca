@@ -113,6 +113,4 @@ class ConfigurationPage(QtGui.QWidget):
         #self.setPalette(palette)
 
     def navBarItemClicked(self, index):
-        print index.row()
-
         self.mainContainer.setCurrentIndex(index.row())

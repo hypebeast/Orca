@@ -136,7 +136,7 @@ class MainAppWindow(QtGui.QMainWindow):
         self.createMenus()
         self.connectToSignals()
 
-        self.resize(1000, 750)
+        self.resize(1200, 850)
         self.setWindowTitle("Matunus")
         self.statusBar().showMessage("Ready", 3000)
 
@@ -151,6 +151,7 @@ class MainAppWindow(QtGui.QMainWindow):
     def createUi(self):
         self.mainLayout = QtGui.QVBoxLayout()
 
+        # Connection box
         self.topGroupBox = QtGui.QGroupBox("Connection")
         self.topGroupBox.setMaximumHeight(70)
         topLayout = QtGui.QHBoxLayout()
@@ -193,18 +194,6 @@ class MainAppWindow(QtGui.QMainWindow):
         self.pages.append(self.flightControlPage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "joystick.png"))
         self.mainContainer.addTab(self.flightControlPage, icon, "Flight Control")
-        
-        #self.receiverPage = ReceiverPage()
-        #self.pages.append(self.receiverPage)
-        #self.mainContainer.addTab(self.receiverPage, "Receiver")
-        
-        #self.attitudePage = AttitudePage()
-        #self.pages.append(self.attitudePage)
-        #self.mainContainer.addTab(self.attitudePage, "Attitude")
-        
-        #self.gpsPage = GpsPage()
-        #self.pages.append(self.gpsPage)
-        #self.mainContainer.addTab(self.gpsPage, "GPS")
         
         self.configurationPage = ConfigurationPage(self.serial_connection)
         self.pages.append(self.configurationPage)

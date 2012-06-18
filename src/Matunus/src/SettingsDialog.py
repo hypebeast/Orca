@@ -36,5 +36,5 @@ class SettingsDialog(QtGui.QDialog):
 		self.create_ui()
 
 	def create_ui(self):
-		self.resize(400, 300)
+		self.resize(800, 600)
 		self.setWindowTitle("Settings")
