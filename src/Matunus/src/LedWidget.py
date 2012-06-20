@@ -18,38 +18,47 @@
 
 __author__ = "Sebastian Ruml"
 
-# This is only needed for Python v2 but is harmless for Python v3.
-import sip
-sip.setapi('QVariant', 2)
-
 try:
-    from PyQt4 import QtGui
+    from PyQt4 import QtGui, QtCore, QtSvg
 except ImportError:
     print "No PyQt found!"
     import sys
     sys.exit(2)
 
+import os
 
-class FlightControlPage(QtGui.QWidget):
+import defs
+
+
+GREEN = 0
+RED = 1
+
+class LedWidget(QtGui.QWidget):
     def __init__(self):
-        super(FlightControlPage, self).__init__()
+        super(LedWidget, self).__init__()
 
         self.createUI()
 
     def createUI(self):
-        pass
+        self.setMinimumSize(20, 20)
+
+        app_defs = defs.AppDefs()
+        self.colors = [os.path.join(app_defs.ArtworkPath, "led_green.svg"),
+                        os.path.join(app_defs.ArtworkPath, "led_red.svg")]
+        self.color = self.colors[0]
 
     def paintEvent(self, e):
         qp = QtGui.QPainter()
         qp.begin(self)
-        self.drawBackground(qp)
+        self.drawWidget(qp)
         qp.end()
 
-    def drawBackground(self, qp):
-        size = self.size()
-        width = size.width()
-        height = size.height()
+    def drawWidget(self, qp):
+        renderer = QtSvg.QSvgRenderer()
+        renderer.load(self.color)
+        renderer.render()
 
-        # Draw the background
-        qp.setBrush(QtGui.QColor(128, 128, 128))
-        qp.drawRect(0, 0, width, height)
+    def setColor(self, color):
+        if color < len(self.colors) or color > len(self.colors):
+            return
+        self.color = self.colors[color]

@@ -75,7 +75,8 @@ int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController)
 	
 	/* Pitch/Aileron Control */
 	if(flightController->rcServoIn->servo2 > FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
-		flightController->leftEdfSetPoint -= (flightController->rcServoIn->servo2 - FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_AILERON_FACTOR;
+		flightController->leftEdfSetPoint -= (flightController->rcServoIn->servo2
+												- FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_AILERON_FACTOR;
 	 
 	return SYSTEM_INFO_TRUE;	
 }
@@ -92,9 +93,10 @@ int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController)
 {
 	flightController->rightEdfSetPoint = FLIGHT_CONTROLLER_EDF_OFFSET + flightController->rcServoIn->servo3;
 	
-		/* Pitch/Aileron Control */
+	/* Pitch/Aileron Control */
 	if(flightController->rcServoIn->servo2 < FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
-		flightController->rightEdfSetPoint -= (FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH - flightController->rcServoIn->servo2)*FLIGHT_CONTROLLER_AILERON_FACTOR;
+		flightController->rightEdfSetPoint -= (FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH
+												- flightController->rcServoIn->servo2)*FLIGHT_CONTROLLER_AILERON_FACTOR;
 		
 	return SYSTEM_INFO_TRUE;	
 }

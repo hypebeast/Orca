@@ -5,3 +5,6 @@ tmp
 Debug
 Release
 *.atsuo
+*.log
+.project
+.pydevproject

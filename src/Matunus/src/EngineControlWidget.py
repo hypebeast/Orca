@@ -60,7 +60,7 @@ class EngineControlWidget(QtGui.QWidget):
         layout.setMargin(2)
         layout.addSpacing(5)
         
-        lCurrentVelocity = QtGui.QLabel("<b>Current Velocity</b>")
+        lCurrentVelocity = QtGui.QLabel("<b>Current Value</b>")
         layout.addWidget(lCurrentVelocity)
         layout.addSpacing(5)
         
@@ -81,9 +81,9 @@ class EngineControlWidget(QtGui.QWidget):
         self.positionBar.setMaximumHeight(30)
         self.positionBar.setValue(0)
         self.positionBar.setBarColor(QtGui.QColor(0,0,255))
+        self.positionBar.valueChanged.connect(self.positionBarValueChanged)
         layout.addWidget(self.positionBar)
         #layout.addSpacing(5)
-        
 
         self.leServoPosition = QtGui.QLineEdit()
         self.leServoPosition.setMaximumWidth(50)
@@ -114,9 +114,17 @@ class EngineControlWidget(QtGui.QWidget):
         command.addArgument(str(position))
         self.serial_connection.writeCommand(command)
 
+    def setMinValue(self, value):
+        self.minValue = value
+
+    def setMaxValue(self, value):
+        self.maxValue = value
 
     def checkValue(self, value):
         if value < self.minValue or value > self.maxValue:
             return False
         else:
             return True
+
+    def positionBarValueChanged(self, value):
+        self.leServoPosition.setText(str(value))

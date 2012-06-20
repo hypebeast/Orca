@@ -34,7 +34,7 @@ class _Logger:
         default_format = common + '%(message)s'
         datefmt = '%d/%m/%Y %H:%M:%S'
         
-        self._log = logging.getLogger('Morphine')
+        self._log = logging.getLogger('Matunus')
         
         logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s',

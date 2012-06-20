@@ -19,9 +19,11 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import sys
+import os
 from optparse import OptionParser
 
 from src import MainAppWindow
+from src import defs
 
 __appName__ = 'Matunus'
 __version__ = '0.1.0'
@@ -45,8 +47,14 @@ def main():
     """
     Everything dispatches from this main function.
     """
-    usage = "usage: %prog"
+    # Initialize all app definitions
+    app_defs = defs.AppDefs()
+    app_defs.AppPath = os.path.dirname(os.path.abspath(__file__))
+    app_defs.DataPath = os.path.join(app_defs.AppPath, "data")
+    app_defs.IconsPath = os.path.join(app_defs.DataPath, "icons")
+    app_defs.ArtworkPath = os.path.join(app_defs.DataPath, "artwork")
 
+    # Start the application
     app = MainAppWindow.App()
 
 

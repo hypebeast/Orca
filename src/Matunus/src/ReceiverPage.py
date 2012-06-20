@@ -16,6 +16,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+__author__ = 'Sebastian Ruml'
+
 
 # This is only needed for Python v2 but is harmless for Python v3.
 import sip
@@ -28,7 +30,37 @@ except ImportError:
     import sys
     sys.exit(2)
 
+from ReceiverStatusPage import ReceiverStatusPage
+from FlightModeSettingsPage import FlightModeSettingsPage
+from RcInputPage import RcInputPage
+
 
 class ReceiverPage(QtGui.QWidget):
     def __init__(self):
         super(ReceiverPage, self).__init__()
+
+        self.createUI()
+
+    def createUI(self):
+    	mainLayout = QtGui.QVBoxLayout()
+    	mainLayout.setMargin(0)
+    	#mainLayout.addSpacing(5)
+
+        tabWidget = QtGui.QTabWidget()
+        tabWidget.setTabPosition(QtGui.QTabWidget.North)
+        tabWidget.setTabShape(QtGui.QTabWidget.Rounded)
+        mainLayout.addWidget(tabWidget)
+
+        page = ReceiverStatusPage()
+        tabWidget.addTab(page, "Status")
+
+        page = RcInputPage(self)
+        tabWidget.addTab(page, "RC Input")
+
+        page = FlightModeSettingsPage()
+        tabWidget.addTab(page, "Flight Mode Settings")
+
+    	self.setLayout(mainLayout)
+
+    def update(self, data):
+        pass

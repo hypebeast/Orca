@@ -31,12 +31,16 @@ except ImportError:
     sys.exit(2)
 
 from ServoControlWidget import ServoControlWidget
+from EngineControlWidget import EngineControlWidget
 
 
-class ServoPage(QtGui.QWidget):
+class OutputPage(QtGui.QWidget):
     def __init__(self, serial=None):
-        super(ServoPage, self).__init__()
+        super(OutputPage, self).__init__()
 
+        if serial is None:
+            raise Exception
+            
         self.serial_connection = serial
         self.createUi()
 
@@ -49,7 +53,7 @@ class ServoPage(QtGui.QWidget):
         # Servo 1
         groupBox1 = QtGui.QGroupBox("Servo 1 (Left)")
         groupBox1.setMinimumHeight(70)
-        self.servo1Control = ServoControlWidget(self.serial_connection)
+        self.servo1Control = ServoControlWidget(self.serial_connection, servo_nr=1)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.servo1Control)
@@ -59,20 +63,49 @@ class ServoPage(QtGui.QWidget):
         # Servo 2
         groupBox2 = QtGui.QGroupBox("Servo 2 (Right)")
         groupBox2.setMinimumHeight(70)
-        self.servo2Control = ServoControlWidget(self.serial_connection)
+        self.servo2Control = ServoControlWidget(self.serial_connection, servo_nr=2)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.servo2Control)
         groupBox2.setLayout(hBox)
         mainLayout.addWidget(groupBox2)
-        #mainLayout.addStretch()
+
+        # Engine 1 (left)
+        groupBox = QtGui.QGroupBox("Engine 1 (Left)")
+        groupBox.setMinimumHeight(70)
+        self.engine1Control = EngineControlWidget(self.serial_connection, engine_nr=1)
+        hBox = QtGui.QHBoxLayout()
+        hBox.setMargin(2)
+        hBox.addWidget(self.engine1Control)
+        groupBox.setLayout(hBox)
+        mainLayout.addWidget(groupBox)
+
+        # Engine 2 (right)
+        groupBox = QtGui.QGroupBox("Engine 2 (Left)")
+        groupBox.setMinimumHeight(70)
+        self.engine1Control = EngineControlWidget(self.serial_connection, engine_nr=2)
+        hBox = QtGui.QHBoxLayout()
+        hBox.setMargin(2)
+        hBox.addWidget(self.engine1Control)
+        groupBox.setLayout(hBox)
+        mainLayout.addWidget(groupBox)
+
+        # Engine 3 (rear)
+        groupBox = QtGui.QGroupBox("Engine 3 (Left)")
+        groupBox.setMinimumHeight(70)
+        self.engine1Control = EngineControlWidget(self.serial_connection, engine_nr=3)
+        hBox = QtGui.QHBoxLayout()
+        hBox.setMargin(2)
+        hBox.addWidget(self.engine1Control)
+        groupBox.setLayout(hBox)
+        mainLayout.addWidget(groupBox)
 
         # Configuration
-        groupBox3 = QtGui.QGroupBox("Configuration")
-        groupBox3.setMinimumHeight(200)
-        mainLayout.addWidget(groupBox3)
+        #groupBox3 = QtGui.QGroupBox("Configuration")
+        #groupBox3.setMinimumHeight(200)
+        #mainLayout.addWidget(groupBox3)
+        
         mainLayout.addStretch()
-
         self.setLayout(mainLayout)
 
     def startMoveServo1(self):
@@ -84,3 +117,6 @@ class ServoPage(QtGui.QWidget):
 
     def dialServo1ValueChanged(self, value):
         self.setPositionServo1.display(value)
+
+    def update(self, data):
+        pass

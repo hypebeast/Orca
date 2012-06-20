@@ -9,27 +9,20 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-app_defs = None
+__author__ = 'Sebastian Ruml'
 
-class _AppDefs:
-	AppPath = ""
-	DataPath = ""
-	IconsPath = ""
-	ArtworkPath = ""
-	
-	def __init__(self):
-		pass
 
-def AppDefs():
-	global app_defs
-
-	if not app_defs:
-		app_defs = _AppDefs()
-	return app_defs
+class Servo(object):
+	"""
+	This class represents an servo. It's used to control and retrieve
+	the status of a servo.
+	"""
+    def __init__(self):
+        pass

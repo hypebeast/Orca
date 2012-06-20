@@ -38,6 +38,9 @@ class ServoControlWidget(QtGui.QWidget):
     def __init__(self, serial=None, servo_nr=1):
         super(ServoControlWidget, self).__init__()
 
+        if serial is None:
+            raise Exception
+
         self.serial_connection = serial
 
         self.servo_nr = servo_nr
@@ -54,9 +57,9 @@ class ServoControlWidget(QtGui.QWidget):
         layout.setMargin(2)
         layout.addSpacing(5)
         
-        lActualPosition = QtGui.QLabel("<b>Current Pos</b>")
+        lActualPosition = QtGui.QLabel("<b>Current Value</b>")
         layout.addWidget(lActualPosition)
-        layout.addSpacing(10)
+        layout.addSpacing(5)
 
         self.actualPositionServo = QtGui.QLCDNumber()
         self.actualPositionServo.setMaximumHeight(25)
@@ -67,6 +70,7 @@ class ServoControlWidget(QtGui.QWidget):
 
         lMove1 = QtGui.QLabel("<b>Setpoint</b>")
         layout.addWidget(lMove1)
+        layout.addSpacing(5)
         
         self.positionBar = PositionBar()
         self.positionBar.setMinimumWidth(200)
@@ -74,6 +78,7 @@ class ServoControlWidget(QtGui.QWidget):
         self.positionBar.setMaximumHeight(30)
         self.positionBar.setValue(0)
         self.positionBar.setBarColor(QtGui.QColor(0,0,255))
+        self.positionBar.valueChanged.connect(self.positionBarValueChanged)
         layout.addWidget(self.positionBar)
         #layout.addSpacing(50)
         
@@ -83,12 +88,33 @@ class ServoControlWidget(QtGui.QWidget):
         layout.addSpacing(30)
         
         self.startServo = QtGui.QPushButton("Start")
-        self.startServo.clicked.connect(self.startMoveServo)
+        self.startServo.clicked.connect(self.startServoClicked)
         layout.addWidget(self.startServo)
         layout.addStretch()
         self.setLayout(layout)
 
-    def startMoveServo(self):
+    def runMoveServo(self, position):
+        if not self.checkValue(float(position)):
+            return
+
+        command = CommandMessage(CommandType.SETSERVOPOS)
+        command.addArgument(str(self.servo_nr))
+        command.addArgument(str(position))
+        self.serial_connection.writeCommand(command)
+
+    def setMinValue(self, value):
+        self.minValue = value
+
+    def setMaxValue(self, value):
+        self.maxValue = value
+    
+    def checkValue(self, value):
+        if value < self.minValue or value > self.maxValue:
+            return False
+        else:
+            return True
+
+    def startServoClicked(self):
         try:
             position = self.leServoPosition.displayText()
         except:
@@ -98,16 +124,11 @@ class ServoControlWidget(QtGui.QWidget):
             return
 
         self.positionBar.setValue(int(position))
-        self.actualPositionServo.display(position)
-        print "Position: " + position
-        command = CommandMessage(CommandType.SETSERVOPOS)
-        command.addArgument(str(1))
-        command.addArgument(str(position))
-        self.serial_connection.writeCommand(command)
+        #self.actualPositionServo.display(position)
 
+        self.runMoveServo(int(position))
 
-    def checkValue(self, value):
-        if value < self.minValue or value > self.maxValue:
-            return False
-        else:
-            return True
+    def positionBarValueChanged(self, value):
+        self.leServoPosition.setText(str(value))
+
+        self.runMoveServo(value)

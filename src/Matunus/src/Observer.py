@@ -16,20 +16,32 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-app_defs = None
+__author__ = 'Sebastian Ruml'
 
-class _AppDefs:
-	AppPath = ""
-	DataPath = ""
-	IconsPath = ""
-	ArtworkPath = ""
-	
+
+class Observable(object):
+	def __init__(self):
+		self._observers = []
+
+	def attach(self, observer):
+		if not observer in self._observers:
+			self._observers.append(observer)
+
+	def detach(self, observer):
+		try:
+			self._observers.remove(observer)
+		except ValueError:
+			pass
+
+	def notifiy(self, modifier=None):
+		for observer in self._observers:
+			if modifier != observer:
+				observer.update()
+
+
+class Observer(object):
 	def __init__(self):
 		pass
 
-def AppDefs():
-	global app_defs
-
-	if not app_defs:
-		app_defs = _AppDefs()
-	return app_defs
+	def update(self, data):
+		pass

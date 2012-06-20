@@ -41,18 +41,27 @@ static void serial_set_servo_pos(int argc, char **argv);
 /* Get the actual position of a servo */
 static void serial_get_servo_pos(int argc, char **argv);
 
+/* This function parses all engine commands */
+static void process_engine_command(int argc, char **argv);
+
+/* This function sets a new value for the given engine */
+static void serial_engine_set_value(int argc, char **argv);
+
 /* Enabled API commands */
 struct api_command commands[] = {
-	{ "test",		test_command },
-	{ "ledsoff",	leds_off },
-	{ "ledson",		leds_on},
-	{ "SERVO",		process_servo_command}
+	{ "SERVO", process_servo_command},
+	{ "ENGINE",	process_engine_command}
 };
 
 /* Enabled servo API commands */
 struct api_command servo_commands[] = {
 	{ "POS", serial_set_servo_pos},
 	{ "GETPOS", serial_get_servo_pos}	
+};
+
+/* Enabled engine API commands */
+struct api_command engine_commands[] = {
+	{ "VALUE", serial_engine_set_value}	
 };
 
 
@@ -69,18 +78,35 @@ static void test_command(int argc, char **argv)
 	}
 }
 
-static void leds_on(int argc, char **argv)
+/**
+* \brief This function parses all engine commands.
+*/
+static void process_engine_command(int argc, char **argv)
 {
-
-}
-
-static void leds_off(int argc, char **argv)
-{
-
+	// Get the length of the sub command
+	uint16_t nl = strlen(argv[1]);
+	uint16_t cl;
+	
+	for (int i = 0; i < ARRAY_SIZE(engine_commands); i++) {
+		cl = strlen(engine_commands[i].name);
+		
+		if (cl == nl && engine_commands[i].function != NULL &&
+		!strncmp(argv[1], engine_commands[i].name, nl)) {
+			engine_commands[i].function(argc, argv);
+		}
+	}
 }
 
 /**
-* \brief This function parses all servo commands
+* \brief This functions sets a new value for the given engine.
+*/
+static void serial_engine_set_value(int argc, char **argv)
+{
+	
+}
+
+/**
+* \brief This function parses all servo commands.
 */
 static void process_servo_command(int argc, char **argv)
 {
@@ -120,12 +146,19 @@ static void serial_set_servo_pos(int argc, char **argv)
 */
 static void serial_get_servo_pos(int argc, char **argv)
 {
-	if (argc != 2)
-		return;
+	//if (argc != 3)
+		//return;
 		
-	uint16_t servo_nr = atoi(argv[1]);
-	uint16_t position = servo_get_pos_degree(servo_nr);	
+	//uint16_t servo_nr = atoi(argv[2]);
+	//uint16_t position = servo_get_pos_degree(servo_nr);	
 	//sprintf()
+	usart_putchar(USART_SERIAL_API, '\n');
+	usart_putchar(USART_SERIAL_API, '\r');
+	usart_putchar(USART_SERIAL_API, 'c');
+	//usart_putchar(USART_SERIAL_API, '\r');
+	//usart_putchar(USART_SERIAL_API, '\n');
+	//char resp[] = "200";
+	//write_command(resp);
 }
 
 /**
@@ -157,7 +190,7 @@ static char is_whitespace(char c)
 }
 
 /**
-* This method parses an received command.
+* This method parses a received command.
 */
 void parse_command(void)
 {
@@ -167,6 +200,7 @@ void parse_command(void)
 	char *in_arg = NULL;
 	
 	for (i = 0; i < command_buff.index; i++) {
+		// Remove all leading whitespaces
 		if (is_whitespace(command_buff.buff[i]) && argc == 0)
 			continue;
 		
@@ -211,7 +245,7 @@ void execute_command(int argc, char **argv)
 /**
 * \brief This function writes the given data to the serial connection.
 */
-void send_command(char *data)
+void write_command(char *data)
 {
 	uint16_t cl = strlen(data);
 	
@@ -219,6 +253,7 @@ void send_command(char *data)
 		usart_putchar(USART_SERIAL_API, data[i]);
 	}
 	
+	usart_putchar(USART_SERIAL_API, '\r');
 	usart_putchar(USART_SERIAL_API, '\n');
 }
 
