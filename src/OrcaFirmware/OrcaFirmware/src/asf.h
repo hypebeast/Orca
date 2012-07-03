@@ -75,6 +75,9 @@
 // From module: PWM service using timer/counter
 #include <pwm.h>
 
+// From module: RTC - Real Time Counter
+#include <rtc.h>
+
 // From module: Sleep Controller driver
 #include <sleep.h>
 
@@ -90,6 +93,9 @@
 
 // From module: TIMING - Delay routines
 #include <delay.h>
+
+// From module: TWI - Two-wire Master Interface
+#include <twim.h>
 
 // From module: USART - Universal Synchronous/Asynchronous Receiver/Transmitter
 #include <usart.h>

@@ -17,13 +17,19 @@
  * All information, error and state messages.
  */
 enum system_message{
-	SYSTEM_INFO_FALSE						=0x0000,	/*!< brief */
-	SYSTEM_INFO_TRUE						=0x0001,	/*!< brief */
+	SYSTEM_INFO_FALSE							=0x0000,	/*!< brief */
+	SYSTEM_INFO_TRUE							=0x0001,	/*!< brief */
 	/* Flight Controller */
-	SYSTEM_INFO_WRONG_FLIGHT_MODE			=0x0010,	/*!< brief RC Controll is not possible. False mode selected. */
-	SYSTEM_INFO_NO_FLIGHT_MODE				=0x0011,	/*!< brief No Flight Mode selected */
+	SYSTEM_INFO_WRONG_FLIGHT_MODE				=0x0010,	/*!< brief RC Controll is not possible. False mode selected. */
+	SYSTEM_INFO_NO_FLIGHT_MODE					=0x0011,	/*!< brief No Flight Mode selected */
 	/* Servo Input */
-	SYSTEM_INFO_WRONG_SERVO_INPUT_VALUE		=0x0020,	/*!< brief Servo Input value is inadmissible. */
+	SYSTEM_INFO_WRONG_SERVO_INPUT_VALUE			=0x0020,	/*!< brief Servo Input value is inadmissible. */
+	/* Voltage Sensor */
+	SYSTEM_INFO_VOLTAGE_SENSOR_WRITE_ERR		=0x0030,	/*!< brief I2C Write to the DAC is not possible. */
+	SYSTEM_INFO_VOLTAGE_SENSOR_NO_CH_SELECTED	=0x0031,	/*!< brief No Channel to read selected. */
+	SYSTEM_INFO_VOLTAGE_SENSOR_READ_ERR			=0x0032,	/*!< brief I2C Read from the DAC is not possible. */
+	SYSTEM_INFO_VOLTAGE_SENSOR_INIT_ERR			=0x0033,	/*!< brief Initaialisation of DAC is not possible. */
+	SYSTEM_INFO_VOLTAGE_SENSOR_TASK_ERR			=0x0034,	/*!< brief Error during the Voltage Sensor Task. */
 };
 
 /*! \enum errlvl
