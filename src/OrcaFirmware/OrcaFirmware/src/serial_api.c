@@ -7,24 +7,33 @@
 
 #include "serial_api.h"
 
-
+/*
+ * Defines
+ */
 #define ARRAY_SIZE(a)	(sizeof(a)/sizeof(a[0]))
 #define CMD_BUFFER_LENGTH 128
 
-/* This structure represents an input buffer for incoming commands */
+/*
+ * Global variables
+ */
+
+/** \brief This structure represents an input buffer for incoming API commands.
+ *
+ */
 static struct {
-	char buff[CMD_BUFFER_LENGTH];
+	/* Buffer for the command packet */
+	char buff[MAX_PACKET_LENGTH];
 	unsigned int index;
-	bool cr_received;
+	bool start_received;
 	unsigned int match;
 } command_buff;
+
+SERIAL_API_PACKET_t receive_command_packet;
+SERIAL_API_PACKET_t transmit_command_packet;
 
 /************************************************************************/
 /* API command definitions                                              */
 /************************************************************************/
-
-/* Test API command */
-static void test_command(int argc, char **argv);
 
 /* All LEDs on */
 static void leds_on(int argc, char **argv);
@@ -69,14 +78,6 @@ struct api_command engine_commands[] = {
 /* API commands implementation                                          */
 /************************************************************************/
 
-/* Test API command */
-static void test_command(int argc, char **argv)
-{
-	char tx_buffer[] = "Test Command";
-	for (int i = 0; i < 14; i++) {
-		usart_putchar(USART_SERIAL_API, tx_buffer[i]);
-	}
-}
 
 /**
 * \brief This function parses all engine commands.
@@ -178,7 +179,7 @@ void serial_api_init(void)
 	usart_init_rs232(USART_SERIAL_API, &USART_SERIAL_OPTIONS);
 	
 	command_buff.index = 0;
-	command_buff.cr_received = false;
+	command_buff.start_received = false;
 }
 
 /**
@@ -187,39 +188,6 @@ void serial_api_init(void)
 static char is_whitespace(char c)
 {
 	return (c == ' ' || c == '\t' || c == '\r' || c == '\n');
-}
-
-/**
-* This method parses a received command.
-*/
-void parse_command(void)
-{
-	uint8_t i;
-	char *argv[16];
-	int argc = 0;
-	char *in_arg = NULL;
-	
-	for (i = 0; i < command_buff.index; i++) {
-		// Remove all leading whitespaces
-		if (is_whitespace(command_buff.buff[i]) && argc == 0)
-			continue;
-		
-		if (is_whitespace(command_buff.buff[i])) {
-			if (in_arg) {
-				command_buff.buff[i] = '\0';
-				in_arg = NULL;
-			}
-		} else if (!in_arg) {
-			in_arg = &command_buff.buff[i];
-			argv[argc] = in_arg;
-			argc++;
-		}
-	}
-	
-	command_buff.buff[i] = '\0';
-	
-	if (argc > 0)
-		execute_command(argc, argv);
 }
 
 /**
@@ -257,6 +225,56 @@ void write_command(char *data)
 	usart_putchar(USART_SERIAL_API, '\n');
 }
 
+/** \brief This method parses a received command packet.
+* 
+*/
+void parse_command_packet(void)
+{
+	uint8_t i;
+	char *argv[16];
+	int argc = 0;
+	char *in_arg = NULL;
+	uint16_t index = 0;
+	
+	// The first byte is the start delimiter
+	receive_command_packet.start_delimiter = command_buff.buff[index++];
+	
+	// The second byte is the message type
+	receive_command_packet.message_type = command_buff.buff[index++];
+	
+	// The third byte is the data length
+	receive_command_packet.data_length = command_buff.buff[index++];
+	
+	// Byte four and five contains the command type
+	receive_command_packet.command_type = 0;
+	receive_command_packet.command_type = (receive_command_packet.command_type << 8) | command_buff.buff[index++];
+	receive_command_packet.command_type = (receive_command_packet.command_type << 8) | command_buff.buff[index++];
+	
+	//receive_command_packet.data = memcp
+	
+	for (i = 0; i < command_buff.index; i++) {
+		// Remove all leading whitespaces
+		if (is_whitespace(command_buff.buff[i]) && argc == 0)
+			continue;
+		
+		if (is_whitespace(command_buff.buff[i])) {
+			if (in_arg) {
+				command_buff.buff[i] = '\0';
+				in_arg = NULL;
+			}
+		} else if (!in_arg) {
+			in_arg = &command_buff.buff[i];
+			argv[argc] = in_arg;
+			argc++;
+		}
+	}
+	
+	command_buff.buff[i] = '\0';
+	
+	if (argc > 0)
+		execute_command(argc, argv);
+}
+
 /**
 * Main worker method for the serial API.
 */
@@ -271,32 +289,33 @@ void serial_api_task(void)
 
 		// Process the received byte
 		switch (received_byte) {
-			// LF received
-			case '\n':
-			if (command_buff.cr_received)
-			{
-				if (command_buff.index > 0) {
-					parse_command();
-					command_buff.index = 0;
-					command_buff.cr_received = false;
-					memset(command_buff.buff, 0, sizeof(command_buff.buff));
+			case PACKET_START_STOP_DELIMITER:
+				// Start delimiter received
+				if (!command_buff.start_received) {
+					command_buff.start_received = true;
+					command_buff.buff[command_buff.index] = PACKET_START_STOP_DELIMITER;
+					command_buff.index++;
 				}
-			}
-			break;
-			
-			// CR received
-			case '\r':
-			command_buff.cr_received = true;
-			break;
-			
-			case '\b':
-			break;
+				// Stop delimiter received
+				else if (command_buff.start_received) {
+					if (command_buff.index > 0) {
+						command_buff.buff[command_buff.index] = PACKET_START_STOP_DELIMITER;
+						parse_command_packet();
+						command_buff.index = 0;
+						command_buff.start_received = false;
+						memset(command_buff.buff, 0, sizeof(command_buff.buff));
+					}
+				}
+				break;
 			
 			default:
-			if (command_buff.index < CMD_BUFFER_LENGTH - 1) {
-				command_buff.buff[command_buff.index] = received_byte;
-				command_buff.index++;
-			}
+				if (command_buff.start_received) {
+					if (command_buff.index < MAX_PACKET_LENGTH - 1) {
+						command_buff.buff[command_buff.index] = received_byte;
+						command_buff.index++;
+					}
+				}
+				break;
 		}
 	}
 }
