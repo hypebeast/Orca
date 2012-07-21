@@ -173,6 +173,7 @@ typedef struct BOARD_CONFIG {
 }BOARD_CONFIG_t;
 
 void orca_init(void);
-
+static void system_timer(uint32_t time);
+uint16_t i2c_intern_init(void);
 
 #endif /* ORCA_BOARD_H_ */
