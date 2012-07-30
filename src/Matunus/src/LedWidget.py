@@ -34,6 +34,9 @@ GREEN = 0
 RED = 1
 
 class LedWidget(QtGui.QWidget):
+    GREEN = 0
+    RED = 1
+    
     def __init__(self):
         super(LedWidget, self).__init__()
 
