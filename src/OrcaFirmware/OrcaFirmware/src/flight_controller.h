@@ -25,11 +25,18 @@
 #define FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH		1500	// in ticks
 
 //---------------------------------------------------------------------
-//	EDF Definitions
+//	Front EDF Definitions
 //---------------------------------------------------------------------
 #define FLIGHT_CONTROLLER_EDF_OFFSET					300		/*!< brief Additions-Offset für die EDF's links und Rechts */
 #define FLIGHT_CONTROLLER_EDF_Factor					0.5f	/*!< brief External RC controlled */
 #define FLIGHT_CONTROLLER_AILERON_FACTOR				0.1f	/*!< brief Factor für die EDF Subtraktion für die EDF's */
+
+//---------------------------------------------------------------------
+//	Rear EDF Definitions
+//---------------------------------------------------------------------
+#define FLIGHT_CONTROLLER_EDF_REAR_OFFSET				000		/*!< brief Additions-Offset für rear EDF */
+#define FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET			1260
+
 //---------------------------------------------------------------------
 //	Servo Definitions
 //---------------------------------------------------------------------

@@ -169,6 +169,12 @@ int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController)
 int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 {
 
+	if(flightController->rcServoIn->servo3 >= FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET)
+		flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_EDF_REAR_OFFSET+ flightController->rcServoIn->servo3;
+
+	else
+		flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH;	
+		
 	return SYSTEM_INFO_TRUE;	
 }
 

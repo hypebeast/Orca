@@ -18,7 +18,6 @@
 #include "serial_api.h"
 #include <rtc.h>
 
-//just for test
 #include "system_info.h"
 #include "user_board.h"
 #include "orca_init.h"
@@ -26,56 +25,64 @@
 #include "servo.h"
 #include "flight_controller.h"
 #include "voltage_sens.h"
+#include "MPU6000.h"
 
 /* global variables */
-BOARD_CONFIG_t board;  						/*!< \brief board module */
-SERVO_IN_t servoIn;							/*!< \brief servo input module */
-FLIGHT_CONTROLLER_t flightController;		/*!< \brief flight controller module */
-VOLTAGE_SENSOR_t voltageSensor;				/*!< \brief voltage Sensor module */
+BOARD_CONFIG_t board;  								/*!< \brief board module */
+SERVO_IN_t servoIn;									/*!< \brief servo input module */
+FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
+VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
+MOTION_PROCESSING_UNIT_t *motionProcessingUnit;		/*!< \brief motion processing unit module */
 
- static void ISR_system_timer(void)
- {
-	nop();
- }
- 
+unsigned long ulFcTickCounter = 0;			/*!< \brief Flight Controller system tick counter */
+unsigned long ulVsTickCounter = 0;			/*!< \brief Voltage sensor system tick counter */
+
 int main (void)
 {
 	// Initialize all basic board functions
 	orca_init();
 	
-	//testing stuff	
-	Stat_LED_ON();
-	Err_LED_ON();
+
 	
 	//voltage_sens_write_Setup(0);
+	mpu_6000_read_accelerometer_measurements(motionProcessingUnit);
+//	mpu_6000_read_gyroscope_measurements(motionProcessingUnit);
 	
+		//testing stuff
+		Stat_LED_ON();
+		Err_LED_ON();
+		
 	while(1)
 	{
 		// Process incoming API commands
 		serial_api_task();
-		voltage_sens_task(&voltageSensor);
-		// Flight controller
-		//flight_controller_task(&flightController);		
+		flight_controller_task(&flightController);
+		
 	}
 }
 
 void orca_init()
 {
-	//struct pll_config pllcfg;
-				
-	osc_enable(OSC_ID_RC32MHZ);
-    osc_wait_ready(OSC_ID_RC32MHZ); 
-	//pll_enable_config_defaults(0); 
+	struct pll_config pcfg;
 	
-		pmic_init();
-		
-	/* init system timer */
-	sysclk_init();
+	pmic_init();
+	
+	/* Init clock */	
+	sysclk_init();	
+	
+	osc_enable(OSC_ID_RC32MHZ);
+	osc_enable(OSC_ID_RC32KHZ);
+    osc_wait_ready(OSC_ID_RC32MHZ); 	
+	//pll_config_init(&pcfg, PLL_SRC_RC32MHZ, 4, 4);
+	//pll_enable(&pcfg, 0);
+	//do {} while (!pll_is_locked(0));
+	//sysclk_set_prescalers(SYSCLK_PSADIV_1, SYSCLK_PSBCDIV_1_1);
+	//sysclk_set_source(SYSCLK_SRC_PLL);
 	
 	/* Init delay functions */
 	delay_init(sysclk_get_cpu_hz());
 	
-	/* board init */
+	/* Board Init */
 	orca_board_init(&board);
 	
 	/* servo in subsystem init */
@@ -95,29 +102,24 @@ void orca_init()
 	
 	cpu_irq_enable();
 		
-	rtc_init();
-	rtc_set_callback(system_timer);
-		
-
-	
+	/* Wait some time for external devices to start up */	
 	delay_ms(300);
 	
 	/* Initialize the the voltage sensor */
 	voltage_sens_init(&voltageSensor, 0x02);
 	
-	//tc_enable(&TCC0);
-	//tc_set_overflow_interrupt_callback(&TCC0, ISR_system_timer);
-	//tc_set_wgm(&TCC0, TC_WG_NORMAL);
-	//tc_write_period(&TCC0, 1000);
-	//tc_set_overflow_interrupt_level(&TCC0, TC_INT_LVL_HI);
+	mpu_6000_init(motionProcessingUnit);
+	
+	/* Initialize and start System Timer */
+	rtc_init();
+	rtc_set_callback(system_timer);
+	rtc_set_alarm(5);
+	//rtc_set_alarm_relative(0);
 
 	/* enable interrupts */
 	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
 	//pmic_init();
 	//cpu_irq_enable();
-	
-	//tc_write_clock_source(&TCC0, TC_CLKSEL_DIV1_gc);
-	
 
 }
 
@@ -137,9 +139,36 @@ uint16_t i2c_intern_init(void)
 	twi_master_enable(BOARD_I2C_INTERN_INTERFACE);
 }
 
+/**************************************************************************
+* \brief System Timer Callback
+*	This function is called periodically every 10 ms. Use this function 
+*	for scheduling. /n
+*
+* \param *time time
+*
+* \return  ---
+***************************************************************************/
 static void system_timer(uint32_t time)
 {
-	rtc_set_alarm(time);
+	ulFcTickCounter++;
+	ulVsTickCounter++;
+	
+	/* Call the flight Controller every 10 ms */ 
+	if(ulFcTickCounter >= 1)
+	{
+		//flight_controller_task(&flightController);
+		ulFcTickCounter = 0;		
+	}
+	
+	/* Call the voltage sensor every 500 */
+	if(ulVsTickCounter >= 50)
+	{
+		voltage_sens_task(&voltageSensor);
+		ulVsTickCounter = 0;
+	}
+
+	rtc_set_alarm(1);
+	rtc_set_time(0);
 }
  
 ISR(PORTH_INT0_vect)

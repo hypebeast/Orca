@@ -30,6 +30,9 @@ enum system_message{
 	SYSTEM_INFO_VOLTAGE_SENSOR_READ_ERR			=0x0032,	/*!< brief I2C Read from the DAC is not possible. */
 	SYSTEM_INFO_VOLTAGE_SENSOR_INIT_ERR			=0x0033,	/*!< brief Initaialisation of DAC is not possible. */
 	SYSTEM_INFO_VOLTAGE_SENSOR_TASK_ERR			=0x0034,	/*!< brief Error during the Voltage Sensor Task. */
+	/* MPU Sensor */
+	SYSTEM_INFO_MPU_SENSOR_ACC_READ_ERR			=0x0040,	/*!< brief MPU acceleration I2C read error. */
+	SYSTEM_INFO_MPU_SENSOR_GYRO_READ_ERR		=0x0041,	/*!< brief MPU gyro I2C read error. */
 };
 
 /*! \enum errlvl
