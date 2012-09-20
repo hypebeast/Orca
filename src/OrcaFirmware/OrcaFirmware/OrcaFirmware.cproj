@@ -500,6 +500,12 @@
     <None Include="src\asf\xmega\utils\assembler\gas.h">
       <SubType>compile</SubType>
     </None>
+    <Compile Include="src\crc8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\crc8.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\MPU6000.c">
       <SubType>compile</SubType>
     </Compile>
