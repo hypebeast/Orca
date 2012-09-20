@@ -10,7 +10,7 @@
 #include "servo.h"
 
 
-volatile uint16_t servo_compare_period[6];
+uint16_t servo_compare_period[6];
 
 /**
 * \brief Calculates and sets the right frequency for the timer.
@@ -23,7 +23,6 @@ void servo_set_frequency()
 
 /**
 * \brief This function initializes the servo subsystem.
-*
 */
 void servo_init()
 {	
@@ -142,7 +141,8 @@ void servo_set_pos_ticks(uint8_t servo_nr, uint16_t pos)
 }
 
 /**
-* This function returns the current position of the specified servo in ticks (microseconds).
+* \brief This function returns the current position of the specified servo in
+* ticks (microseconds).
 */
 uint16_t servo_get_pos_ticks(uint8_t servo_nr)
 {

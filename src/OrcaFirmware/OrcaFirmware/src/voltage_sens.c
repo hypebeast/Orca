@@ -63,7 +63,7 @@ uint16_t voltage_sens_write_Setup(uint8_t setup)
 	int8_t status = 0x00; 
 	
 	package.chip = VOLTAGE_SENS_DEV_ADDRESS;
-	package.addr = 0;
+	package.addr[0] = 0;
 	package.addr_length = 0;
 	package.buffer = &data;
 	package.length = 0x01;
@@ -86,7 +86,7 @@ uint16_t voltage_sens_write_config(uint8_t conf)
 	int8_t status = 0x00; 
 	
 	package.chip = VOLTAGE_SENS_DEV_ADDRESS;
-	package.addr = 0;
+	package.addr[0] = 0;
 	package.addr_length = 0;
 	package.buffer = &data;
 	package.length = 0x01;
@@ -119,7 +119,7 @@ uint16_t voltage_sens_read_channels(VOLTAGE_SENSOR_t *sensor)
 	//uint8_t i = 0x00;
 	
 	packetReceived.chip = VOLTAGE_SENS_DEV_ADDRESS;
-	packetReceived.addr = 0;
+	packetReceived.addr[0] = 0;
 	packetReceived.addr_length = 0;
 	packetReceived.buffer = dataReceived;
 	packetReceived.length = (sensor->channelNumber)*2;	// One Channel is stored in two Bytes

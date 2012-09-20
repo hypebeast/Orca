@@ -33,6 +33,9 @@
 #define SERVO_PULSE_WIDTH (SERVO_UPPER_PULSE_WIDTH - SERVO_LOWER_PULSE_WIDTH)
 #define SERVO_TICKS_PER_DEGREE (SERVO_PULSE_WIDTH/180.0f)
 
+typedef struct servo_out {
+	
+} SERVO_OUT_t;
 
 /**
 * \brief Servo configuration
