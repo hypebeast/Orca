@@ -3,7 +3,7 @@
  *
  * \brief System clock management
  *
- * Copyright (c) 2010 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2010-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -79,6 +79,8 @@
 /**
  * \ingroup clk_group
  * \defgroup sysclk_group System Clock Management
+ *
+ * See \ref sysclk_quickstart.
  *
  * The <em>sysclk</em> API covers the <em>system clock</em> and all
  * clocks derived from it. The system clock is a chip-internal clock on

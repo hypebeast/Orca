@@ -3,7 +3,7 @@
  *
  * \brief Chip-specific system clock manager configuration
  *
- * Copyright (c) 2011 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2011-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -54,7 +54,6 @@
 //#define CONFIG_PLL0_SOURCE          PLL_SRC_XOSC
 //#define CONFIG_PLL0_SOURCE          PLL_SRC_RC2MHZ
 //#define CONFIG_PLL0_SOURCE          PLL_SRC_RC32MHZ
-//#define CONFIG_PLL0_SOURCE          PLL_SRC_XOSC
 
 /* Fpll = (Fclk * PLL_mul) / PLL_div */
 //#define CONFIG_PLL0_MUL             (24000000UL / BOARD_XOSC_HZ)

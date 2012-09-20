@@ -346,7 +346,7 @@ void nvm_read_device_serial(struct nvm_device_serial *storage);
 #ifndef CONFIG_NVM_IGNORE_XMEGA_A3_D3_REVB_ERRATA
 #  if XMEGA_A3 || XMEGA_D3
 #    error This NVM driver does not support rev B of XMEGA A3/D3 devices. \
-     Set CONFIG_NVM_IGNORE_XMEGA_A3_D3_REVB_ERRATA to disable this system_message
+     Set CONFIG_NVM_IGNORE_XMEGA_A3_D3_REVB_ERRATA to disable this message
 #  endif
 #endif
 
@@ -483,13 +483,16 @@ void nvm_eeprom_erase_all(void);
 		part_is_defined(ATxmega128A1U) | \
 		part_is_defined(ATxmega128A3)  | \
 		part_is_defined(ATxmega128A3U) | \
-		part_is_defined(ATxmega128A4U) | \
-		part_is_defined(ATxmega128B1)  | \
-		part_is_defined(ATxmega128B3)  | \
 		part_is_defined(ATxmega128D3)  | \
 		part_is_defined(ATxmega128D4)
 #    define FLASH_SIZE      (128*1024L)
 #    define FLASH_PAGE_SIZE (512)
+
+#  elif part_is_defined(ATxmega128A4U)         | \
+		part_is_defined(ATxmega128B1)  | \
+		part_is_defined(ATxmega128B3)
+#    define FLASH_SIZE      (128*1024L)
+#    define FLASH_PAGE_SIZE (256)
 
 // 192K devices
 #  elif part_is_defined(ATxmega192A3U) | \

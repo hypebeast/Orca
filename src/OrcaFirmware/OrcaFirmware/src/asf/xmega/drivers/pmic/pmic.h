@@ -3,7 +3,7 @@
  *
  * \brief Programmable Multilevel Interrupt Controller driver
  *
- * Copyright (c) 2010 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2010-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -47,7 +47,7 @@
 /**
  * \defgroup pmic_group Programmable Multilevel Interrupt Controller
  *
- * See \ref pmic_quickstart.
+ * See \ref xmega_pmic_quickstart.
  *
  * This is a low-level driver implementation for the AVR XMEGA Programmable
  * Multilevel Interrupt Controller.
@@ -220,7 +220,7 @@ static inline void pmic_set_vector_location(enum pmic_vector vector)
 //! @}
 
 /**
- * \page pmic_quickstart Quick start guide for PMIC driver
+ * \page xmega_pmic_quickstart Quick start guide for PMIC driver
  *
  * This is the quick start guide for the \ref pmic_group "PMIC driver" and
  * the closely related \ref interrupt_group "global interrupt driver", with

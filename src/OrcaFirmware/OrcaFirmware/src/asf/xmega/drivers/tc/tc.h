@@ -728,7 +728,7 @@ static inline void tc_set_input_capture(volatile void *tc,
 		TC_EVSEL_t eventsource, TC_EVACT_t eventaction)
 {
 	((TC0_t *)tc)->CTRLD &= ~(TC0_EVSEL_gm | TC0_EVACT_gm);
-	((TC0_t *)tc)->CTRLD |= (eventsource | eventaction);
+	((TC0_t *)tc)->CTRLD |= ((uint8_t)eventsource | (uint8_t)eventaction);
 }
 
 /**

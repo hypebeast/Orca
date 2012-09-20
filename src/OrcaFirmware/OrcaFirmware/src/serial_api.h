@@ -47,7 +47,6 @@ typedef struct serial_api_packet {
 	uint16_t command_type;
 	uint8_t data[DATA_BUFFER_LENGTH];
 	uint8_t crc;
-	uint8_t stop_delimiter;
 } SERIAL_API_PACKET_t;
 
 

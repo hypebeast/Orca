@@ -3,7 +3,7 @@
  *
  * \brief XMEGA TWI master source file.
  *
- * Copyright (c) 2010-2011 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2010-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -184,7 +184,7 @@ static inline void twim_write_handler(void)
 
 	if (transfer.addr_count < pkg->addr_length) {
 
-		const uint8_t * const data = (uint8_t *) &pkg->addr;
+		const uint8_t * const data = pkg->addr;
 		bus->MASTER.DATA = data[transfer.addr_count++];
 
 	} else if (transfer.data_count < pkg->length) {
@@ -295,7 +295,7 @@ static void twim_interrupt_handler(void)
  * \retval STATUS_OK        Transaction is successful
  * \retval ERR_INVALID_ARG  Invalid arguments in \c opt.
  */
-status_code_t twi_master_init(volatile TWI_t *twi, const twi_options_t *opt)
+status_code_t twi_master_init(TWI_t *twi, const twi_options_t *opt)
 {
 	uint8_t const ctrla = CONF_TWIM_INTLVL | TWI_MASTER_RIEN_bm |
 		TWI_MASTER_WIEN_bm | TWI_MASTER_ENABLE_bm;
@@ -334,7 +334,7 @@ status_code_t twi_master_init(volatile TWI_t *twi, const twi_options_t *opt)
  *      - ERR_PROTOCOL to indicate an unexpected bus state
  *      - ERR_INVALID_ARG to indicate invalid arguments.
  */
-status_code_t twi_master_transfer(volatile TWI_t *twi,
+status_code_t twi_master_transfer(TWI_t *twi,
 		const twi_package_t *package, bool read)
 {
 	/* Do a sanity check on the arguments. */

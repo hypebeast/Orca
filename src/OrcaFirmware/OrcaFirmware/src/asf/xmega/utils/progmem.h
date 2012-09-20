@@ -63,8 +63,8 @@
 # define PROGMEM_DECLARE(type, name) const type name __attribute__((__progmem__))
 # define PROGMEM_STRING(x) PSTR(x)
 # define PROGMEM_STRING_T  PGM_P
-# define PROGMEM_T
-# define PROGMEM_PTR_T *
+# define PROGMEM_T const
+# define PROGMEM_PTR_T const *
 # define PROGMEM_BYTE_ARRAY_T uint8_t*
 # define PROGMEM_WORD_ARRAY_T uint16_t*
 # define PROGMEM_READ_BYTE(x) pgm_read_byte(x)

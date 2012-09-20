@@ -3,7 +3,7 @@
  *
  * \brief Sleep manager
  *
- * Copyright (c) 2010 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2010-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -45,7 +45,9 @@
 #include <sleep.h>
 #include <parts.h>
 
-#if defined(XMEGA)
+#if (SAM3S || SAM3U || SAM3N || SAM3XA || SAM4S)
+# include "sam/sleepmgr.h"
+#elif defined(XMEGA)
 # include "xmega/sleepmgr.h"
 #elif (defined(__GNUC__) && defined(__AVR32__)) || (defined(__ICCAVR32__) || defined(__AAVR32__))
 # include "uc3/sleepmgr.h"

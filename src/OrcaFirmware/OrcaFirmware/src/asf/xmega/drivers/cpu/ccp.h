@@ -45,7 +45,7 @@
 /**
  * \defgroup ccp_group Configuration Change Protection
  *
- * See \ref ccp_quickstart.
+ * See \ref xmega_ccp_quickstart.
  *
  * Function for writing to protected IO registers.
  * @{
@@ -97,7 +97,7 @@ extern void ccp_write_io(void *addr, uint8_t value);
 /** @} */
 
 /**
- * \page ccp_quickstart Quick start guide for CCP driver
+ * \page xmega_ccp_quickstart Quick start guide for CCP driver
  *
  * This is the quick start guide for the \ref ccp_group
  * "Configuration Change Protection (CCP) driver", with step-by-step

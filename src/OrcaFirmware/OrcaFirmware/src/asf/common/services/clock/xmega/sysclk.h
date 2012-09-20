@@ -3,7 +3,7 @@
  *
  * \brief Chip-specific system clock management functions
  *
- * Copyright (c) 2010-2011 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2010-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -54,6 +54,156 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * \page sysclk_quickstart Quick Start Guide for the System Clock Management service (XMEGA)
+ *
+ * This is the quick start guide for the \ref sysclk_group "System Clock Management"
+ * service, with step-by-step instructions on how to configure and use the service for
+ * specific use cases.
+ *
+ * \section sysclk_quickstart_usecases System Clock Management use cases
+ * - \ref sysclk_quickstart_basic
+ * - \ref sysclk_quickstart_use_case_2
+ *
+ * \section sysclk_quickstart_basic Basic usage of the System Clock Management service
+ * This section will present a basic use case for the System Clock Management service.
+ * This use case will configure the main system clock to 32MHz, using an internal PLL
+ * module to multiply the frequency of a crystal attached to the microcontroller. The
+ * secondary peripheral bus clock and CPU clock are scaled down from the speed of the
+ * main system clock.
+ *
+ * \subsection sysclk_quickstart_use_case_1_prereq Prerequisites
+ *  - None
+ *
+ * \subsection sysclk_quickstart_use_case_1_setup_steps Initialization code
+ * Add to the application initialization code:
+ * \code
+ *    sysclk_init();
+ * \endcode
+ *
+ * \subsection sysclk_quickstart_use_case_1_setup_steps_workflow Workflow
+ * -# Configure the system clocks according to the settings in conf_clock.h:
+ *    \code sysclk_init(); \endcode
+ *
+ * \subsection sysclk_quickstart_use_case_1_example_code Example code
+ *   Add or uncomment the following in your conf_clock.h header file, commenting out all other
+ *   definitions of the same symbol(s):
+ *   \code
+ *   #define CONFIG_SYSCLK_SOURCE        SYSCLK_SRC_PLL
+ *
+ *   // Fpll0 = (Fclk * PLL_mul) / PLL_div
+ *   #define CONFIG_PLL0_SOURCE          PLL_SRC_XOSC
+ *   #define CONFIG_PLL0_MUL             (32000000UL / BOARD_XOSC_HZ)
+ *   #define CONFIG_PLL0_DIV             1
+ *
+ *   // Fbus = Fsys / (2 ^ BUS_div)
+ *   #define CONFIG_SYSCLK_PSADIV        SYSCLK_PSADIV_1
+ *   #define CONFIG_SYSCLK_PSBCDIV       SYSCLK_PSBCDIV_1_2
+ *   \endcode
+ *
+ * \subsection sysclk_quickstart_use_case_1_example_workflow Workflow
+ *  -# Configure the main system clock to use the output of the PLL module as its source:
+ *   \code #define CONFIG_SYSCLK_SOURCE          SYSCLK_SRC_PLL \endcode
+ *  -# Configure the PLL0 module to use external crystal oscillator XOSC as its source:
+ *   \code #define CONFIG_PLL0_SOURCE            PLL_SRC_XOSC \endcode
+ *  -# Configure the PLL0 module to multiply the external oscillator XOSC frequency up to 32MHz:
+ *   \code
+ *   #define CONFIG_PLL0_MUL             (32000000UL / BOARD_XOSC_HZ)
+ *   #define CONFIG_PLL0_DIV             1 
+ *   \endcode
+ *   \note For user boards, \c BOARD_XOSC_HZ should be defined in the board \c conf_board.h configuration
+ *         file as the frequency of the crystal attached to XOSC.
+ *  -# Configure the main CPU clock and slow peripheral bus to run at 16MHz, run the fast peripheral bus
+ *     at the full 32MHz speed:
+ *    \code
+ *    #define CONFIG_SYSCLK_PSADIV       SYSCLK_PSADIV_1
+ *    #define CONFIG_SYSCLK_PSBCDIV      SYSCLK_PSBCDIV_1_2
+ *    \endcode
+ *    \note Some dividers are powers of two, while others are integer division factors. Refer to the
+ *          formulas in the conf_clock.h template commented above each division define.
+ */
+
+/**
+ * \page sysclk_quickstart_use_case_2 Advanced use case - Peripheral Bus Clock Management (XMEGA)
+ *
+ * \section sysclk_quickstart_use_case_2 Advanced use case - Peripheral Bus Clock Management
+ * This section will present a more advanced use case for the System Clock Management service.
+ * This use case will configure the main system clock to 32MHz, using an internal PLL
+ * module to multiply the frequency of a crystal attached to the microcontroller. The peripheral bus
+ * clocks will run at the same speed as the CPU clock, and the USB clock will be configured to use
+ * the internal 32MHz (nominal) RC oscillator calibrated to 48MHz with the USB Start-of-Frame as the
+ * calibration reference.
+ *
+ * \subsection sysclk_quickstart_use_case_2_prereq Prerequisites
+ *  - None
+ *
+ * \subsection sysclk_quickstart_use_case_2_setup_steps Initialization code
+ * Add to the application initialization code:
+ * \code
+ *    sysclk_init();
+ * \endcode
+ *
+ * \subsection sysclk_quickstart_use_case_2_setup_steps_workflow Workflow
+ * -# Configure the system clocks according to the settings in conf_clock.h:
+ *    \code sysclk_init(); \endcode
+ *
+ * \subsection sysclk_quickstart_use_case_2_example_code Example code
+ *   Add or uncomment the following in your conf_clock.h header file, commenting out all other
+ *   definitions of the same symbol(s):
+ *   \code
+ *   #define CONFIG_SYSCLK_SOURCE        SYSCLK_SRC_PLL
+ *
+ *   // Fpll0 = (Fclk * PLL_mul) / PLL_div
+ *   #define CONFIG_PLL0_SOURCE          PLL_SRC_XOSC
+ *   #define CONFIG_PLL0_MUL             (32000000UL / BOARD_XOSC_HZ)
+ *   #define CONFIG_PLL0_DIV             1
+ *
+ *   // Fbus = Fsys / (2 ^ BUS_div)
+ *   #define CONFIG_SYSCLK_PSADIV        SYSCLK_PSADIV_1
+ *   #define CONFIG_SYSCLK_PSBCDIV       SYSCLK_PSBCDIV_1_1
+ *
+ *   #define CONFIG_USBCLK_SOURCE        USBCLK_SRC_RCOSC
+ *   #define CONFIG_OSC_RC32_CAL         48000000UL
+ *   #define CONFIG_OSC_AUTOCAL          OSC_ID_RC32MHZ
+ *   #define CONFIG_OSC_AUTOCAL_REF_OSC  OSC_ID_USBSOF
+ *   \endcode
+ *
+ * \subsection sysclk_quickstart_use_case_2_example_workflow Workflow
+ *  -# Configure the main system clock to use the output of the PLL module as its source:
+ *   \code #define CONFIG_SYSCLK_SOURCE           SYSCLK_SRC_PLL \endcode
+ *  -# Configure the PLL0 module to use external crystal oscillator XOSC as its source:
+ *   \code #define CONFIG_PLL0_SOURCE             PLL_SRC_XOSC \endcode
+ *  -# Configure the PLL0 module to multiply the external oscillator XOSC frequency up to 32MHz:
+ *   \code
+ *   #define CONFIG_PLL0_MUL              (32000000UL / BOARD_XOSC_HZ)
+ *   #define CONFIG_PLL0_DIV              1 
+ *   \endcode
+ *   \note For user boards, \c BOARD_XOSC_HZ should be defined in the board \c conf_board.h configuration
+ *         file as the frequency of the crystal attached to XOSC.
+ *  -# Configure the main CPU and peripheral bus clocks to run at 32MHz:
+ *    \code
+ *    #define CONFIG_SYSCLK_PSADIV        SYSCLK_PSADIV_1
+ *    #define CONFIG_SYSCLK_PSBCDIV       SYSCLK_PSBCDIV_1_2
+ *    \endcode
+ *    \note Some dividers are powers of two, while others are integer division factors. Refer to the
+ *          formulas in the conf_clock.h template commented above each division define.
+ *  -# Configure the USB module clock to use the internal fast (32MHz) RC oscillator:
+ *    \code
+ *    #define CONFIG_USBCLK_SOURCE        USBCLK_SRC_RCOSC
+ *    \endcode
+ *    \note When the internal RC oscillator is used for the USB module, it must be recalibrated to 4MHz for
+ *          the USB peripheral to function. If this oscillator is then used as the main system clock source,
+ *          the clock must be divided down via the peripheral and CPU bus clock division constants to ensure
+ *          that the maximum allowable CPU frequency is not exceeded.
+ *  -# Configure the internal fast (32MHz) RC oscillator to calibrate to 48MHz using the USB Start of Frame (SOF)
+ *     as the calibration reference:
+ *    \code
+ *    #define CONFIG_OSC_RC32_CAL         48000000UL
+ *    #define CONFIG_OSC_AUTOCAL          OSC_ID_RC32MHZ
+ *    #define CONFIG_OSC_AUTOCAL_REF_OSC  OSC_ID_USBSOF
+ *    \endcode
+ */
 
 // Use 2 MHz with no prescaling if config was empty.
 #ifndef CONFIG_SYSCLK_SOURCE
@@ -472,43 +622,43 @@ static inline uint32_t sysclk_get_peripheral_bus_hz(const volatile void *module)
 		return sysclk_get_per_hz();
 	}
 #endif
-#ifdef USART0C
-	else if (module == &USART0C) {
+#ifdef USARTC0
+	else if (module == &USARTC0) {
 		return sysclk_get_per_hz();
 	}
 #endif
-#ifdef USART0D
-	else if (module == &USART0D) {
+#ifdef USARTD0
+	else if (module == &USARTD0) {
 		return sysclk_get_per_hz();
 	}
 #endif
-#ifdef USART0E
-	else if (module == &USART0E) {
+#ifdef USARTE0
+	else if (module == &USARTE0) {
 		return sysclk_get_per_hz();
 	}
 #endif
-#ifdef USART0F
-	else if (module == &USART0F) {
+#ifdef USARTF0
+	else if (module == &USARTF0) {
 		return sysclk_get_per_hz();
 	}
 #endif
-#ifdef USART1C
-	else if (module == &USART1C) {
+#ifdef USARTC1
+	else if (module == &USARTC1) {
 		return sysclk_get_per_hz();
 	}
 #endif
-#ifdef USART1D
-	else if (module == &USART1D) {
+#ifdef USARTD1
+	else if (module == &USARTD1) {
 		return sysclk_get_per_hz();
 	}
 #endif
-#ifdef USART1E
-	else if (module == &USART1E) {
+#ifdef USARTE1
+	else if (module == &USARTE1) {
 		return sysclk_get_per_hz();
 	}
 #endif
-#ifdef USART1F
-	else if (module == &USART1F) {
+#ifdef USARTF1
+	else if (module == &USARTF1) {
 		return sysclk_get_per_hz();
 	}
 #endif
@@ -928,43 +1078,43 @@ static inline void sysclk_disable_peripheral_clock(const volatile void *module)
 		sysclk_disable_module(SYSCLK_PORT_F, SYSCLK_SPI);
 	}
 #endif
-#ifdef USART0C
-	else if (module == &USART0C) {
+#ifdef USARTC0
+	else if (module == &USARTC0) {
 		sysclk_disable_module(SYSCLK_PORT_C, SYSCLK_USART0);
 	}
 #endif
-#ifdef USART0D
-	else if (module == &USART0D) {
+#ifdef USARTD0
+	else if (module == &USARTD0) {
 		sysclk_disable_module(SYSCLK_PORT_D, SYSCLK_USART0);
 	}
 #endif
-#ifdef USART0E
-	else if (module == &USART0E) {
+#ifdef USARTE0
+	else if (module == &USARTE0) {
 		sysclk_disable_module(SYSCLK_PORT_E, SYSCLK_USART0);
 	}
 #endif
-#ifdef USART0F
-	else if (module == &USART0F) {
+#ifdef USARTF0
+	else if (module == &USARTF0) {
 		sysclk_disable_module(SYSCLK_PORT_F, SYSCLK_USART0);
 	}
 #endif
-#ifdef USART1C
-	else if (module == &USART1C) {
+#ifdef USARTC1
+	else if (module == &USARTC1) {
 		sysclk_disable_module(SYSCLK_PORT_C, SYSCLK_USART1);
 	}
 #endif
-#ifdef USART1D
-	else if (module == &USART1D) {
+#ifdef USARTD1
+	else if (module == &USARTD1) {
 		sysclk_disable_module(SYSCLK_PORT_D, SYSCLK_USART1);
 	}
 #endif
-#ifdef USART1E
-	else if (module == &USART1E) {
+#ifdef USARTE1
+	else if (module == &USARTE1) {
 		sysclk_disable_module(SYSCLK_PORT_E, SYSCLK_USART1);
 	}
 #endif
-#ifdef USART1F
-	else if (module == &USART1F) {
+#ifdef USARTF1
+	else if (module == &USARTF1) {
 		sysclk_disable_module(SYSCLK_PORT_F, SYSCLK_USART1);
 	}
 #endif

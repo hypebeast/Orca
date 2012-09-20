@@ -6,7 +6,7 @@
  * This file contains basic functions for the AVR XMEGA USART, with support for all
  * modes, settings and clock speeds.
  *
- * Copyright (c) 2009-2011 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2009-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -54,7 +54,7 @@ extern "C" {
 /**
  * \defgroup usart_group USART module (USART)
  *
- * See \ref usart_quickstart.
+ * See \ref xmega_usart_quickstart.
  *
  * This is a driver for configuring, enablig, disabling and use of the on-chip
  * USART.
@@ -363,7 +363,7 @@ static inline uint8_t usart_spi_transmit(USART_t * usart,
 	return usart_get(usart);
 }
 
-void usart_init_rs232(USART_t *usart, const usart_rs232_options_t *opt);
+bool usart_init_rs232(USART_t *usart, const usart_rs232_options_t *opt);
 void usart_init_spi(USART_t * usart, const usart_spi_options_t * opt);
 
 enum status_code usart_putchar(USART_t * usart, uint8_t c);
@@ -381,7 +381,7 @@ void usart_spi_set_baudrate(USART_t * usart, uint32_t baud, uint32_t cpu_hz);
 #endif
 
 /**
- * \page usart_quickstart Quick start guide for USART module
+ * \page xmega_usart_quickstart Quick start guide for USART module
  *
  * This is the quick start guide for the \ref usart_group "USART module", with
  * step-by-step instructions on how to configure and use the driver in a

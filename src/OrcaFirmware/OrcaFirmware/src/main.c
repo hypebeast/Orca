@@ -15,11 +15,11 @@
 #include <pll.h>
 #include <osc.h>
 #include <delay.h>
-#include "serial_api.h"
 #include <rtc.h>
 
 #include "system_info.h"
 #include "user_board.h"
+#include "serial_api.h"
 #include "orca_init.h"
 #include "servo_in.h"
 #include "servo.h"

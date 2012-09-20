@@ -3,7 +3,7 @@
  *
  * \brief USART driver for AVR XMEGA.
  *
- * Copyright (c) 2009-2011 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2009-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -106,16 +106,22 @@ static inline void usart_enable_module_clock(USART_t *usart)
  *
  * \param usart The USART module.
  * \param opt The RS232 configuration option.
+ *
+ * \retval true if the initialization was successfull
+ * \retval false if the initialization failed (error in baud rate calculation)
  */
-void usart_init_rs232(USART_t *usart, const usart_rs232_options_t *opt)
+bool usart_init_rs232(USART_t *usart, const usart_rs232_options_t *opt)
 {
+	bool result;
 	usart_enable_module_clock(usart);
 	usart_set_mode(usart, USART_CMODE_ASYNCHRONOUS_gc);
 	usart_format_set(usart, opt->charlength, opt->paritytype,
 			opt->stopbits);
-	usart_set_baudrate(usart, opt->baudrate, sysclk_get_per_hz());
+	result = usart_set_baudrate(usart, opt->baudrate, sysclk_get_per_hz());
 	usart_tx_enable(usart);
 	usart_rx_enable(usart);
+	
+	return result;
 }
 
 /**

@@ -6,15 +6,15 @@
  * This file includes the appropriate board header file according to the
  * defined board (parameter BOARD).
  *
- * Copyright (c) 2009-2011 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2009-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
  *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
@@ -23,20 +23,19 @@
  * 3. The name of Atmel may not be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
+ * 4. This software may only be redistributed and used in connection with an Atmel
+ *    microcontroller product.
  *
  * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
  * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * \asf_license_stop
  *
@@ -91,13 +90,16 @@ extern "C" {
 #define STK600_RC064X_LCDX    28  //!< XMEGAB3 STK600 RC064X LCDX board.
 #define STK600_RC100X_LCDX    29  //!< XMEGAB1 STK600 RC100X LCDX board.
 #define UC3B_BOARD_CONTROLLER 30  //!< AT32UC3B1 board controller for Atmel boards
-#define RZ600                 31  //!< AT32UC3A RZ600 MCU board.
+#define RZ600                 31  //!< AT32UC3A RZ600 MCU board
 #define SAM3S_EK              32  //!< SAM3S-EK board.
 #define SAM3U_EK              33  //!< SAM3U-EK board.
 #define SAM3X_EK              34  //!< SAM3X-EK board.
 #define SAM3N_EK              35  //!< SAM3N-EK board.
 #define SAM3S_EK2             36  //!< SAM3S-EK2 board.
 #define SAM4S_EK              37  //!< SAM4S-EK board.
+#define STK600_RCUC3A0        38  //!< STK600 RCUC3A0 board.
+#define SAM4S_XPLAINED        39  //!< SAM4S Xplained board. 
+#define ATXMEGA128A1_QT600    40  //!< QT600 ATXMEGA128A1 MCU board.
 #define SIMULATOR_XMEGA_A1    97  //!< Simulator for XMEGA A1 devices
 #define AVR_SIMULATOR_UC3     98  //!< AVR SIMULATOR for AVR UC3 device family.
 #define USER_BOARD            99  //!< User-reserved board (if any).
@@ -185,7 +187,10 @@ extern "C" {
   #include "system_sam3n.h"  
 #elif BOARD == SAM4S_EK
   #include "sam4s_ek/sam4s_ek.h"
-  #include "system_sam4s.h" 
+  #include "system_sam4s.h"
+#elif BOARD == SAM4S_XPLAINED
+  #include "sam4s_xplained/sam4s_xplained.h"
+  #include "system_sam4s.h"  
 #elif BOARD == MEGA1284P_XPLAINED_BC
   #include "mega1284p_xplained_bc/mega1284p_xplained_bc.h"
 #elif BOARD == UC3_L0_QT600
@@ -196,6 +201,10 @@ extern "C" {
   #include "uc3b_board_controller/uc3b_board_controller.h"
 #elif BOARD == RZ600
   #include "rz600/rz600.h"
+#elif BOARD == STK600_RCUC3A0
+  #include "stk600/rcuc3a0/stk600_rcuc3a0.h"
+#elif BOARD == ATXMEGA128A1_QT600
+  #include "atxmega128a1_qt600/atxmega128a1_qt600.h"
 #elif BOARD == SIMULATOR_XMEGA_A1
   #include "simulator/xmega_a1/simulator_xmega_a1.h"
 #elif BOARD == AVR_SIMULATOR_UC3

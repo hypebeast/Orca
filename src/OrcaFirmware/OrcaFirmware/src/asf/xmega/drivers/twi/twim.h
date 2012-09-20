@@ -6,7 +6,7 @@
  * This file defines a useful set of functions for the TWI interface on AVR
  * devices.
  *
- * Copyright (c) 2010-2011 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2010-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -86,8 +86,7 @@ extern "C" {
  * \retval STATUS_OK        Transaction is successful
  * \retval ERR_INVALID_ARG  Invalid arguments in \c opt.
  */
-extern status_code_t twi_master_init(volatile TWI_t *twi,
-		const twi_options_t *opt);
+status_code_t twi_master_init(TWI_t *twi, const twi_options_t *opt);
 
 /*! \brief Perform a TWI master write or read transfer.
  *
@@ -106,8 +105,8 @@ extern status_code_t twi_master_init(volatile TWI_t *twi,
  *      - ERR_PROTOCOL to indicate an unexpected bus state
  *      - ERR_INVALID_ARG to indicate invalid arguments.
  */
-extern status_code_t twi_master_transfer(volatile TWI_t *twi,
-		const twi_package_t *package, bool read);
+status_code_t twi_master_transfer(TWI_t *twi, const twi_package_t *package,
+		bool read);
 
 /*! \brief Read multiple bytes from a TWI compatible slave device
  *
@@ -116,7 +115,7 @@ extern status_code_t twi_master_transfer(volatile TWI_t *twi,
  *                  (see \ref twi_package_t)
  * \return STATUS_OK   If all bytes were read, error code otherwise
  */
-static inline status_code_t twi_master_read(volatile TWI_t *twi,
+static inline status_code_t twi_master_read(TWI_t *twi,
 		const twi_package_t *package)
 {
 	return twi_master_transfer (twi, package, true);
@@ -129,7 +128,7 @@ static inline status_code_t twi_master_read(volatile TWI_t *twi,
  *                  (see \ref twi_package_t)
  * \return STATUS_OK   If all bytes were written, error code otherwise
  */
-static inline status_code_t twi_master_write(volatile TWI_t *twi,
+static inline status_code_t twi_master_write(TWI_t *twi,
 		const twi_package_t *package)
 {
 	return twi_master_transfer (twi, package, false);
@@ -139,7 +138,7 @@ static inline status_code_t twi_master_write(volatile TWI_t *twi,
  *
  * \param twi       Base address of the TWI instance.
  */
-static inline void twi_master_enable(volatile TWI_t *twi)
+static inline void twi_master_enable(TWI_t *twi)
 {
   twi->MASTER.CTRLA |= TWI_MASTER_ENABLE_bm;
 }
@@ -148,7 +147,7 @@ static inline void twi_master_enable(volatile TWI_t *twi)
  *
  * \param twi       Base address of the TWI instance.
  */
-static inline void twi_master_disable(volatile TWI_t *twi)
+static inline void twi_master_disable(TWI_t *twi)
 {
   twi->MASTER.CTRLA &= (~TWI_MASTER_ENABLE_bm);
 }

@@ -54,13 +54,16 @@
 #include <ccp.h>
 #include <xmega_reset_cause.h>
 
+// From module: Delay routines
+#include <delay.h>
+
 // From module: GPIO - General purpose Input/Output
 #include <gpio.h>
 
 // From module: Generic board support
 #include <board.h>
 
-// From module: IOPORT - Input/Output Port Controller
+// From module: IOPORT - General purpose I/O service
 #include <ioport.h>
 
 // From module: Interrupt management - XMEGA implementation
@@ -91,11 +94,9 @@
 // From module: TC - Timer Counter
 #include <tc.h>
 
-// From module: TIMING - Delay routines
-#include <delay.h>
-
-// From module: TWI - Two-wire Master Interface
+// From module: TWI - Two-wire Master and Slave Interface
 #include <twim.h>
+#include <twis.h>
 
 // From module: USART - Universal Synchronous/Asynchronous Receiver/Transmitter
 #include <usart.h>

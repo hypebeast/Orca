@@ -3,7 +3,7 @@
  *
  * \brief AVR XMEGA Real Time Counter driver definitions
  *
- * Copyright (c) 2010 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2010-2012 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -47,7 +47,7 @@
 /**
  * \defgroup rtc_group Real Time Counter (RTC)
  *
- * See \ref rtc_quickstart.
+ * See \ref xmega_rtc_quickstart.
  *
  * This is a driver implementation for the XMEGA RTC.
  *
@@ -151,7 +151,7 @@ extern void rtc_init(void);
 //! @}
 
 /**
- * \page rtc_quickstart Quick start guide for RTC driver
+ * \page xmega_rtc_quickstart Quick start guide for RTC driver
  *
  * This is the quick start guide for the \ref rtc_group "RTC driver", with
  * step-by-step instructions on how to configure and use the drivers in a
