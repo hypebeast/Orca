@@ -37,17 +37,18 @@ struct api_command {
 	void (*function)(int argc, char **argv);
 };
 
-/**
-* This struct defines an serial API command packet.
-*/
+
+/**************************************************************************
+* This struct defines an serial API command.
+***************************************************************************/
 typedef struct serial_api_packet {
-	uint8_t start_delimiter;
-	uint8_t message_type;
-	uint8_t data_length;
-	uint16_t command_type;
-	uint8_t data[DATA_BUFFER_LENGTH];
-	uint8_t crc;
-	uint8_t stop_delimiter;
+	uint8_t start_delimiter; /** The start delimiter */
+	uint8_t message_type; /** The type of the message */
+	uint8_t data_length; /** The length of the data */
+	uint16_t command_type; /** The command ID */
+	uint8_t data[DATA_BUFFER_LENGTH]; /** The actual data */
+	uint8_t crc; /** CRC checksum for this message */
+	uint8_t stop_delimiter; /** The final stop delimiter */
 } SERIAL_API_PACKET_t;
 
 

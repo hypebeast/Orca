@@ -5,7 +5,10 @@
  * Author: Sebastian Ruml <sebastian.ruml@gmail.com>
  */
 
+#include <string.h>
+
 #include "serial_api.h"
+#include "crc8.h"
 
 /*
  * Defines
@@ -17,8 +20,8 @@
  * Global variables
  */
 
-/** \brief This structure represents an input buffer for incoming API commands.
- *
+/**
+ * \brief This structure represents an input buffer for incoming API commands.
  */
 static struct {
 	/* Buffer for the command packet */
@@ -28,7 +31,7 @@ static struct {
 	unsigned int match;
 } command_buff;
 
-SERIAL_API_PACKET_t receive_command_packet;
+SERIAL_API_PACKET_t received_command_packet;
 SERIAL_API_PACKET_t transmit_command_packet;
 
 /************************************************************************/
@@ -191,26 +194,6 @@ static char is_whitespace(char c)
 }
 
 /**
-* This method executes an received command.
-*/
-void execute_command(int argc, char **argv)
-{
-	unsigned int i;
-	unsigned int nl = strlen(argv[0]);
-	unsigned int cl;
-	
-	for (i = 0; i < ARRAY_SIZE(commands); i++) {
-		cl = strlen(commands[i].name);
-		
-		if (cl == nl && commands[i].function != NULL &&
-			!strncmp(argv[0], commands[i].name, nl)) {
-			commands[i].function(argc, argv);
-			//usart_putchar(USART_SERIAL_API, '\n');		
-		}
-	}
-}
-
-/**
 * \brief This function writes the given data to the serial connection.
 */
 void write_command(char *data)
@@ -225,54 +208,75 @@ void write_command(char *data)
 	usart_putchar(USART_SERIAL_API, '\n');
 }
 
+/**
+* This method executes an received command.
+*/
+void execute_command(int argc, char **argv)
+{
+	unsigned int i;
+	unsigned int nl = strlen(argv[0]);
+	unsigned int cl;
+	
+	for (i = 0; i < ARRAY_SIZE(commands); i++) {
+		cl = strlen(commands[i].name);
+		
+		if (cl == nl && commands[i].function != NULL &&
+		!strncmp(argv[0], commands[i].name, nl)) {
+			commands[i].function(argc, argv);
+			//usart_putchar(USART_SERIAL_API, '\n');
+		}
+	}
+}
+
 /** \brief This method parses a received command packet.
 * 
 */
 void parse_command_packet(void)
 {
-	uint8_t i;
-	char *argv[16];
-	int argc = 0;
-	char *in_arg = NULL;
 	uint16_t index = 0;
 	
 	// The first byte is the start delimiter
-	receive_command_packet.start_delimiter = command_buff.buff[index++];
+	received_command_packet.start_delimiter = command_buff.buff[index++];
 	
 	// The second byte is the message type
-	receive_command_packet.message_type = command_buff.buff[index++];
+	received_command_packet.message_type = command_buff.buff[index++];
 	
 	// The third byte is the data length
-	receive_command_packet.data_length = command_buff.buff[index++];
+	received_command_packet.data_length = command_buff.buff[index++];
 	
 	// Byte four and five contains the command type
-	receive_command_packet.command_type = 0;
-	receive_command_packet.command_type = (receive_command_packet.command_type << 8) | command_buff.buff[index++];
-	receive_command_packet.command_type = (receive_command_packet.command_type << 8) | command_buff.buff[index++];
+	received_command_packet.command_type = 0;
+	received_command_packet.command_type = (received_command_packet.command_type << 8) | command_buff.buff[index++];
+	received_command_packet.command_type = (received_command_packet.command_type << 8) | command_buff.buff[index++];
 	
-	//receive_command_packet.data = memcp
+	// Get the payload from the buffer
+	memcpy(received_command_packet.data, command_buff.buff + index, received_command_packet.data_length * sizeof(char));
+	index += received_command_packet.data_length;
 	
-	for (i = 0; i < command_buff.index; i++) {
-		// Remove all leading whitespaces
-		if (is_whitespace(command_buff.buff[i]) && argc == 0)
-			continue;
-		
-		if (is_whitespace(command_buff.buff[i])) {
-			if (in_arg) {
-				command_buff.buff[i] = '\0';
-				in_arg = NULL;
-			}
-		} else if (!in_arg) {
-			in_arg = &command_buff.buff[i];
-			argv[argc] = in_arg;
-			argc++;
-		}
+	// Get the CRC
+	received_command_packet.crc = command_buff.buff[index++];
+	
+	// Set the stop delimiter
+	received_command_packet.stop_delimiter = PACKET_START_STOP_DELIMITER;
+	
+	// Check the crc checksum
+	uint8_t crc_data[MAX_PACKET_LENGTH];
+	uint16_t crc_data_length = command_buff.index - 2;
+	memcpy(crc_data, command_buff.buff, crc_data_length * sizeof(char));
+	
+	crc_t crc = crc_init();
+	crc_update(crc, crc_data, crc_data_length);
+	crc = crc_finalize(crc);
+	
+	// Checksum error
+	if (crc != received_command_packet.crc)
+	{
+		// TODO: Handle error
+		return;
 	}
 	
-	command_buff.buff[i] = '\0';
-	
-	if (argc > 0)
-		execute_command(argc, argv);
+	//if (argc > 0)
+		//execute_command(argc, argv);
 }
 
 /**
@@ -289,6 +293,7 @@ void serial_api_task(void)
 
 		// Process the received byte
 		switch (received_byte) {
+			// Start or stop delimiter received
 			case PACKET_START_STOP_DELIMITER:
 				// Start delimiter received
 				if (!command_buff.start_received) {
@@ -300,7 +305,10 @@ void serial_api_task(void)
 				else if (command_buff.start_received) {
 					if (command_buff.index > 0) {
 						command_buff.buff[command_buff.index] = PACKET_START_STOP_DELIMITER;
+						// Parse received command
 						parse_command_packet();
+						
+						// Reset the command buffer
 						command_buff.index = 0;
 						command_buff.start_received = false;
 						memset(command_buff.buff, 0, sizeof(command_buff.buff));
@@ -309,6 +317,7 @@ void serial_api_task(void)
 				break;
 			
 			default:
+				// Only get the byte if the start delimiter was received
 				if (command_buff.start_received) {
 					if (command_buff.index < MAX_PACKET_LENGTH - 1) {
 						command_buff.buff[command_buff.index] = received_byte;
