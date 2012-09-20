@@ -42,15 +42,12 @@ int main (void)
 	// Initialize all basic board functions
 	orca_init();
 	
-
-	
-	//voltage_sens_write_Setup(0);
 	mpu_6000_read_accelerometer_measurements(motionProcessingUnit);
 	mpu_6000_read_gyroscope_measurements(motionProcessingUnit);
 	
-		//testing stuff
-		Stat_LED_ON();
-		Err_LED_ON();
+	//testing stuff
+	Stat_LED_ON();
+	Err_LED_ON();
 		
 	//mpu_6000_get_z_acc_offset(motionProcessingUnit);
 	mpu_6000_get_product_id(motionProcessingUnit);
@@ -154,7 +151,7 @@ uint16_t i2c_intern_init(void)
 *
 * \return  ---
 ***************************************************************************/
-static void system_timer(uint32_t time)
+void system_timer(uint32_t time)
 {
 	ulFcTickCounter++;
 	ulVsTickCounter++;

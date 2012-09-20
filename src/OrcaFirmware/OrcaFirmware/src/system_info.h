@@ -9,7 +9,7 @@
 #ifndef SYSTEM_INFO_H_
 #define SYSTEM_INFO_H_
 
-#ifndef nop()
+#ifndef nop
 	#define nop()   do { __asm__ __volatile__ ("nop"); } while (0)
 #endif
 

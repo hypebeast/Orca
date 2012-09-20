@@ -54,6 +54,8 @@ uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mpu)
 	/* Configure the gyroscope sensor */
 	mpu_6000_write(MPU_6000_GYRO_CONFIG_ADDR, (MPU_6000_GYRO_FS_CONF)<<MPU_6000_GYRO_FS_SEL_bp);
 	delay_ms(1);
+	
+	return SYSTEM_INFO_TRUE;
 }
 
 uint16_t mpu_6000_write(uint8_t addr, uint8_t value)
