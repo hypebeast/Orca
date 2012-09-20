@@ -54,6 +54,8 @@ uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mpu)
 	/* Configure the gyroscope sensor */
 	mpu_6000_write(MPU_6000_GYRO_CONFIG_ADDR, (MPU_6000_GYRO_FS_CONF)<<MPU_6000_GYRO_FS_SEL_bp);
 	delay_ms(1);
+	
+	return SYSTEM_INFO_TRUE;
 }
 
 uint16_t mpu_6000_write(uint8_t addr, uint8_t value)
@@ -63,7 +65,7 @@ uint16_t mpu_6000_write(uint8_t addr, uint8_t value)
 	uint8_t data = value;
 	
 	package.chip = MPU_6000_DEV_ADDRESS;
-	package.addr = addr;
+	package.addr[0] = addr;
 	package.addr_length = 1;
 	package.buffer = &data;
 	package.length = 0x01;
@@ -85,7 +87,7 @@ uint16_t mpu_6000_read(uint8_t addr, uint8_t number, uint8_t *datarec)
 	int8_t status = 0x00;
 		
 	packetReceived.chip = MPU_6000_DEV_ADDRESS;
-	packetReceived.addr = addr;
+	packetReceived.addr[0] = addr;
 	packetReceived.addr_length = 1;
 	packetReceived.buffer = datarec;
 	packetReceived.length = number;	
