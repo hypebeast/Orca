@@ -116,7 +116,7 @@ uint16_t voltage_sens_read_channels(VOLTAGE_SENSOR_t *sensor)
 	//uint8_t dataReceived[(sensor->channelNumber)*2];	// One Channel is stored in two Bytes
 	uint8_t dataReceived[4];	// One Channel is stored in two Bytes
 	int8_t status = 0x00;
-	uint8_t i = 0x00;
+	//uint8_t i = 0x00;
 	
 	packetReceived.chip = VOLTAGE_SENS_DEV_ADDRESS;
 	packetReceived.addr = 0;

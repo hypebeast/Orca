@@ -10,7 +10,7 @@
 #define SYSTEM_INFO_H_
 
 #ifndef nop()
-#define nop()   do { __asm__ __volatile__ ("nop"); } while (0)
+	#define nop()   do { __asm__ __volatile__ ("nop"); } while (0)
 #endif
 
 /*! \enum message
@@ -33,6 +33,7 @@ enum system_message{
 	/* MPU Sensor */
 	SYSTEM_INFO_MPU_SENSOR_ACC_READ_ERR			=0x0040,	/*!< brief MPU acceleration I2C read error. */
 	SYSTEM_INFO_MPU_SENSOR_GYRO_READ_ERR		=0x0041,	/*!< brief MPU gyro I2C read error. */
+	SYSTEM_INFO_MPU_SENSOR_ACC_WRITE_ERR		=0x0042,	/*!< brief MPU gyro I2C write error. */
 };
 
 /*! \enum errlvl

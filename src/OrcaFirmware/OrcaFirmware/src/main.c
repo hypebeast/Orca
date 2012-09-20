@@ -46,11 +46,14 @@ int main (void)
 	
 	//voltage_sens_write_Setup(0);
 	mpu_6000_read_accelerometer_measurements(motionProcessingUnit);
-//	mpu_6000_read_gyroscope_measurements(motionProcessingUnit);
+	mpu_6000_read_gyroscope_measurements(motionProcessingUnit);
 	
 		//testing stuff
 		Stat_LED_ON();
 		Err_LED_ON();
+		
+	//mpu_6000_get_z_acc_offset(motionProcessingUnit);
+	mpu_6000_get_product_id(motionProcessingUnit);
 		
 	while(1)
 	{
@@ -63,7 +66,7 @@ int main (void)
 
 void orca_init()
 {
-	struct pll_config pcfg;
+	//struct pll_config pcfg;
 	
 	pmic_init();
 	
@@ -121,6 +124,7 @@ void orca_init()
 	//pmic_init();
 	//cpu_irq_enable();
 
+	delay_ms(300);
 }
 
 uint16_t i2c_intern_init(void)
@@ -137,6 +141,8 @@ uint16_t i2c_intern_init(void)
 	return SYSTEM_INFO_VOLTAGE_SENSOR_INIT_ERR;
 
 	twi_master_enable(BOARD_I2C_INTERN_INTERFACE);
+	
+	return SYSTEM_INFO_TRUE;
 }
 
 /**************************************************************************
