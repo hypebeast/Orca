@@ -60,6 +60,7 @@ void orca_board_init(BOARD_CONFIG_t *board)
 	ioport_configure_pin(BOARD_SERVO_OUT_EDF_REAR, IOPORT_DIR_OUTPUT | IOPORT_INIT_LOW);
 	ioport_configure_pin(BOARD_SERVO_OUT_6_GPIO, IOPORT_DIR_OUTPUT | IOPORT_INIT_LOW);
 	
+	ioport_configure_pin(BOARD_MPU_6000_INT, IOPORT_DIR_INPUT | IOPORT_PULL_DOWN | IOPORT_RISING);
 	//PORT_ConfigureInterrupt0( &PORTH, PORT_INT0LVL_MED_gc, 0x01 );
 	
 	

@@ -102,10 +102,13 @@
 #define BOARD_SPARE_PIN_2_GPIO				IOPORT_CREATE_PIN(PORTA, 1)		/*!< \brief Spare PIN */
 #define BOARD_SPARE_PIN_3_GPIO				IOPORT_CREATE_PIN(PORTA, 2)		/*!< \brief Spare PIN */
 #define BOARD_SPARE_PIN_4_GPIO				IOPORT_CREATE_PIN(PORTA, 3)		/*!< \brief Spare PIN */
-#define BOARD_SPARE_PIN_5_GPIO				IOPORT_CREATE_PIN(PORTA, 4)		/*!< \brief Spare PIN */
 #define BOARD_SPARE_PIN_6_GPIO				IOPORT_CREATE_PIN(PORTA, 5)		/*!< \brief Spare PIN */
 #define BOARD_SPARE_PIN_7_GPIO				IOPORT_CREATE_PIN(PORTA, 6)		/*!< \brief Spare PIN */
 #define BOARD_SPARE_PIN_8_GPIO				IOPORT_CREATE_PIN(PORTA, 7)		/*!< \brief Spare PIN */
+
+#define BOARD_MPU_6000_INT_PORT				PORTA
+#define BOARD_MPU_6000_INT					IOPORT_CREATE_PIN(PORTA, 4)		/*!< \brief MPU 6000 interrupt pin */
+#define BOARD_MPU_6000_INT_PIN_bm			0x10
 
 //---------------------------------------------------------------------
 //	GPIO Serial Data Flash

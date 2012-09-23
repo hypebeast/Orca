@@ -18,6 +18,7 @@
 #define MPU_6000_GYRO_FS_CONF			MPU_6000_GYRO_FS_2000		/*!< brief Used full scale range of the gyroscope */
 #define MPU_6000_ACC_AFS_CONF			MPU_6000_ACCEL_AFS_4g		/*!< brief Used full scale range of the accelerometer */
 #define MPU_6000_SMPRT_DIV_CONF			0x04						/*!< brief Used sample rate divider */
+#define MPU_6000_ISR_LVL				PORT_INT0LVL_HI_gc		/*!< brief Servo Input ISR Level */	
 
 //---------------------------------------------------------------------
 //	General
@@ -29,6 +30,15 @@
 #define MPU_6000_STATE_RUN				0x02		/*!< brief The MPU is running */
 #define MPU_6000_STATE_NOT_ACCES		0x03		/*!< brief The MPU is not accessible */
 
+#define MPU_6000_ACCEL_AFS_FACTOR_2g	16384.0f
+#define MPU_6000_ACCEL_AFS_FACTOR_4g	8192.0f
+#define MPU_6000_ACCEL_AFS_FACTOR_8g	4096.0f
+#define MPU_6000_ACCEL_AFS_FACTOR_16g	2048.0f
+#define MPU_6000_GYRO_FS_FACTOR_250		131000.0f
+#define MPU_6000_GYRO_FS_FACTOR_500		65500.0f	
+#define MPU_6000_GYRO_FS_FACTOR_1000	32800.0f	
+#define MPU_6000_GYRO_FS_FACTOR_2000	16400.0f
+		
 //---------------------------------------------------------------------
 //	MPU Register 107 – Power Management 1, Page 41
 //---------------------------------------------------------------------
@@ -93,7 +103,46 @@
 //---------------------------------------------------------------------
 //	MPU Register 25 – Sample Rate Divider, Page 11
 //---------------------------------------------------------------------
-#define MPU_6000_SMPRT_DIV_ADDR		0x19		/*!< brief MPU Register Sample Rate Divider */
+#define MPU_6000_SMPRT_DIV_ADDR			0x19		/*!< brief MPU Register Sample Rate Divider */
+
+//---------------------------------------------------------------------
+//	MPU Register 26 – Configuration, Page 13
+//---------------------------------------------------------------------
+#define MPU_6000_CONFIG_ADDR			0x1A		/*!< brief MPU Register Configuration */
+#define MPU_6000_CONFIG_DLPF_bp			0x00		/*!< brief Digital Low Pass Filter bitposition */
+#define MPU_6000_CONFIG_DLPF_260		0x00		/*!< brief DLPF @Fs=1 kHz, Acc =260 Hz, Gyro = 256 Hz */
+#define MPU_6000_CONFIG_DLPF_184		0x01		/*!< brief DLPF @Fs=1 kHz, Acc =184 Hz, Gyro = 188 Hz */
+#define MPU_6000_CONFIG_DLPF_94			0x02		/*!< brief DLPF @Fs=1 kHz, Acc =94 Hz, Gyro = 98 Hz */
+#define MPU_6000_CONFIG_DLPF_44			0x03		/*!< brief DLPF @Fs=1 kHz, Acc =44 Hz, Gyro = 42 Hz */
+#define MPU_6000_CONFIG_DLPF_21			0x04		/*!< brief DLPF @Fs=1 kHz, Acc =21 Hz, Gyro = 20 Hz */
+#define MPU_6000_CONFIG_DLPF_10			0x05		/*!< brief DLPF @Fs=1 kHz, Acc =10 Hz, Gyro = 10 Hz */
+#define MPU_6000_CONFIG_DLPF_5			0x06		/*!< brief DLPF @Fs=1 kHz, Acc =5 Hz, Gyro = 5 Hz */
+#define MPU_6000_CONFIG_FSYNC_bp			0x03		/*!< brief External Frame Synchronization (FSYNC) bitposition */
+#define MPU_6000_CONFIG_FSYNC_DIS			0x00		/*!< brief FSYNC Input disabled */
+#define MPU_6000_CONFIG_FSYNC_TEMP_OUT		0x01		/*!< brief FSYNC TEMP_OUT_L[0] */
+#define MPU_6000_CONFIG_FSYNC_GYRO_XOUT		0x02		/*!< brief FSYNC GYRO_XOUT_L[0] */
+#define MPU_6000_CONFIG_FSYNC_GYRO_YOUT		0x03		/*!< brief FSYNC GYRO_YOUT_L[0] */
+#define MPU_6000_CONFIG_FSYNC_GYRO_ZOUT		0x04		/*!< brief FSYNC GYRO_ZOUT_L[0] */
+#define MPU_6000_CONFIG_FSYNC_ACCEL_XOUT	0x05		/*!< brief FSYNC ACCEL_XOUT_L[0] */
+#define MPU_6000_CONFIG_FSYNC_ACCEL_YOUT	0x06		/*!< brief FSYNC ACCEL_YOUT_L[0] */
+#define MPU_6000_CONFIG_FSYNC_ACCEL_ZOUT	0x07		/*!< brief FSYNC ACCEL_ZOUT_L[0] */
+
+//---------------------------------------------------------------------
+//	Register 56 – Interrupt Enable, Page 28
+//---------------------------------------------------------------------
+#define MPU_6000_INT_ENABLE_ADDR				0x38		/*!< brief MPU register enables interrupt generation by interrupt sources. */
+#define MPU_6000_INT_ENABLE_DATA_RDY_EN_bp		0x00		/*!< brief Data Ready interrupt bitposition */
+#define MPU_6000_INT_ENABLE_DATA_RDY_ENABLE		0x01		/*!< brief Enables the Data Ready interrupt */
+#define MPU_6000_INT_ENABLE_DATA_RDY_DISABLE	0x00		/*!< brief Disables the Data Ready interrupt */
+#define MPU_6000_INT_ENABLE_I2C_MST_INT_EN_bp	0x03		/*!< brief I2C Master interrupt source bitposition */
+#define MPU_6000_INT_ENABLE_I2C_MST_INT_ENABLE	0x01		/*!< brief Enables I2C Master interrupt source interrupt */
+#define MPU_6000_INT_ENABLE_I2C_MST_INT_DIABLE	0x00		/*!< brief Disables I2C Master interrupt source disable */
+#define MPU_6000_INT_ENABLE_FIFO_OFLOW_EN_bp	0x04		/*!< brief FIFO buffer overflow to generate an interrupt bitposition */
+#define MPU_6000_INT_ENABLE_FIFO_OFLOW_ENABLE	0x01		/*!< brief Enables FIFO buffer overflow to generate an interrupt */
+#define MPU_6000_INT_ENABLE_FIFO_OFLOW_DIABLE	0x00		/*!< brief Disables FIFO buffer overflow to generate an interrupt */
+#define MPU_6000_INT_ENABLE_MOT_EN_bp			0x06		/*!< brief FIFO buffer overflow to generate an interrupt bitposition */
+#define MPU_6000_INT_ENABLE_MOT_ENABLE			0x01		/*!< brief enables Motion detection to generate an interrupt */
+#define MPU_6000_INT_ENABLE_MOT_DIABLE			0x00		/*!< brief Disables Motion detection to generate an interrupt */
 
 //---------------------------------------------------------------------
 //	MPU Register 117 – Who Am I, Page 46
@@ -132,24 +181,27 @@
 
 /*! MPU6000 sensor struct */
 typedef struct MOTION_PROCESSING_UNIT{
-	uint8_t state;								/*!< brief The actual state of the motion processing unit*/
-	uint8_t accAfs;								/*!< brief Full scale range of the accelerometer */
-	uint8_t gyrfs;								/*!< brief Full scale range of the gyroscope */
-	int16_t xAcc;								/*!< brief x-accelerometer value */
-	int16_t yAcc;								/*!< brief y-accelerometer value */
-	int16_t zAcc;								/*!< brief z-accelerometer value */
-	int16_t xGyr;								/*!< brief x-gyroscope value */
-	int16_t yGyr;								/*!< brief y-gyroscope value */
-	int16_t zGyr;								/*!< brief z-gyroscope value */
+	uint8_t state;							/*!< brief The actual state of the motion processing unit*/
+	uint8_t accAfs;							/*!< brief Full scale range of the accelerometer */
+	uint8_t gyrfs;							/*!< brief Full scale range of the gyroscope */
+	unsigned long time;
+	float xAcc;								/*!< brief X-Acceleration in g */
+	float yAcc;								/*!< brief Y-Acceleration in g */
+	float zAcc;								/*!< brief Z-Acceleration in g */
+	float xGyr;								/*!< brief X-rate of rotation in deg/ms */
+	float yGyr;								/*!< brief Y-rate of rotation in deg/ms */
+	float zGyr;								/*!< brief Z-rate of rotation in deg/ms */
+	float estaxr;							/*!< brief estimated  x angle */
+	float estayr;							/*!< brief estimated  y angle */
+	float estazr;							/*!< brief estimated  z angle */
 }MOTION_PROCESSING_UNIT_t;
 
-uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mpu);
-uint16_t mpu_6000_write(uint8_t addr, uint8_t value);
-uint16_t mpu_6000_read(uint8_t addr, uint8_t number, uint8_t *datarec);
-uint16_t mpu_6000_read_accelerometer_measurements(MOTION_PROCESSING_UNIT_t *mpu);
-uint16_t mpu_6000_read_gyroscope_measurements(MOTION_PROCESSING_UNIT_t *mpu);
-uint16_t mpu_6000_is_available(MOTION_PROCESSING_UNIT_t *mpu);
-int16_t mpu_6000_get_z_acc_offset(MOTION_PROCESSING_UNIT_t *mpu);
-uint8_t mpu_6000_get_product_id(MOTION_PROCESSING_UNIT_t *mpu);
-uint16_t mpu_6000_reset(MOTION_PROCESSING_UNIT_t *mpu);
+uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit);
+uint16_t mpu_6000_is_available(void);
+int16_t mpu_6000_get_z_acc_offset(void);
+uint8_t mpu_6000_get_product_id(void);
+uint16_t mpu_6000_reset(void);
+void isr_mpu_6000_int_pin(void);
+uint8_t mpu_6000_get_new_data(void);
+uint8_t mpu_6000_task(void);
 #endif /* MPU6000_H_ */
