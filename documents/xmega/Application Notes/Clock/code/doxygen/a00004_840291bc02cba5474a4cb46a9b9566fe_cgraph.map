@@ -1,7 +1,0 @@
-<area shape="rect" href="$a00002.html#31b1ca1994b6a687974a119d1ad8008c" title="This function disables the selected oscillator." alt="" coords="161,5,287,32">
-<area shape="rect" href="$a00002.html#1e46c4a8f01a83d4e4747d32d113e7e2" title="This function selects the main system clock source." alt="" coords="105,56,343,83">
-<area shape="rect" href="$a00002.html#cb82744003806825da7fb6a7bb973941" title="This function configures the internal high&#45;frequency PLL." alt="" coords="148,107,300,133">
-<area shape="rect" href="$a00002.html#8e350b689dc409a4c9b902a192d1e8a3" title="This function changes the prescaler configuration." alt="" coords="129,157,319,184">
-<area shape="rect" href="$a00002.html#ce371b352e90117520436eb125aeeec0" title="This function configures the external oscillator." alt="" coords="141,208,307,235">
-<area shape="rect" href="$a00004.html#29f93cfc7129ad4561b0d154fcf63ed1" title="This function waits for a button push and release before proceeding." alt="" coords="163,259,285,285">
-<area shape="rect" href="$a00002.html#ad4e162434c2cc7e0087bbc0ddfe266c" title="CCP write helper function written in assembly." alt="" coords="393,107,473,133">
