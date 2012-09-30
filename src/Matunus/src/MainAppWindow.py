@@ -193,7 +193,7 @@ class MainAppWindow(QtGui.QMainWindow):
         self.flightControlPage = FlightControlPage()
         self.pages.append(self.flightControlPage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "joystick.png"))
-        self.mainContainer.addTab(self.flightControlPage, icon, "Flight Control")
+        #self.mainContainer.addTab(self.flightControlPage, icon, "Flight Control")
         
         self.configurationPage = ConfigurationPage(self.serial_connection)
         self.pages.append(self.configurationPage)
@@ -241,7 +241,7 @@ class MainAppWindow(QtGui.QMainWindow):
                 self.serial_connection.connect()
 
                 # Start reading board status
-                self.startStatusReader()
+                #self.startStatusReader()
 
                 #self.serial_connection.writeCommand(CommandMessage(CommandType.LEDSON))
                 self.statusBar().showMessage("Connected!", 2000)
@@ -261,7 +261,7 @@ class MainAppWindow(QtGui.QMainWindow):
             
         elif self.serial_connection.connected:
             # Stop reading board status
-            self.stopStatusReader()
+            #self.stopStatusReader()
 
             # Disconnect
             self.serial_connection.disconnect()

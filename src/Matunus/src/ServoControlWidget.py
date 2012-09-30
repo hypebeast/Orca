@@ -30,7 +30,7 @@ except ImportError:
     import sys
     sys.exit(2)
 
-from serial_api import CommandMessage, CommandType
+from serial_api import SetServoPosCommand, CommandType
 from PositionBar import PositionBar
 
 
@@ -97,9 +97,7 @@ class ServoControlWidget(QtGui.QWidget):
         if not self.checkValue(float(position)):
             return
 
-        command = CommandMessage(CommandType.SETSERVOPOS)
-        command.addArgument(str(self.servo_nr))
-        command.addArgument(str(position))
+        command = SetServoPosCommand(self.servo_nr, position)
         self.serial_connection.writeCommand(command)
 
     def setMinValue(self, value):

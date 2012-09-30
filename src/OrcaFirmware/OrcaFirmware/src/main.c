@@ -45,29 +45,31 @@ int main (void)
 	mpu_6000_read_accelerometer_measurements(motionProcessingUnit);
 	mpu_6000_read_gyroscope_measurements(motionProcessingUnit);
 	
-	//testing stuff
+	// test stuff
 	Stat_LED_ON();
 	Err_LED_ON();
 		
 	//mpu_6000_get_z_acc_offset(motionProcessingUnit);
 	mpu_6000_get_product_id(motionProcessingUnit);
 		
+	// Do here all the stuff
 	while(1)
 	{
 		// Process incoming API commands
 		serial_api_task();
 		flight_controller_task(&flightController);
-		
 	}
+	
+	return 0;
 }
 
 void orca_init()
 {
 	//struct pll_config pcfg;
 	
-	pmic_init();
+	//pmic_init();
 	
-	/* Init clock */	
+	/* Initialize clock */	
 	sysclk_init();	
 	
 	osc_enable(OSC_ID_RC32MHZ);
@@ -88,18 +90,22 @@ void orca_init()
 	/* servo in subsystem init */
 	servo_in_init(&board, &servoIn);
 	
-	/* servo out subsystem init */
+	/* Initialize the servo output subsystem */
 	servo_init();
 	
 	/* flight controller subsystem init */
 	flight_controller_init(&board, &servoIn, &flightController);
 
 	/* Initialize the serial interface */
-	serial_api_init();
+	//serial_api_init();
 	
 	/* Initialize the I2C intern interface*/
 	i2c_intern_init();
 	
+	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
+	pmic_init();
+	
+	/* Enable interrupts */
 	cpu_irq_enable();
 		
 	/* Wait some time for external devices to start up */	
@@ -115,11 +121,6 @@ void orca_init()
 	rtc_set_callback(system_timer);
 	rtc_set_alarm(5);
 	//rtc_set_alarm_relative(0);
-
-	/* enable interrupts */
-	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
-	//pmic_init();
-	//cpu_irq_enable();
 
 	delay_ms(300);
 }

@@ -1,154 +1,114 @@
-/*
- * shell.c
+/**************************************************************************
+ * \file serial_api.c
+ *
+ * \brief Serial command interface implementation.
  *
  * Created: 25.03.2012 21:22:48
  * Author: Sebastian Ruml <sebastian.ruml@gmail.com>
- */
+ **************************************************************************/
 
 #include <string.h>
 
 #include "serial_api.h"
 #include "crc8.h"
 
-/*
- * Defines
- */
+
+//////////////////////////////////////////////////////////////////////////
+// Defines
+//////////////////////////////////////////////////////////////////////////
+
 #define ARRAY_SIZE(a)	(sizeof(a)/sizeof(a[0]))
-#define CMD_BUFFER_LENGTH 128
 
-/*
- * Global variables
- */
 
-/**
+//////////////////////////////////////////////////////////////////////////
+// Variables
+//////////////////////////////////////////////////////////////////////////
+
+/*! USART data struct. */
+USART_data_t USART_data;
+
+/**************************************************************************
  * \brief This structure represents an input buffer for incoming API commands.
- */
+ **************************************************************************/
 static struct {
-	/* Buffer for the command packet */
-	char buff[MAX_PACKET_LENGTH];
-	unsigned int index;
-	bool start_received;
-	unsigned int match;
+	uint8_t buff[MAX_PACKET_LENGTH]; /** Buffer for the command packet */
+	unsigned int index; /** Index */
+	bool start_received; /** Flag that indicates if a start delimiter was received */
 } command_buff;
 
-SERIAL_API_PACKET_t received_command_packet;
-SERIAL_API_PACKET_t transmit_command_packet;
+/**************************************************************************
+ * \brief RX command packet
+ **************************************************************************/
+SERIAL_API_PACKET_t rx_command_packet;
 
-/************************************************************************/
-/* API command definitions                                              */
-/************************************************************************/
+/**************************************************************************
+ * \brief TX command packet
+ **************************************************************************/
+SERIAL_API_PACKET_t tx_command_packet;
 
-/* All LEDs on */
-static void leds_on(int argc, char **argv);
 
-/* All LEDs off */
-static void leds_off(int argc, char **argv);
+//////////////////////////////////////////////////////////////////////////
+// Function declarations
+//////////////////////////////////////////////////////////////////////////
 
-/* This function parses all servo commands*/
-static void process_servo_command(int argc, char **argv);
+/**************************************************************************
+* \brief This method parses a received command packet.
+**************************************************************************/
+static void parse_command_packet(void);
 
-/* Set new servo position */
-static void serial_set_servo_pos(int argc, char **argv);
+/**************************************************************************
+* This method executes an received command.
+**************************************************************************/
+static void execute_command(void);
 
-/* Get the actual position of a servo */
-static void serial_get_servo_pos(int argc, char **argv);
+/**************************************************************************
+* Sets new servo position
+**************************************************************************/
+static void command_set_servo_pos(void);
 
-/* This function parses all engine commands */
-static void process_engine_command(int argc, char **argv);
-
-/* This function sets a new value for the given engine */
-static void serial_engine_set_value(int argc, char **argv);
+/**************************************************************************
+/* Gets the actual position of a servo
+**************************************************************************/
+static void command_get_servo_pos(void);
 
 /* Enabled API commands */
 struct api_command commands[] = {
-	{ "SERVO", process_servo_command},
-	{ "ENGINE",	process_engine_command}
-};
-
-/* Enabled servo API commands */
-struct api_command servo_commands[] = {
-	{ "POS", serial_set_servo_pos},
-	{ "GETPOS", serial_get_servo_pos}	
-};
-
-/* Enabled engine API commands */
-struct api_command engine_commands[] = {
-	{ "VALUE", serial_engine_set_value}	
+	{ 0x0001, command_set_servo_pos},
+	{ 0x0002, command_get_servo_pos}
 };
 
 
-/************************************************************************/
-/* API commands implementation                                          */
-/************************************************************************/
-
-
-/**
-* \brief This function parses all engine commands.
-*/
-static void process_engine_command(int argc, char **argv)
-{
-	// Get the length of the sub command
-	uint16_t nl = strlen(argv[1]);
-	uint16_t cl;
-	
-	for (int i = 0; i < ARRAY_SIZE(engine_commands); i++) {
-		cl = strlen(engine_commands[i].name);
-		
-		if (cl == nl && engine_commands[i].function != NULL &&
-		!strncmp(argv[1], engine_commands[i].name, nl)) {
-			engine_commands[i].function(argc, argv);
-		}
-	}
-}
-
-/**
-* \brief This functions sets a new value for the given engine.
-*/
-static void serial_engine_set_value(int argc, char **argv)
-{
-	
-}
-
-/**
-* \brief This function parses all servo commands.
-*/
-static void process_servo_command(int argc, char **argv)
-{
-	uint16_t nl = strlen(argv[1]);
-	uint16_t cl;
-	
-	for (int i = 0; i < ARRAY_SIZE(servo_commands); i++) {
-		cl = strlen(servo_commands[i].name);
-		
-		if (cl == nl && servo_commands[i].function != NULL &&
-			!strncmp(argv[1], servo_commands[i].name, nl)) {
-			servo_commands[i].function(argc, argv);		
-		}
-	}
-}
+//////////////////////////////////////////////////////////////////////////
+// API commands implementation                                          
+//////////////////////////////////////////////////////////////////////////
 
 /**
 * \brief This function sets a new position for a servo.
 */
-static void serial_set_servo_pos(int argc, char **argv)
+static void command_set_servo_pos(void)
 {
-	if (argc != 4)
+	uint8_t servo_nr = -1;
+	uint8_t position = 0;
+	
+	// Get the parameters
+	//servo_nr = received_command_packet.data[0];
+	//position = received_command_packet.data[1];
+	
+	if (servo_nr < 0)
+	{
 		return;
-		
-	uint16_t servo_nr = 0;
-	uint16_t position = 0;
-
-	servo_nr = atoi(argv[2]);
-	position = atoi(argv[3]);
+	}
 	
 	// Set the new position
-	servo_set_pos_degree(servo_nr, position);
+	//servo_set_pos_degree(servo_nr, position);
+	servo_set_pos_degree(servo_nr, 90);
 }
+
 
 /**
 * \brief This function returns the actual position of a servo.
 */
-static void serial_get_servo_pos(int argc, char **argv)
+static void command_get_servo_pos(void)
 {
 	//if (argc != 3)
 		//return;
@@ -156,42 +116,24 @@ static void serial_get_servo_pos(int argc, char **argv)
 	//uint16_t servo_nr = atoi(argv[2]);
 	//uint16_t position = servo_get_pos_degree(servo_nr);	
 	//sprintf()
-	usart_putchar(USART_SERIAL_API, '\n');
-	usart_putchar(USART_SERIAL_API, '\r');
-	usart_putchar(USART_SERIAL_API, 'c');
+	//usart_putchar(USART_SERIAL_API, '\n');
+	//usart_putchar(USART_SERIAL_API, '\r');
+	//usart_putchar(USART_SERIAL_API, 'c');
 	//usart_putchar(USART_SERIAL_API, '\r');
 	//usart_putchar(USART_SERIAL_API, '\n');
 	//char resp[] = "200";
 	//write_command(resp);
 }
 
-/**
-* This method initializes the serial interface.
-*/
-void serial_api_init(void)
-{
-	// USART options
-	static usart_rs232_options_t USART_SERIAL_OPTIONS = {
-		.baudrate = USART_SERIAL_API_BAUDRATE,
-		.charlength = USART_SERIAL_CHAR_LENGTH,
-		.paritytype = USART_SERIAL_PARITY,
-		.stopbits = USART_SERIAL_STOP_BIT
-	};
 
-	// Initialize usart driver in RS232 mode
-	usart_init_rs232(USART_SERIAL_API, &USART_SERIAL_OPTIONS);
-	
-	command_buff.index = 0;
-	command_buff.start_received = false;
-}
-
-/**
+/**************************************************************************
 * This method checks if the given character is a whitespace character.
-*/
+**************************************************************************/
 static char is_whitespace(char c)
 {
 	return (c == ' ' || c == '\t' || c == '\r' || c == '\n');
 }
+
 
 /**
 * \brief This function writes the given data to the serial connection.
@@ -201,82 +143,81 @@ void write_command(char *data)
 	uint16_t cl = strlen(data);
 	
 	for (int i = 0; i < cl; i++) {
-		usart_putchar(USART_SERIAL_API, data[i]);
+		//usart_putchar(USART_SERIAL_API_INTERFACE, data[i]);
 	}
 	
-	usart_putchar(USART_SERIAL_API, '\r');
-	usart_putchar(USART_SERIAL_API, '\n');
+	//usart_putchar(USART_SERIAL_API_INTERFACE, '\r');
+	//usart_putchar(USART_SERIAL_API_INTERFACE, '\n');
 }
 
-/**
+
+/**************************************************************************
 * This method executes an received command.
-*/
-void execute_command(int argc, char **argv)
+**************************************************************************/
+static void execute_command(void)
 {
 	unsigned int i;
-	unsigned int nl = strlen(argv[0]);
-	unsigned int cl;
 	
 	for (i = 0; i < ARRAY_SIZE(commands); i++) {
-		cl = strlen(commands[i].name);
-		
-		if (cl == nl && commands[i].function != NULL &&
-		!strncmp(argv[0], commands[i].name, nl)) {
-			commands[i].function(argc, argv);
-			//usart_putchar(USART_SERIAL_API, '\n');
+		if (commands[i].command_type == rx_command_packet.command &&
+			commands[i].function != NULL) {
+			commands[i].function();
 		}
 	}
 }
 
-/** \brief This method parses a received command packet.
-* 
-*/
-void parse_command_packet(void)
+
+/**************************************************************************
+* \brief This method parses a received command packet.
+**************************************************************************/
+static void parse_command_packet(void)
 {
 	uint16_t index = 0;
 	
+	// TODO: Reset the received command struct
+	
 	// The first byte is the start delimiter
-	received_command_packet.start_delimiter = command_buff.buff[index++];
+	rx_command_packet.start_delimiter = command_buff.buff[index++];
 	
-	// The second byte is the message type
-	received_command_packet.message_type = command_buff.buff[index++];
-	
-	// The third byte is the data length
-	received_command_packet.data_length = command_buff.buff[index++];
+	// The second byte contains the message type
+	rx_command_packet.message_type = command_buff.buff[index++];
 	
 	// Byte four and five contains the command type
-	received_command_packet.command_type = 0;
-	received_command_packet.command_type = (received_command_packet.command_type << 8) | command_buff.buff[index++];
-	received_command_packet.command_type = (received_command_packet.command_type << 8) | command_buff.buff[index++];
+	rx_command_packet.command = 0;
+	rx_command_packet.command = (rx_command_packet.command << 8) | command_buff.buff[index++];
+	rx_command_packet.command = (rx_command_packet.command << 8) | command_buff.buff[index++];
+	
+	// Byte six contains the data length
+	rx_command_packet.data_length = command_buff.buff[index++];
 	
 	// Get the payload from the buffer
-	memcpy(received_command_packet.data, command_buff.buff + index, received_command_packet.data_length * sizeof(char));
-	index += received_command_packet.data_length;
+	memcpy(rx_command_packet.data, command_buff.buff + index, rx_command_packet.data_length * sizeof(uint8_t));
+	index += rx_command_packet.data_length;
 	
 	// Get the CRC
-	received_command_packet.crc = command_buff.buff[index++];
+	rx_command_packet.crc = command_buff.buff[index++];
 	
 	// Set the stop delimiter
-	received_command_packet.stop_delimiter = PACKET_START_STOP_DELIMITER;
+	rx_command_packet.stop_delimiter = command_buff.buff[index];
 	
 	// Check the crc checksum
 	uint8_t crc_data[MAX_PACKET_LENGTH];
 	uint16_t crc_data_length = command_buff.index - 2;
-	memcpy(crc_data, command_buff.buff, crc_data_length * sizeof(char));
+	memcpy(crc_data, command_buff.buff, crc_data_length * sizeof(uint8_t));
 	
 	crc_t crc = crc_init();
 	crc_update(crc, crc_data, crc_data_length);
 	crc = crc_finalize(crc);
 	
 	// Checksum error
-	if (crc != received_command_packet.crc)
-	{
+	//if (crc != received_command_packet.crc)
+	//{
 		// TODO: Handle error
-		return;
-	}
+		//return;
+	//}
 	
-	//if (argc > 0)
-		//execute_command(argc, argv);
+	// If the CRC is correct, execute the command
+	execute_command();
 }
 
 /**
@@ -287,44 +228,295 @@ void serial_api_task(void)
 	//uint8_t received_byte = usart_getchar(USART_SERIAL_API);
 	uint8_t received_byte;
 	
-	if (usart_rx_is_complete(USART_SERIAL_API))
-	{
-		received_byte = (uint8_t) (USART_SERIAL_API)->DATA;
-
+	if (USART_RXBufferData_Available(&USART_data)) {
+		received_byte = USART_RXBuffer_GetByte(&USART_data);
+		
 		// Process the received byte
 		switch (received_byte) {
-			// Start or stop delimiter received
-			case PACKET_START_STOP_DELIMITER:
-				// Start delimiter received
-				if (!command_buff.start_received) {
-					command_buff.start_received = true;
-					command_buff.buff[command_buff.index] = PACKET_START_STOP_DELIMITER;
-					command_buff.index++;
+			// Start byte received
+			case PACKET_START_BYTE:
+			if (!command_buff.start_received) {
+				command_buff.index = 0;
+				command_buff.start_received = true;
+				command_buff.buff[command_buff.index] = PACKET_START_BYTE;
+				command_buff.index++;
+			}
+			break;
+			
+			// Stop byte received
+			case PACKET_STOP_BYTE:
+			if (command_buff.start_received) {
+				if (command_buff.index > 0) {
+					command_buff.buff[command_buff.index] = PACKET_STOP_BYTE;
+					
+					// Parse received command
+					parse_command_packet();
+					
+					// Reset the command buffer
+					command_buff.index = 0;
+					command_buff.start_received = false;
+					memset(command_buff.buff, 0, sizeof(command_buff.buff));
 				}
-				// Stop delimiter received
-				else if (command_buff.start_received) {
-					if (command_buff.index > 0) {
-						command_buff.buff[command_buff.index] = PACKET_START_STOP_DELIMITER;
-						// Parse received command
-						parse_command_packet();
-						
-						// Reset the command buffer
-						command_buff.index = 0;
-						command_buff.start_received = false;
-						memset(command_buff.buff, 0, sizeof(command_buff.buff));
-					}
-				}
-				break;
+			}
+			break;
 			
 			default:
-				// Only get the byte if the start delimiter was received
-				if (command_buff.start_received) {
-					if (command_buff.index < MAX_PACKET_LENGTH - 1) {
-						command_buff.buff[command_buff.index] = received_byte;
-						command_buff.index++;
-					}
+			// Only get the byte if the start byte was received
+			if (command_buff.start_received) {
+				if (command_buff.index < MAX_PACKET_LENGTH - 1) {
+					command_buff.buff[command_buff.index] = received_byte;
+					command_buff.index++;
 				}
-				break;
+				else {
+					// Reset everything
+					command_buff.index = 0;
+					command_buff.start_received = false;
+					memset(command_buff.buff, 0, sizeof(command_buff.buff));
+				}
+			}
+			break;
 		}
 	}
+}
+
+/**
+* This method initializes the serial interface.
+*/
+void serial_api_init(void)
+{	
+	// Use USARTE0 and initialize buffers
+	USART_InterruptDriver_Initialize(&USART_data, USART_SERIAL_API_INTERFACE,
+									 USART_DREINTLVL_LO_gc);
+	
+	// USARTE0, 8 data bits, no parity, 1 stop bit
+	USART_Format_Set(USART_data.usart, USART_CHSIZE_8BIT_gc,
+					 USART_PMODE_DISABLED_gc, false);
+	
+	// Enable RXC interrupt
+	USART_RxdInterruptLevel_Set(USART_data.usart, USART_RXCINTLVL_LO_gc);
+	
+	// Set baudrate to 9600 bps; scale factor is set to zero
+	// BSEL = ((I/O clock frequency)/(2^(ScaleFactor)*16*Baudrate))-1
+	USART_Baudrate_Set(USART_data.usart, 207, 0);
+	
+	// Enable both RX and TX
+	USART_Rx_Enable(USART_data.usart);
+	USART_Tx_Enable(USART_data.usart);
+	
+	// Enable PMIC interrupt level low
+	//PMIC.CTRL |= PMIC_LOLVLEX_bm;
+	
+	// Initialize command buffer
+	command_buff.index = 0;
+	command_buff.start_received = false;
+}
+
+/*! \brief Initializes buffer and selects what USART module to use.
+ *
+ *  Initializes receive and transmit buffer and selects what USART module to use,
+ *  and stores the data register empty interrupt level.
+ *
+ *  \param usart_data           The USART_data_t struct instance.
+ *  \param usart                The USART module.
+ *  \param dreIntLevel          Data register empty interrupt level.
+ */
+void USART_InterruptDriver_Initialize(USART_data_t * usart_data,
+                                      USART_t * usart,
+                                      USART_DREINTLVL_t dreIntLevel)
+{
+	usart_data->usart = usart;
+	usart_data->dreIntLevel = dreIntLevel;
+
+	usart_data->buffer.RX_Tail = 0;
+	usart_data->buffer.RX_Head = 0;
+	usart_data->buffer.TX_Tail = 0;
+	usart_data->buffer.TX_Head = 0;
+}
+
+/*! \brief RX Complete Interrupt Service Routine.
+ *
+ *  RX Complete Interrupt Service Routine.
+ *  Stores received data in RX software buffer.
+ *
+ *  \param usart_data      The USART_data_t struct instance.
+ */
+bool USART_RXComplete(USART_data_t * usart_data)
+{
+	USART_Buffer_t * bufPtr;
+	bool ans;
+
+	bufPtr = &usart_data->buffer;
+	/* Advance buffer head. */
+	uint8_t tempRX_Head = (bufPtr->RX_Head + 1) & USART_RX_BUFFER_MASK;
+
+	/* Check for overflow. */
+	uint8_t tempRX_Tail = bufPtr->RX_Tail;
+	uint8_t data = usart_data->usart->DATA;
+
+	if (tempRX_Head == tempRX_Tail) {
+	  	ans = false;
+	}else{
+		ans = true;
+		usart_data->buffer.RX[usart_data->buffer.RX_Head] = data;
+		usart_data->buffer.RX_Head = tempRX_Head;
+	}
+	return ans;
+}
+
+/*! \brief Data Register Empty Interrupt Service Routine.
+ *
+ *  Data Register Empty Interrupt Service Routine.
+ *  Transmits one byte from TX software buffer. Disables DRE interrupt if buffer
+ *  is empty. Argument is pointer to USART (USART_data_t).
+ *
+ *  \param usart_data      The USART_data_t struct instance.
+ */
+void USART_DataRegEmpty(USART_data_t * usart_data)
+{
+	USART_Buffer_t * bufPtr;
+	bufPtr = &usart_data->buffer;
+
+	/* Check if all data is transmitted. */
+	uint8_t tempTX_Tail = usart_data->buffer.TX_Tail;
+	if (bufPtr->TX_Head == tempTX_Tail){
+	    /* Disable DRE interrupts. */
+		uint8_t tempCTRLA = usart_data->usart->CTRLA;
+		tempCTRLA = (tempCTRLA & ~USART_DREINTLVL_gm) | USART_DREINTLVL_OFF_gc;
+		usart_data->usart->CTRLA = tempCTRLA;
+
+	}else{
+		/* Start transmitting. */
+		uint8_t data = bufPtr->TX[usart_data->buffer.TX_Tail];
+		usart_data->usart->DATA = data;
+
+		/* Advance buffer tail. */
+		bufPtr->TX_Tail = (bufPtr->TX_Tail + 1) & USART_TX_BUFFER_MASK;
+	}
+}
+
+/*! \brief Test if there is data in the receive software buffer.
+ *
+ *  This function can be used to test if there is data in the receive software
+ *  buffer.
+ *
+ *  \param usart_data         The USART_data_t struct instance
+ *
+ *  \retval true      There is data in the receive buffer.
+ *  \retval false     The receive buffer is empty.
+ */
+bool USART_RXBufferData_Available(USART_data_t * usart_data)
+{
+	/* Make copies to make sure that volatile access is specified. */
+	uint8_t tempHead = usart_data->buffer.RX_Head;
+	uint8_t tempTail = usart_data->buffer.RX_Tail;
+
+	/* There are data left in the buffer unless Head and Tail are equal. */
+	return (tempHead != tempTail);
+}
+
+
+
+/*! \brief Get received data (5-8 bit character).
+ *
+ *  The function USART_RXBufferData_Available should be used before this
+ *  function is used to ensure that data is available.
+ *
+ *  Returns data from RX software buffer.
+ *
+ *  \param usart_data       The USART_data_t struct instance.
+ *
+ *  \return         Received data.
+ */
+uint8_t USART_RXBuffer_GetByte(USART_data_t * usart_data)
+{
+	USART_Buffer_t * bufPtr;
+	uint8_t ans;
+
+	bufPtr = &usart_data->buffer;
+	ans = (bufPtr->RX[bufPtr->RX_Tail]);
+
+	/* Advance buffer tail. */
+	bufPtr->RX_Tail = (bufPtr->RX_Tail + 1) & USART_RX_BUFFER_MASK;
+
+	return ans;
+}
+
+
+/*! \brief Test if there is data in the transmitter software buffer.
+ *
+ *  This function can be used to test if there is free space in the transmitter
+ *  software buffer.
+ *
+ *  \param usart_data The USART_data_t struct instance.
+ *
+ *  \retval true      There is data in the receive buffer.
+ *  \retval false     The receive buffer is empty.
+ */
+bool USART_TXBuffer_FreeSpace(USART_data_t * usart_data)
+{
+	/* Make copies to make sure that volatile access is specified. */
+	uint8_t tempHead = (usart_data->buffer.TX_Head + 1) & USART_TX_BUFFER_MASK;
+	uint8_t tempTail = usart_data->buffer.TX_Tail;
+
+	/* There are data left in the buffer unless Head and Tail are equal. */
+	return (tempHead != tempTail);
+}
+
+
+/*! \brief Put data (5-8 bit character).
+ *
+ *  Stores data byte in TX software buffer and enables DRE interrupt if there
+ *  is free space in the TX software buffer.
+ *
+ *  \param usart_data The USART_data_t struct instance.
+ *  \param data       The data to send.
+ */
+bool USART_TXBuffer_PutByte(USART_data_t * usart_data, uint8_t data)
+{
+	uint8_t tempCTRLA;
+	uint8_t tempTX_Head;
+	bool TXBuffer_FreeSpace;
+	USART_Buffer_t * TXbufPtr;
+
+	TXbufPtr = &usart_data->buffer;
+	TXBuffer_FreeSpace = USART_TXBuffer_FreeSpace(usart_data);
+
+
+	if(TXBuffer_FreeSpace)
+	{
+	  	tempTX_Head = TXbufPtr->TX_Head;
+	  	TXbufPtr->TX[tempTX_Head]= data;
+		/* Advance buffer head. */
+		TXbufPtr->TX_Head = (tempTX_Head + 1) & USART_TX_BUFFER_MASK;
+
+		/* Enable DRE interrupt. */
+		tempCTRLA = usart_data->usart->CTRLA;
+		tempCTRLA = (tempCTRLA & ~USART_DREINTLVL_gm) | usart_data->dreIntLevel;
+		usart_data->usart->CTRLA = tempCTRLA;
+	}
+	return TXBuffer_FreeSpace;
+}
+
+
+/*! \brief Receive complete interrupt service routine.
+ *
+ *  Receive complete interrupt service routine.
+ *  Calls the common receive complete handler with pointer to the correct USART
+ *  as argument.
+ */
+ISR(USARTE0_RXC_vect)
+{
+	USART_RXComplete(&USART_data);
+}
+
+
+/*! \brief Data register empty  interrupt service routine.
+ *
+ *  Data register empty  interrupt service routine.
+ *  Calls the common data register empty complete handler with pointer to the
+ *  correct USART as argument.
+ */
+ISR(USARTE0_DRE_vect)
+{
+	USART_DataRegEmpty(&USART_data);
 }

@@ -7,7 +7,7 @@
 
 #include <ioport.h>
 #include "orca_init.h"
-#include"user_board.h"
+#include "user_board.h"
 
  /***********************************************************************//**
 * \brief Board Init
@@ -62,6 +62,9 @@ void orca_board_init(BOARD_CONFIG_t *board)
 	
 	//PORT_ConfigureInterrupt0( &PORTH, PORT_INT0LVL_MED_gc, 0x01 );
 	
+	// Configure the pins for the USB USART interface
+	ioport_configure_pin(BOARD_USART_USB_INTERFACE_RXD, IOPORT_DIR_INPUT | IOPORT_INIT_HIGH);
+	ioport_configure_pin(BOARD_USART_USB_INTERFACE_TXD, IOPORT_DIR_OUTPUT | IOPORT_INIT_HIGH);
 	
 	/* check for extension boards. The corresponding pin is low if the extension board is used. */
 	if(ioport_pin_is_low(BOARD_EXTENSION_POWER_BOARD))

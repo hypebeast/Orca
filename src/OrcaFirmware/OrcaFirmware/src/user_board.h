@@ -2,9 +2,9 @@
 /**
  * \file user_board.h
  *
- * \brief Header file for board definitons
+ * \brief Header file for board definitions
  *
- * Copyright (c) 2012 Fabian Ruml <fabian.ruml@gmail.com>
+ * Copyright (c) 2012 Fabian Ruml <fabian.ruml@gmail.com>, Sebastian Ruml <sebastian.ruml@gmail.com>
  *
  */
 

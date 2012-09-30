@@ -19,7 +19,7 @@
 __author__ = 'Sebastian Ruml'
 
 
-from Subject import Observable
+from Observer import Observable
 
 
 class BoardStatus(Observable):

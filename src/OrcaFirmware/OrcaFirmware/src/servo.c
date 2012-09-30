@@ -12,6 +12,7 @@
 
 uint16_t servo_compare_period[6];
 
+
 /**
 * \brief Calculates and sets the right frequency for the timer.
 */
@@ -110,7 +111,7 @@ uint16_t servo_get_pos_degree(uint8_t servo_nr)
 
 /**
 * \brief This function sets a new position for the given servo. The new position
-* is given in ticks (microseconds).
+* is given in ticks (pulse width in microseconds).
 */
 void servo_set_pos_ticks(uint8_t servo_nr, uint16_t pos)
 {

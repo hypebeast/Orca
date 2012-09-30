@@ -33,14 +33,18 @@
 #define SERVO_PULSE_WIDTH (SERVO_UPPER_PULSE_WIDTH - SERVO_LOWER_PULSE_WIDTH)
 #define SERVO_TICKS_PER_DEGREE (SERVO_PULSE_WIDTH/180.0f)
 
-typedef struct servo_out {
+
+/**
+* \brief Servo control structure
+*/
+typedef struct servo_out_struct {
 	
 } SERVO_OUT_t;
 
 /**
 * \brief Servo configuration
 */
-struct servo_config {
+struct servo_config_struct {
 	enum TC_CLKSEL_enum clk_sel;
 };
 

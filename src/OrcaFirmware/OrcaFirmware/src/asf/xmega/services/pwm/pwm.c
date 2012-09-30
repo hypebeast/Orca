@@ -40,6 +40,7 @@
  */
 
  #include <asf.h>
+ #include "pwm.h"
 
 /**
  * \brief Calculate TC settings from PWM frequency

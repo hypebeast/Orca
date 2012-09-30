@@ -21,7 +21,10 @@ __author__ = 'Sebastian Ruml'
 import serial
 import threading
 import sys
+import struct
+import binascii
 
+from crc8 import crc8
 from logger import Logger
 
 
@@ -34,7 +37,7 @@ DEFAULT_BAUDRATE = 9600
 DEFAULT_PARITY = serial.PARITY_NONE
 DEFAULT_BYTESIZE = serial.EIGHTBITS
 DEFAULT_STOPBITS = serial.STOPBITS_ONE
-DEFAULT_XONXOFF = True
+DEFAULT_XONXOFF = False
 DEFAULT_RTS = None
 DEFUALT_DTR = None
 
@@ -57,10 +60,11 @@ class SerialError(Exception):
 
 
 class CommandType:
-    LEDSON = "ledson"
-    LEDSOFF = "ledsoff"
-    SETSERVOPOS = "SERVO POS"
-    READSERVOPOS = "SERVO GETPOS"
+    """
+    Command types
+    """
+    SET_SERVO_POS = 0x01
+    READ_SERVO_POS = 0x02
 
 
 class ResponseStatus:
@@ -72,22 +76,88 @@ class ResponseStatus:
 
 
 class CommandMessage:
+    """
+    An command message is used for the communication with the flight controller
+    over a serial connection.
+    """
+
+    START_BYTE = 0x8D
+    STOP_BYTE = 0x7E
+    MESSAGE_COMMAND = 0x10
+    MESSAGE_RESPONSE = 0x20
+
     def __init__(self, commandType):
         self.commandType = commandType
         self.data = []
 
-    def addArgument(self, argument):
-        self.data.append(argument)
 
     def getMessage(self):
-        message = self.commandType
-        for arg in self.data:
-            message = message + ' ' + arg
+        """
+        Returns the encoded message as a byte array.
+        """
+        pass
 
-        return message + NEWLINECHARACTER
+    def fromMessage(self, data):
+        """
+        Creates a message object from the given data.
+        """
+        pass
+
+
+class SetServoPosCommand(CommandMessage):
+    """
+    This command sets a new position to the specified servo.
+    """
+    def __init__(self, servo_nr = 1, position = 0):
+        CommandMessage.__init__(self, CommandType.SET_SERVO_POS)
+        self.servo_nr = servo_nr
+        self.position = position
+
+    def getMessage(self):
+        package = bytearray()
+
+        # Calculate the CRC-8 checksum
+        #crc_msg = struct.pack('BBhBBh', self.START_BYTE, 0x10, self.commandType, 0x03, self.servo_nr, self.position)
+        #crc = crc8()
+        #c = crc.crc(crc_msg)
+        c = 0x11
+        print "CRC: " + str(c)
+
+        # Start byte
+        package.extend(struct.pack("B", self.START_BYTE))
+        # Message type
+        package.extend(struct.pack("B", self.MESSAGE_COMMAND))
+        # Command type
+        package.extend(struct.pack("H", self.commandType))
+        # Data length
+        package.extend(struct.pack("B", 3))
+        # Data: Servo number
+        package.extend(struct.pack("B", self.servo_nr))
+        # Data: Position
+        package.extend(struct.pack("H", self.position))
+        # CRC
+        package.extend(struct.pack("B", c))
+        # Stop Byte
+        package.extend(struct.pack("B", self.STOP_BYTE))
+
+        print binascii.hexlify(package)
+
+        #for i in package:
+            #print chr(i)
+
+        message = ''.join(chr(b) for b in package)
+        
+        return message
+        #return package
+
+    def fromMessage(self, data):
+        pass
 
 
 class SerialAPI:
+    """
+    This class handles the serial connection to the flight controller board.
+    """
     def __init__(self, port=DEFAULT_PORT,
                  baudrate=DEFAULT_BAUDRATE,
                  parity=DEFAULT_PARITY,
@@ -171,11 +241,14 @@ class SerialAPI:
         self.baudrate = baudrate
 
     def writeCommand(self, command):
+        """
+        This method writes the given command packet to the serial communication line.
+        """
         if self.serial_connection is None or not self.connected:
             return
 
         self.serial_connection.write(command.getMessage())
-        self.serial_connection.flush()
+        #self.serial_connection.flush()
 
     def scan(self):
         pass
@@ -185,7 +258,7 @@ class SerialAPI:
             while self.connected and self.reader_alive:
                 #data = character(self.serial_connection.read(1))
                 data = self.serial_connection.read(1)
-                print "Data: " + data
+                #print "Data: " + data
 
                 if data != '':
                     print "Received data: " + data
