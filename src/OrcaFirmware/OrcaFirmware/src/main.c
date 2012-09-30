@@ -32,7 +32,7 @@ BOARD_CONFIG_t board;  								/*!< \brief board module */
 SERVO_IN_t servoIn;									/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
 VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
-MOTION_PROCESSING_UNIT_t *motionProcessingUnit;		/*!< \brief motion processing unit module */
+MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing unit module */
 
 unsigned long ulFcTickCounter = 0;			/*!< \brief Flight Controller system tick counter */
 unsigned long ulVsTickCounter = 0;			/*!< \brief Voltage sensor system tick counter */
@@ -42,15 +42,14 @@ int main (void)
 	// Initialize all basic board functions
 	orca_init();
 	
-	mpu_6000_read_accelerometer_measurements(motionProcessingUnit);
-	mpu_6000_read_gyroscope_measurements(motionProcessingUnit);
+	mpu_6000_get_new_data();
 	
 	// test stuff
 	Stat_LED_ON();
 	Err_LED_ON();
 		
 	//mpu_6000_get_z_acc_offset(motionProcessingUnit);
-	mpu_6000_get_product_id(motionProcessingUnit);
+	mpu_6000_get_product_id();
 		
 	// Do here all the stuff
 	while(1)
@@ -114,7 +113,7 @@ void orca_init()
 	/* Initialize the the voltage sensor */
 	voltage_sens_init(&voltageSensor, 0x02);
 	
-	mpu_6000_init(motionProcessingUnit);
+	mpu_6000_init(&motionProcessingUnit);
 	
 	/* Initialize and start System Timer */
 	rtc_init();
@@ -160,6 +159,7 @@ void system_timer(uint32_t time)
 	/* Call the flight Controller every 10 ms */ 
 	if(ulFcTickCounter >= 1)
 	{
+		mpu_6000_task();
 		//flight_controller_task(&flightController);
 		ulFcTickCounter = 0;		
 	}
@@ -178,4 +178,9 @@ void system_timer(uint32_t time)
 ISR(PORTH_INT0_vect)
 {
 	isr_servo_in(&servoIn);	
+}
+
+ISR(PORTA_INT0_vect)
+{
+	isr_servo_in(&servoIn);
 }
