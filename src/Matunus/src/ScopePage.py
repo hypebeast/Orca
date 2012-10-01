@@ -36,13 +36,9 @@ import defs
 
 
 class ScopePage(QtGui.QWidget):
-    def __init__(self, serial=None):
+    def __init__(self):
         super(ScopePage, self).__init__()
 
-        if serial is None:
-            raise Exception
-
-        self.serial_connection = serial
         self.app_defs = defs.AppDefs()
         self.createUi()
 

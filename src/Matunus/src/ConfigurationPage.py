@@ -42,13 +42,13 @@ import defs
 
 
 class ConfigurationPage(QtGui.QWidget):
-    def __init__(self, serial=None):
+    def __init__(self, controllerManager=None):
         super(ConfigurationPage, self).__init__()
 
-        if serial is None:
+        if controllerManager is None:
             raise Exception
 
-        self.serial_connection = serial
+        self.controllerManager = controllerManager
         self.app_defs = defs.AppDefs()
         self.createUi()
 
@@ -91,7 +91,7 @@ class ConfigurationPage(QtGui.QWidget):
         page = ReceiverPage()
         self.mainContainer.addWidget(page)
 
-        page = OutputPage(self.serial_connection)
+        page = OutputPage(self.controllerManager)
         self.mainContainer.addWidget(page)
 
         page = AttitudePage()

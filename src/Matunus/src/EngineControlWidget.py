@@ -30,7 +30,6 @@ except ImportError:
     import sys
     sys.exit(2)
 
-from serial_api import CommandMessage, CommandType
 from PositionBar import PositionBar
 
 
@@ -109,10 +108,11 @@ class EngineControlWidget(QtGui.QWidget):
         self.positionBar.setValue(int(position))
         self.actualPositionServo.display(position)
         print "Position: " + position
-        command = CommandMessage(CommandType.SETSERVOPOS)
-        command.addArgument(str(1))
-        command.addArgument(str(position))
-        self.serial_connection.writeCommand(command)
+        
+        #command = CommandMessage(CommandType.SETSERVOPOS)
+        #command.addArgument(str(1))
+        #command.addArgument(str(position))
+        #self.serial_connection.writeCommand(command)
 
     def setMinValue(self, value):
         self.minValue = value

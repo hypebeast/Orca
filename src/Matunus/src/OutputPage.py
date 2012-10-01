@@ -35,13 +35,13 @@ from EngineControlWidget import EngineControlWidget
 
 
 class OutputPage(QtGui.QWidget):
-    def __init__(self, serial=None):
+    def __init__(self, controller=None):
         super(OutputPage, self).__init__()
 
-        if serial is None:
+        if controller is None:
             raise Exception
             
-        self.serial_connection = serial
+        self.controller = controller
         self.createUi()
 
     def createUi(self):
@@ -53,7 +53,7 @@ class OutputPage(QtGui.QWidget):
         # Servo 1
         groupBox1 = QtGui.QGroupBox("Servo 1 (Left)")
         groupBox1.setMinimumHeight(70)
-        self.servo1Control = ServoControlWidget(self.serial_connection, servo_nr=1)
+        self.servo1Control = ServoControlWidget(self.controller, servo_nr=1)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.servo1Control)
@@ -63,7 +63,7 @@ class OutputPage(QtGui.QWidget):
         # Servo 2
         groupBox2 = QtGui.QGroupBox("Servo 2 (Right)")
         groupBox2.setMinimumHeight(70)
-        self.servo2Control = ServoControlWidget(self.serial_connection, servo_nr=2)
+        self.servo2Control = ServoControlWidget(self.controller, servo_nr=2)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.servo2Control)
@@ -73,7 +73,7 @@ class OutputPage(QtGui.QWidget):
         # Engine 1 (left)
         groupBox = QtGui.QGroupBox("Engine 1 (Left)")
         groupBox.setMinimumHeight(70)
-        self.engine1Control = EngineControlWidget(self.serial_connection, engine_nr=1)
+        self.engine1Control = EngineControlWidget(self.controller, engine_nr=1)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.engine1Control)
@@ -83,7 +83,7 @@ class OutputPage(QtGui.QWidget):
         # Engine 2 (right)
         groupBox = QtGui.QGroupBox("Engine 2 (Left)")
         groupBox.setMinimumHeight(70)
-        self.engine1Control = EngineControlWidget(self.serial_connection, engine_nr=2)
+        self.engine1Control = EngineControlWidget(self.controller, engine_nr=2)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.engine1Control)
@@ -93,7 +93,7 @@ class OutputPage(QtGui.QWidget):
         # Engine 3 (rear)
         groupBox = QtGui.QGroupBox("Engine 3 (Left)")
         groupBox.setMinimumHeight(70)
-        self.engine1Control = EngineControlWidget(self.serial_connection, engine_nr=3)
+        self.engine1Control = EngineControlWidget(self.controller, engine_nr=3)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.engine1Control)

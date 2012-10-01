@@ -30,18 +30,17 @@ except ImportError:
     import sys
     sys.exit(2)
 
-from serial_api import SetServoPosCommand, CommandType
 from PositionBar import PositionBar
 
 
 class ServoControlWidget(QtGui.QWidget):
-    def __init__(self, serial=None, servo_nr=1):
+    def __init__(self, controller=None, servo_nr=1):
         super(ServoControlWidget, self).__init__()
 
-        if serial is None:
+        if controller is None:
             raise Exception
 
-        self.serial_connection = serial
+        self.controller = controller
 
         self.servo_nr = servo_nr
         self.minValue = 0
@@ -87,7 +86,7 @@ class ServoControlWidget(QtGui.QWidget):
         layout.addWidget(self.leServoPosition)
         layout.addSpacing(30)
         
-        self.startServo = QtGui.QPushButton("Start")
+        self.startServo = QtGui.QPushButton("Move")
         self.startServo.clicked.connect(self.startServoClicked)
         layout.addWidget(self.startServo)
         layout.addStretch()
@@ -97,8 +96,8 @@ class ServoControlWidget(QtGui.QWidget):
         if not self.checkValue(float(position)):
             return
 
-        command = SetServoPosCommand(self.servo_nr, position)
-        self.serial_connection.writeCommand(command)
+        #command = SetServoPosCommand(self.servo_nr, position)
+        #self.controller.writeCommand(command)
 
     def setMinValue(self, value):
         self.minValue = value

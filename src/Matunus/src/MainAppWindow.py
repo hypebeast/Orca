@@ -43,10 +43,9 @@ from ScopePage import ScopePage
 from GpsPage import GpsPage
 from AttitudePage import AttitudePage
 from FlightDisplay import FlightDisplay
-from serial_api import SerialAPI
-from serial_api import SerialError
+from SerialConnection import SerialError
 from SettingsDialog import SettingsDialog
-from BoardStatus import BoardStatus
+from ControllerManager import ControllerManager
 from logger import Logger
 import defs
 
@@ -116,23 +115,23 @@ class MainAppWindow(QtGui.QMainWindow):
                              {"name": u"/dev/ttys10", "value": 10},
                              ]
         else:
-            raise NotImplementedError("Sorry no implementation for your platform (%s) available." % sys.platform)
+            raise NotImplementedError("Sorry, there is no implementation for your platform (%s) available." % sys.platform)
 
         # App definitions
         self.appDefs = defs.AppDefs()
 
-        # TODO: Loading configuration
+        # TODO: Load configuration
         
         # Initialize logger
         self._logger = Logger()
         self._logger.info("Starting Matunus...")
 
-        # Board status data
-        self.boardStatus = BoardStatus()
-        
+        # Flight controller manager
+        self.controllerManager = ControllerManager()
+
         # Serial connection
-        self.serial_connection = SerialAPI()
-        self.serial_connection.set_port(0)
+        #self.controllerManager = SerialConnection()
+        #self.controllerManager.set_port(0)
 
         # Create UI
         self.createUi()
@@ -143,10 +142,6 @@ class MainAppWindow(QtGui.QMainWindow):
         self.resize(1200, 850)
         self.setWindowTitle("Matunus")
         self.statusBar().showMessage("Ready", 3000)
-
-        # Add serial reader thread
-        self.serialReaderThread = Thread(target=self.updateBoardStatus)
-        self.statusReaderAlive = False
 
         self.updateUi()
 
@@ -199,12 +194,12 @@ class MainAppWindow(QtGui.QMainWindow):
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "joystick.png"))
         #self.mainContainer.addTab(self.flightControlPage, icon, "Flight Control")
         
-        self.configurationPage = ConfigurationPage(self.serial_connection)
+        self.configurationPage = ConfigurationPage(self.controllerManager)
         self.pages.append(self.configurationPage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "config.png"))
         self.mainContainer.addTab(self.configurationPage, icon, "Configuration")
 
-        self.scopePage = ScopePage(self.serial_connection)
+        self.scopePage = ScopePage()
         self.pages.append(self.scopePage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "scopes.png"))
         self.mainContainer.addTab(self.scopePage, icon, "Scopes")
@@ -237,7 +232,7 @@ class MainAppWindow(QtGui.QMainWindow):
         pass
 
     def updateUi(self):
-        if self.serial_connection.connected:
+        if self.controllerManager.connected():
             self.lStatusBarLabel.setText("<b>Connected</b>")
             self.cbComPort.setEnabled(False)
         else:
@@ -245,16 +240,16 @@ class MainAppWindow(QtGui.QMainWindow):
             self.cbComPort.setEnabled(True)
 
     def connectToController(self):
-        if not self.serial_connection.connected:
+        if not self.controllerManager.connected():
             self.statusBar().showMessage("Connecting to controller...", 2000)
 
             try:    
-                self.serial_connection.connect()
+                self.controllerManager.connect()
 
                 # Start reading board status
                 #self.startStatusReader()
 
-                #self.serial_connection.writeCommand(CommandMessage(CommandType.LEDSON))
+                #self.controllerManager.writeCommand(CommandMessage(CommandType.LEDSON))
                 self.statusBar().showMessage("Connected!", 2000)
                 self.lStatusBarLabel.setText("<b>Connected</b>")
                 self.updateUi()
@@ -270,12 +265,12 @@ class MainAppWindow(QtGui.QMainWindow):
                 msgBox.setIcon(QtGui.QMessageBox.Warning)
                 msgBox.exec_()
             
-        elif self.serial_connection.connected:
+        elif self.controllerManager.connected():
             # Stop reading board status
             #self.stopStatusReader()
 
             # Disconnect
-            self.serial_connection.disconnect()
+            self.controllerManager.disconnect()
 
             self.statusBar().showMessage("Disconnected!", 2000)
             self.lStatusBarLabel.setText("<b>Connected</b>")
@@ -291,29 +286,11 @@ class MainAppWindow(QtGui.QMainWindow):
         dialog.show()
 
     def comPortChanged(self, index):
-        self.serial_connection.set_port(self.comPorts[index]["value"])
+        self.controllerManager.set_serial_port(self.comPorts[index]["value"])
 
     def showSettingsDialog(self):
         dlg = SettingsDialog()
         dlg.exec_()
-
-    def startStatusReader(self):
-        self.statusReaderAlive = True
-        self.serialReaderThread = Thread(target=self.updateBoardStatus)
-        self.serialReaderThread.setDaemon(True)
-        self.serialReaderThread.start()
-
-    def stopStatusReader(self):
-        self.statusReaderAlive = False
-        self.serialReaderThread.join()
-
-    def updateBoardStatus(self):
-        while self.statusReaderAlive:
-            self.boardStatus = self.serial_connection.readStatus()
-
-            # Update all observers
-            self.boardStatus.notify()
-            time.sleep(5)
 
 
 class App():

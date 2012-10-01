@@ -27,111 +27,113 @@ class CommandTypes:
     """
     This class defines the API command types.
     """
-    SET_SERVO_POS = 0x01
-    READ_SERVO_POS = 0x02
+    SET_SERVO_POS = 0x0001
+    READ_SERVO_POS = 0x0002
+    READ_ALL_SERVO_POS = 0x00003
 
 
-class CommandMessage:
+class BaseMessage:
     """
     Base class for an command message packet. An command message is used for
     the communication with the flight controller over a serial connection.
     """
 
+    # Constants
     START_BYTE = 0x8D
     STOP_BYTE = 0x7E
-    MESSAGE_COMMAND = 0x10
-    MESSAGE_RESPONSE = 0x20
+    COMMAND_MESSAGE = 0x10
+    RESPONSE_MESSAGE = 0x20
+
+    MessageType = COMMAND_MESSAGE
+    CommandType = 0
 
     def __init__(self, commandType):
         self.commandType = commandType
-        self.data = []
 
-
-    def getMessage(self, data):
+    def getMessage(self):
         """
-        Returns the encoded message as a byte array.
-        
-        Params:
-        data: A dictionary which contains the arguments and their corresponding lengths
+        This method returns a byte array which can be send via a serial connection.
+        Every class that inherets this class must override this method.
         """
-        package = bytearray()
-
-        # Calculate the CRC-8 checksum
-        #crc_msg = struct.pack('BBhBBh', self.START_BYTE, 0x10, self.commandType, 0x03, self.servo_nr, self.position)
-        #crc = crc8()
-        #c = crc.crc(crc_msg)
-        c = 0x11
-        print "CRC: " + str(c)
-
-        # Start byte
-        package.extend(struct.pack("B", self.START_BYTE))
-        # Message type
-        package.extend(struct.pack("B", self.MESSAGE_COMMAND))
-        # Command type
-        package.extend(struct.pack("H", self.commandType))
-        # Data length
-        package.extend(struct.pack("B", 3))
-        # Data: Servo number
-        package.extend(struct.pack("B", self.servo_nr))
-        # Data: Position
-        package.extend(struct.pack("H", self.position))
-        # CRC
-        package.extend(struct.pack("B", c))
-        # Stop Byte
-        package.extend(struct.pack("B", self.STOP_BYTE))
+        pass
 
     def fromMessage(self, data):
         """
         Creates a new message object from the given data.
+        Every class that inherets this class must override this method
         """
         pass
 
-
-class ServoPositionCommand(CommandMessage):
-    """
-    This command sets a new position to the specified servo.
-    """
-    def __init__(self, servo_nr = 1, position = 0):
-        CommandMessage.__init__(self, CommandType.SET_SERVO_POS)
-        self.servo_nr = servo_nr
-        self.position = position
-
-    def getMessage(self):
+    def _encodeMessage(self, data):
+        """
+        Returns the encoded message as a byte array.
+        
+        Params:
+        data: An array of dictionaries which contains the arguments and their corresponding lengths
+              Format = [{"value": value, "format": format char}]
+        """
         package = bytearray()
-
-        # Calculate the CRC-8 checksum
-        #crc_msg = struct.pack('BBhBBh', self.START_BYTE, 0x10, self.commandType, 0x03, self.servo_nr, self.position)
-        #crc = crc8()
-        #c = crc.crc(crc_msg)
-        c = 0x11
-        print "CRC: " + str(c)
 
         # Start byte
         package.extend(struct.pack("B", self.START_BYTE))
         # Message type
-        package.extend(struct.pack("B", self.MESSAGE_COMMAND))
+        package.extend(struct.pack("B", self.MessageType))
         # Command type
         package.extend(struct.pack("H", self.commandType))
-        # Data length
-        package.extend(struct.pack("B", 3))
-        # Data: Servo number
-        package.extend(struct.pack("B", self.servo_nr))
-        # Data: Position
-        package.extend(struct.pack("H", self.position))
+        # Encode the data
+        package = self._packData(package, data)
         # CRC
-        package.extend(struct.pack("B", c))
+        package.extend(struct.pack("B", _calcCrc(package, data)))
         # Stop Byte
         package.extend(struct.pack("B", self.STOP_BYTE))
 
-        print binascii.hexlify(package)
+        return package
 
-        #for i in package:
-            #print chr(i)
+    def _decodeMessage(self, data):
+        pass
 
-        message = ''.join(chr(b) for b in package)
+    def _packData(self, package, data):
+        """Encodes the data and returns the extended package."""
+        # Encode all arguments
+        for argument in data:
+            format = argument["format"]
+            package.extend(struct.pack(argument["format"], argument["value"]))
+
+        return package
+
+    def _calcCrc(self, package, data):
+        """Calculates the CRC8 for the given package and returns it."""
+        msg = bytearray()
+
+        msg.extend(struct.pack("B", self.START_BYTE))
+        mag.extend(struct.pack("B", self.MessageType))
+        msg.extend(struct.pack("H", self.commandType))
+        msg = self._packData(msg, data)
+
+        crc = crc8()
+        return crc.crc(msg)
+
+
+
+class ServoPositionCommand(BaseMessage):
+    """
+    This command sets a new position to the specified servo.
+
+    Command Type = 0x0001
+    """
+    def __init__(self, servo_nr = 1, position = 0):
+        BaseMessage.__init__(self, CommandType.SET_SERVO_POS)
+        self.MessageType = COMMAND_MESSAGE
         
-        return message
-        #return package
+        self.servo_nr = servo_nr
+        self.position = position
+
+    def getMessage(self):
+       data = []
+       data.append({"value": self.servo_nr, "format": "B"})
+       data.append({"value": self.position, "format": "H"})
+
+       return self._encodeMessage(data)
 
     def fromMessage(self, data):
         pass

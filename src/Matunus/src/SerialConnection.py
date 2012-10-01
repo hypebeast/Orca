@@ -67,7 +67,7 @@ class ResponseStatus:
     RESPONSE_FINISHED = 4
 
 
-class SerialAPI:
+class SerialConnection:
     """
     This class handles the serial connection with the flight controller.
     """
@@ -91,10 +91,6 @@ class SerialAPI:
         self.newResponse = False
         self.responseStatus = ResponseStatus.IDLE
         self.responseBuffer = []
-
-        self.status_queries = [{"query": "SERVO GETPOS", "args": ["1"], "data": 0}]
-        # TODO: Create timer for sending the status queries
-        #self.status_timer = QtTimer
 
         self._logger = Logger()
 
@@ -155,11 +151,11 @@ class SerialAPI:
 
         self.baudrate = baudrate
 
-    def writeCommand(self, command):
+    def writeMessage(self, command):
         """
-        This method writes the given command packet to the serial communication line.
+        This method writes the given message packet to the serial communication line.
         """
-        if self.serial_connection is None or not self.connected:
+        if self.serial_connection is None or not self.connected or command is None:
             return
 
         self.serial_connection.write(command.getMessage())
@@ -215,6 +211,6 @@ class SerialAPI:
 
             #self._logger.debug("Execute query: " + command.getMessage())
             print "Execute query: " + command.getMessage()
-            self.writeCommand(command)
+            self.writeMessage(command)
 
             #self._logger.info("Query: %s Data: %s" % (query["query"], query["data"]))
