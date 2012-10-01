@@ -206,7 +206,7 @@ uint8_t USART_RXBuffer_GetByte(USART_data_t * usart_data);
 bool USART_RXComplete(USART_data_t * usart_data);
 void USART_DataRegEmpty(USART_data_t * usart_data);
 
-void serial_api_init(void);
+void serial_api_init(USART_data_t* usart_data);
 void serial_api_task(void);
 void write_command(char *data);
 void create_command_packet(void);

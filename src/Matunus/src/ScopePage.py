@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -19,35 +19,32 @@
 __author__ = 'Sebastian Ruml'
 
 
-class Observable(object):
-	"""
-	Observable
-	"""
-	def __init__(self):
-		self._observers = []
 
-	def attach(self, observer):
-		if not observer in self._observers:
-			self._observers.append(observer)
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QVariant', 2)
 
-	def detach(self, observer):
-		try:
-			self._observers.remove(observer)
-		except ValueError:
-			pass
-
-	def notifiy(self, modifier=None):
-		for observer in self._observers:
-			if modifier != observer:
-				observer.update()
+try:
+    from PyQt4 import QtGui, QtCore
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
 
-class Observer(object):
-	"""
-	Observer
-	"""
-	def __init__(self):
-		pass
+import defs
 
-	def update(self, data):
-		pass
+
+class ScopePage(QtGui.QWidget):
+    def __init__(self, serial=None):
+        super(ScopePage, self).__init__()
+
+        if serial is None:
+            raise Exception
+
+        self.serial_connection = serial
+        self.app_defs = defs.AppDefs()
+        self.createUi()
+
+    def createUi(self):
+        self.mainLayout = QtGui.QHBoxLayout()

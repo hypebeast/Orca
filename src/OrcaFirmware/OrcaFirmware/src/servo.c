@@ -19,7 +19,7 @@ uint16_t servo_compare_period[6];
 void servo_set_frequency()
 {
 	// TODO
-	uint32_t cpu_hz = sysclk_get_cpu_hz();
+	//uint32_t cpu_hz = sysclk_get_cpu_hz();
 }
 
 /**

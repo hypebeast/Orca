@@ -59,14 +59,6 @@ class SerialError(Exception):
         return self.msg
 
 
-class CommandType:
-    """
-    Command types
-    """
-    SET_SERVO_POS = 0x01
-    READ_SERVO_POS = 0x02
-
-
 class ResponseStatus:
     IDLE = 0
     RECEIVING = 1
@@ -75,88 +67,9 @@ class ResponseStatus:
     RESPONSE_FINISHED = 4
 
 
-class CommandMessage:
-    """
-    An command message is used for the communication with the flight controller
-    over a serial connection.
-    """
-
-    START_BYTE = 0x8D
-    STOP_BYTE = 0x7E
-    MESSAGE_COMMAND = 0x10
-    MESSAGE_RESPONSE = 0x20
-
-    def __init__(self, commandType):
-        self.commandType = commandType
-        self.data = []
-
-
-    def getMessage(self):
-        """
-        Returns the encoded message as a byte array.
-        """
-        pass
-
-    def fromMessage(self, data):
-        """
-        Creates a message object from the given data.
-        """
-        pass
-
-
-class SetServoPosCommand(CommandMessage):
-    """
-    This command sets a new position to the specified servo.
-    """
-    def __init__(self, servo_nr = 1, position = 0):
-        CommandMessage.__init__(self, CommandType.SET_SERVO_POS)
-        self.servo_nr = servo_nr
-        self.position = position
-
-    def getMessage(self):
-        package = bytearray()
-
-        # Calculate the CRC-8 checksum
-        #crc_msg = struct.pack('BBhBBh', self.START_BYTE, 0x10, self.commandType, 0x03, self.servo_nr, self.position)
-        #crc = crc8()
-        #c = crc.crc(crc_msg)
-        c = 0x11
-        print "CRC: " + str(c)
-
-        # Start byte
-        package.extend(struct.pack("B", self.START_BYTE))
-        # Message type
-        package.extend(struct.pack("B", self.MESSAGE_COMMAND))
-        # Command type
-        package.extend(struct.pack("H", self.commandType))
-        # Data length
-        package.extend(struct.pack("B", 3))
-        # Data: Servo number
-        package.extend(struct.pack("B", self.servo_nr))
-        # Data: Position
-        package.extend(struct.pack("H", self.position))
-        # CRC
-        package.extend(struct.pack("B", c))
-        # Stop Byte
-        package.extend(struct.pack("B", self.STOP_BYTE))
-
-        print binascii.hexlify(package)
-
-        #for i in package:
-            #print chr(i)
-
-        message = ''.join(chr(b) for b in package)
-        
-        return message
-        #return package
-
-    def fromMessage(self, data):
-        pass
-
-
 class SerialAPI:
     """
-    This class handles the serial connection to the flight controller board.
+    This class handles the serial connection with the flight controller.
     """
     def __init__(self, port=DEFAULT_PORT,
                  baudrate=DEFAULT_BAUDRATE,
@@ -180,6 +93,8 @@ class SerialAPI:
         self.responseBuffer = []
 
         self.status_queries = [{"query": "SERVO GETPOS", "args": ["1"], "data": 0}]
+        # TODO: Create timer for sending the status queries
+        #self.status_timer = QtTimer
 
         self._logger = Logger()
 
@@ -254,6 +169,7 @@ class SerialAPI:
         pass
 
     def reader(self):
+        """Reads data from the serial line"""
         try:
             while self.connected and self.reader_alive:
                 #data = character(self.serial_connection.read(1))

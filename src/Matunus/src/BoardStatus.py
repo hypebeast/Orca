@@ -19,12 +19,12 @@
 __author__ = 'Sebastian Ruml'
 
 
-from Observer import Observable
+from logger import Logger
 
 
-class BoardStatus(Observable):
+class BoardStatus(object):
 	"""
-	This class holds the status of the board.
+	This class holds the current status of the flight controller.
 	"""
 	ServoLeftValue = 0
 	ServoRightValue = 0

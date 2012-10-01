@@ -39,6 +39,7 @@ import time
 from MainPage import MainPage
 from ConfigurationPage import ConfigurationPage
 from FlightControlPage import FlightControlPage
+from ScopePage import ScopePage
 from GpsPage import GpsPage
 from AttitudePage import AttitudePage
 from FlightDisplay import FlightDisplay
@@ -78,6 +79,9 @@ class SelectControllerDialog(QtGui.QDialog):
 
 
 class MainAppWindow(QtGui.QMainWindow):
+    """
+    Main window of the application.
+    """
     def __init__(self):
         super(MainAppWindow, self).__init__()
 
@@ -199,6 +203,13 @@ class MainAppWindow(QtGui.QMainWindow):
         self.pages.append(self.configurationPage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "config.png"))
         self.mainContainer.addTab(self.configurationPage, icon, "Configuration")
+
+        self.scopePage = ScopePage(self.serial_connection)
+        self.pages.append(self.scopePage)
+        icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "scopes.png"))
+        self.mainContainer.addTab(self.scopePage, icon, "Scopes")
+
+        # Add the main containter to the main layout
         self.mainLayout.addWidget(self.mainContainer)
 
         widget = QtGui.QWidget()

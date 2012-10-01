@@ -19,35 +19,14 @@
 __author__ = 'Sebastian Ruml'
 
 
-class Observable(object):
+from Observer import Observable#
+from logger import Logger
+
+
+class ControllerManager(Observable):
 	"""
-	Observable
-	"""
-	def __init__(self):
-		self._observers = []
-
-	def attach(self, observer):
-		if not observer in self._observers:
-			self._observers.append(observer)
-
-	def detach(self, observer):
-		try:
-			self._observers.remove(observer)
-		except ValueError:
-			pass
-
-	def notifiy(self, modifier=None):
-		for observer in self._observers:
-			if modifier != observer:
-				observer.update()
-
-
-class Observer(object):
-	"""
-	Observer
+	This class manages the communication with the controller, e.g. the
+	connection, status updates, etc.
 	"""
 	def __init__(self):
-		pass
-
-	def update(self, data):
 		pass

@@ -3,7 +3,9 @@
  *
  * Created: 14.09.2012 22:34:20
  *  Author: f-ruml
- */ 
+ */
+
+
 #include "twim.h"
 #include "twi_common.h"
 #include "sysclk.h"

@@ -29,6 +29,7 @@
 
 /* global variables */
 BOARD_CONFIG_t board;  								/*!< \brief board module */
+USART_data_t USART_data;
 SERVO_IN_t servoIn;									/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
 VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
@@ -37,6 +38,11 @@ MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing un
 unsigned long ulFcTickCounter = 0;			/*!< \brief Flight Controller system tick counter */
 unsigned long ulVsTickCounter = 0;			/*!< \brief Voltage sensor system tick counter */
 
+
+/*! \brief Entry point for the program.
+ *
+ * This function initialize everything and starts the main loop.
+ */
 int main (void)
 {
 	// Initialize all basic board functions
@@ -51,22 +57,30 @@ int main (void)
 	//mpu_6000_get_z_acc_offset(motionProcessingUnit);
 	mpu_6000_get_product_id();
 		
-	// Do here all the stuff
+	// Loop forever
 	while(1)
 	{
-		// Process incoming API commands
+		// Process incoming API commands from the USB USART
 		serial_api_task();
+		
+		// Flight controller
 		flight_controller_task(&flightController);
 	}
 	
 	return 0;
 }
 
-void orca_init()
+
+/*! \brief Every subsystem gets initialized by this function
+ *
+ * All subsystem is initialized in this function. It's called by the main function.
+ */
+void orca_init(void)
 {
 	//struct pll_config pcfg;
 	
-	//pmic_init();
+	// Disable all interrupts
+	cpu_irq_disable();
 	
 	/* Initialize clock */	
 	sysclk_init();	
@@ -74,6 +88,7 @@ void orca_init()
 	osc_enable(OSC_ID_RC32MHZ);
 	osc_enable(OSC_ID_RC32KHZ);
     osc_wait_ready(OSC_ID_RC32MHZ); 	
+	
 	//pll_config_init(&pcfg, PLL_SRC_RC32MHZ, 4, 4);
 	//pll_enable(&pcfg, 0);
 	//do {} while (!pll_is_locked(0));
@@ -96,16 +111,10 @@ void orca_init()
 	flight_controller_init(&board, &servoIn, &flightController);
 
 	/* Initialize the serial interface */
-	//serial_api_init();
+	serial_api_init(&USART_data);
 	
 	/* Initialize the I2C intern interface*/
 	i2c_intern_init();
-	
-	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
-	pmic_init();
-	
-	/* Enable interrupts */
-	cpu_irq_enable();
 		
 	/* Wait some time for external devices to start up */	
 	delay_ms(300);
@@ -119,7 +128,13 @@ void orca_init()
 	rtc_init();
 	rtc_set_callback(system_timer);
 	rtc_set_alarm(5);
-	//rtc_set_alarm_relative(0);
+	rtc_set_alarm_relative(0);
+
+	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
+	pmic_init();
+
+	/* Enable interrupts */
+	cpu_irq_enable();
 
 	delay_ms(300);
 }
@@ -175,6 +190,17 @@ void system_timer(uint32_t time)
 	rtc_set_time(0);
 }
  
+/*! \brief Receive complete interrupt service routine.
+ *
+ *  Receive complete interrupt service routine.
+ *  Calls the common receive complete handler with pointer to the correct USART
+ *  as argument.
+ */
+ISR(USARTE0_RXC_vect)
+{
+	USART_RXComplete(&USART_data);
+}
+
 ISR(PORTH_INT0_vect)
 {
 	isr_servo_in(&servoIn);	
@@ -184,3 +210,14 @@ ISR(PORTA_INT0_vect)
 {
 	isr_servo_in(&servoIn);
 }
+
+/*! \brief Data register empty  interrupt service routine.
+ *
+ *  Data register empty  interrupt service routine.
+ *  Calls the common data register empty complete handler with pointer to the
+ *  correct USART as argument.
+ */
+//ISR(USARTE0_DRE_vect)
+//{
+	//USART_DataRegEmpty(&USART_data);
+//}

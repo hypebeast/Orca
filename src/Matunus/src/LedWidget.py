@@ -26,7 +26,6 @@ except ImportError:
     sys.exit(2)
 
 import os
-
 import defs
 
 
