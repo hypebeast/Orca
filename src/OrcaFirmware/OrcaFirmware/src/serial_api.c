@@ -25,7 +25,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 /*! USART data struct. */
-USART_data_t* USART_data;
+USART_data_t USART_data;
 
 /**************************************************************************
  * \brief This structure represents an input buffer for incoming API commands.
@@ -282,32 +282,30 @@ void serial_api_task(void)
 /**
 * This method initializes the serial interface.
 */
-void serial_api_init(USART_data_t* usart_data)
+void serial_api_init()
 {	
-	USART_data = usart_data;
+	// Enable the system clock for USARTE0
+	sysclk_enable_peripheral_clock(USART_SERIAL_API_INTERFACE);
 	
 	// Use USARTE0 and initialize buffers
-	USART_InterruptDriver_Initialize(USART_data, BOARD_USART_USB_INTERFACE,
+	USART_InterruptDriver_Initialize(&USART_data, BOARD_USART_USB_INTERFACE,
 									 USART_DREINTLVL_LO_gc);
 	
 	// USARTE0, 8 data bits, no parity, 1 stop bit
-	USART_Format_Set(USART_data->usart, USART_CHSIZE_8BIT_gc,
+	USART_Format_Set(USART_data.usart, USART_CHSIZE_8BIT_gc,
 					 USART_PMODE_DISABLED_gc, false);
 	
 	// Enable RXC interrupt
-	USART_RxdInterruptLevel_Set(USART_data->usart, USART_RXCINTLVL_LO_gc);
+	USART_RxdInterruptLevel_Set(USART_data.usart, USART_RXCINTLVL_LO_gc);
 	
 	// Set baudrate to 9600 bps; scale factor is set to zero
 	// BSEL = ((I/O clock frequency)/(2^(ScaleFactor)*16*Baudrate))-1
-	// 207
-	USART_Baudrate_Set(USART_data->usart, 12, 0);
+	// BSEL for 9600 bps => 207
+	USART_Baudrate_Set(USART_data.usart, 207, 0);
 	
 	// Enable both RX and TX
-	USART_Rx_Enable(USART_data->usart);
-	//USART_Tx_Enable(USART_data->usart);
-	
-	// Enable PMIC interrupt level low
-	//PMIC.CTRL |= PMIC_LOLVLEX_bm;
+	USART_Rx_Enable(USART_data.usart);
+	USART_Tx_Enable(USART_data.usart);
 	
 	// Initialize command buffer
 	command_buff.index = 0;
@@ -498,4 +496,27 @@ bool USART_TXBuffer_PutByte(USART_data_t * usart_data, uint8_t data)
 		usart_data->usart->CTRLA = tempCTRLA;
 	}
 	return TXBuffer_FreeSpace;
+}
+
+
+/*! \brief Receive complete interrupt service routine.
+ *
+ *  Receive complete interrupt service routine.
+ *  Calls the common receive complete handler with pointer to the correct USART
+ *  as argument.
+ */
+ISR(USARTE0_RXC_vect)
+{
+	USART_RXComplete(&USART_data);
+}
+
+/*! \brief Data register empty  interrupt service routine.
+ *
+ *  Data register empty  interrupt service routine.
+ *  Calls the common data register empty complete handler with pointer to the
+ *  correct USART as argument.
+ */
+ISR(USARTE0_DRE_vect)
+{
+	USART_DataRegEmpty(&USART_data);
 }

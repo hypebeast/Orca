@@ -111,7 +111,7 @@ void orca_init(void)
 	flight_controller_init(&board, &servoIn, &flightController);
 
 	/* Initialize the serial interface */
-	serial_api_init(&USART_data);
+	serial_api_init();
 	
 	/* Initialize the I2C intern interface*/
 	i2c_intern_init();
@@ -189,35 +189,15 @@ void system_timer(uint32_t time)
 	rtc_set_alarm(1);
 	rtc_set_time(0);
 }
- 
-/*! \brief Receive complete interrupt service routine.
- *
- *  Receive complete interrupt service routine.
- *  Calls the common receive complete handler with pointer to the correct USART
- *  as argument.
- */
-ISR(USARTE0_RXC_vect)
-{
-	USART_RXComplete(&USART_data);
-}
+
 
 ISR(PORTH_INT0_vect)
 {
 	isr_servo_in(&servoIn);	
 }
 
+
 ISR(PORTA_INT0_vect)
 {
 	isr_servo_in(&servoIn);
 }
-
-/*! \brief Data register empty  interrupt service routine.
- *
- *  Data register empty  interrupt service routine.
- *  Calls the common data register empty complete handler with pointer to the
- *  correct USART as argument.
- */
-//ISR(USARTE0_DRE_vect)
-//{
-	//USART_DataRegEmpty(&USART_data);
-//}
