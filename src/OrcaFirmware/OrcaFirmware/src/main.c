@@ -29,7 +29,6 @@
 
 /* global variables */
 BOARD_CONFIG_t board;  								/*!< \brief board module */
-USART_data_t USART_data;
 SERVO_IN_t servoIn;									/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
 VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */

@@ -199,7 +199,7 @@ class MainAppWindow(QtGui.QMainWindow):
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "config.png"))
         self.mainContainer.addTab(self.configurationPage, icon, "Configuration")
 
-        self.scopePage = ScopePage()
+        self.scopePage = ScopePage(self.controllerManager)
         self.pages.append(self.scopePage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "scopes.png"))
         self.mainContainer.addTab(self.scopePage, icon, "Scopes")

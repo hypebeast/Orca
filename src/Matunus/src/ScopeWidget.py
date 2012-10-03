@@ -9,15 +9,12 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
-__author__ = 'Sebastian Ruml'
-
 
 
 # This is only needed for Python v2 but is harmless for Python v3.
@@ -31,32 +28,44 @@ except ImportError:
     import sys
     sys.exit(2)
 
+try:
+	import PyQt4.Qwt5 as Qwt 
+except:
+	print "No PyQwt found!"
+	import sys
+	sys.exit(2)
 
-import defs
-from ScopeWidget import ScopeWidget
 
+class ScopeWidget(Qwt.QwtPlot):
+	"""
+	Widget that contains one scope.
+	"""
+	def __init__(self, dataFields, boardController):
+		Qwt.QwtPlot.__init__(self)
 
-class ScopePage(QtGui.QWidget):
-    """
-    """
-    def __init__(self, boardController):
-        super(ScopePage, self).__init__()
+		if dataFields is None or boardController is None:
+			raise "Error!"
 
-        if boardController is None:
-            raise "Error!"
+		self.boardController = boardController
+		self.boardController.board_status_updated.connect(self._on_status_updated)
+		self.plotCurves = list()
+		self.updateTimer = QtCore.QTimer()
+		QtCore.QObject.connect(self.updateTimer, QtCore.SIGNAL('timeout()'), self._on_timer)
+		self.updateInterval = 0.5
 
-        self.scopes = list()
-        self.app_defs = defs.AppDefs()
-        self.createUi()
+		self.has_new_data = False
 
-    def createUi(self):
-        self.mainLayout = QtGui.QHBoxLayout()
+	def start(self):
+		self.updateTimer.start(self.updateInterval * 1000.0)
 
-    def addScopes(self):
-        pass
+	def stop(self):
+		pass
 
-    def start(self):
-        pass
+	def _on_timer(self):
+		self._update_scope()
 
-    def stop(self):
-        pass
+	def _update_scope(self):
+		pass
+
+	def _on_status_updated(self):
+		pass

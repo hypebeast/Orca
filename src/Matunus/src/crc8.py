@@ -54,7 +54,7 @@ class crc8:
 	def crc(self, msg):
 		runningCRC = 0
 		for c in msg:
-			c = ord(c)
+			#c = ord(str(c))
 			runningCRC = self.crcByte(runningCRC, c)
 			return runningCRC
 

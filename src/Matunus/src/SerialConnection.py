@@ -18,14 +18,25 @@
 
 __author__ = 'Sebastian Ruml'
 
+
 import serial
 import threading
 import sys
 import struct
 import binascii
+import Queue
+import time
+
+try:
+    from PyQt4 import pyqtSignal
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
 from crc8 import crc8
 from logger import Logger
+from ApiCommands import MessageFactory
 
 
 NEWLINE_CONVERISON_MAP = ('\n', '\r', '\r\n')
@@ -61,16 +72,20 @@ class SerialError(Exception):
 
 class ResponseStatus:
     IDLE = 0
-    RECEIVING = 1
-    CR_RECEIVED = 2
-    FINSIHED = 3
-    RESPONSE_FINISHED = 4
+    START_RECEIVED = 1
 
 
 class SerialConnection:
     """
     This class handles the serial connection with the flight controller.
     """
+
+    START_BYTE = 0x8D
+    STOP_BYTE = 0x7E
+
+    # This signal is emitted if a new message was received
+    message_received = pyqtSignal()
+
     def __init__(self, port=DEFAULT_PORT,
                  baudrate=DEFAULT_BAUDRATE,
                  parity=DEFAULT_PARITY,
@@ -86,12 +101,19 @@ class SerialConnection:
         self.xonxoff = xonxoff
         self.connected = False
 
+        # Receiver
         self.receiver_thread = None
         self.reader_alive = False
         self.newResponse = False
         self.responseStatus = ResponseStatus.IDLE
         self.responseBuffer = []
+        self.reader_interval = 0.5 # Update interval in seconds
 
+        # This queue contains the received messages. The messages are stored as
+        # tuples in the following format: (message, timestamp).
+        self.messageQueue = Queue.Queue()
+
+        # Logger
         self._logger = Logger()
 
     def start_reader(self):
@@ -151,6 +173,12 @@ class SerialConnection:
 
         self.baudrate = baudrate
 
+    def set_update_rate(self, interval):
+        if interval <= 0.0:
+            return
+
+        self.reader_interval = interval
+
     def writeMessage(self, command):
         """
         This method writes the given message packet to the serial communication line.
@@ -172,45 +200,34 @@ class SerialConnection:
                 data = self.serial_connection.read(1)
                 #print "Data: " + data
 
-                if data != '':
+                if data is not None:
                     print "Received data: " + data
 
                     if self.responseStatus == ResponseStatus.IDLE:
-                        self.responseStatus = ResponseStatus.RECEIVING
-                        self.responseBuffer = []
-                        self.responseBuffer.append(data)
+                        if data == self.START_BYTE:
+                            self.responseStatus = ResponseStatus.RECEIVING
+                            self.responseBuffer = []
+                            self.responseBuffer.append(data)
                     elif self.responseStatus == ResponseStatus.RECEIVING:
-                        if data == '\r':
-                            self.responseStatus = ResponseStatus.CR_RECEIVED
+                        if data == self.STOP_BYTE:
+                            self.responseStatus = ResponseStatus.IDLE
+                            self.responseBuffer.append(data)
+                            self.processReceivedMessage(self.responseBuffer)
                         else:
                             self.responseBuffer.append(data)
-                    elif self.responseStatus == ResponseStatus.CR_RECEIVED:
-                        if data == '\n':
-                            self.responseStatus = ResponseStatus.RESPONSE_FINISHED
-                    elif self.responseStatus == ResponseStatus.RESPONSE_FINISHED:
-                        self.responseStatus = ResponseStatus.IDLE
-                        self.processResponse(data)
+
+                time.sleep(self.reader_interval)
 
         except serial.SerialException, e:
             self.reader_alive = False
             raise
 
-    def processResponse(self, data):
-        pass
+    def processReceivedMessage(self, buffer):
+        """Processes a received message packet."""
+        message = MessageFactory.getMessage(buffer)
 
-    def readStatus(self):
-        """
-        This method reads the current status from the controller
-        """
-        for i in range(0, len(self.status_queries)):
-            query = self.status_queries[i]
+        timestamp = time.clock()
+        self.messageQueue.put((message, timestamp))
 
-            command = CommandMessage(query["query"])
-            for arg in query["args"]:
-                command.addArgument(arg)
-
-            #self._logger.debug("Execute query: " + command.getMessage())
-            print "Execute query: " + command.getMessage()
-            self.writeMessage(command)
-
-            #self._logger.info("Query: %s Data: %s" % (query["query"], query["data"]))
+        # Emit signal to inform all connected classes
+        self.message_received.emit()

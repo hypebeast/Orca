@@ -98,6 +98,7 @@ class ServoControlWidget(QtGui.QWidget):
 
         #command = SetServoPosCommand(self.servo_nr, position)
         #self.controller.writeCommand(command)
+        self.controller.setServoPos(self.servo_nr, position)
 
     def setMinValue(self, value):
         self.minValue = value
