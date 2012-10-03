@@ -299,7 +299,8 @@ uint8_t mpu_6000_get_new_data(void)
 	mpu->xGyr = (float)mpuXGyr / gyrDiv; //Save the X-rate of rotation in deg/ms
 	mpu->yGyr = (float)mpuYGyr / gyrDiv; //Save the Y-rate of rotation in deg/ms
 	mpu->zGyr = (float)mpuZGyr / gyrDiv; //Save the Z-rate of rotation in deg/ms
-
+	
+	return true;
 }
 /**************************************************************************
 * \\brief MPU 6000 get new data
@@ -314,7 +315,7 @@ uint8_t mpu_6000_task(void)
 {
 	mpu->time += 10000;
 	mpu_6000_get_new_data();
-	filters_get_estimated_inclination(mpu->time, mpu->xAcc, mpu->yAcc, mpu->zAcc, mpu->xGyr, mpu->yGyr, mpu->zGyr);
+	filters_calculate_six_degrees_of_freedom(mpu->time, mpu->xAcc, mpu->yAcc, mpu->zAcc, mpu->xGyr, mpu->yGyr, mpu->zGyr);
 	
 	mpu->estaxr = mpufilter.axr;
 	mpu->estayr = mpufilter.ayr;

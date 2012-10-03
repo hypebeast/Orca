@@ -115,15 +115,16 @@ void orca_init(void)
 	/* Initialize the I2C intern interface*/
 	i2c_intern_init();
 		
-	/* Wait some time for external devices to start up */	
+	/* Wait some time for external devices/sensors to start up */	
 	delay_ms(300);
 	
 	/* Initialize the the voltage sensor */
 	voltage_sens_init(&voltageSensor, 0x02);
 	
+	/* Initialize the gyro/acc sensor*/
 	mpu_6000_init(&motionProcessingUnit);
 	
-	/* Initialize and start System Timer */
+	/* Initialize and start the System Timer */
 	rtc_init();
 	rtc_set_callback(system_timer);
 	rtc_set_alarm(5);
@@ -198,5 +199,5 @@ ISR(PORTH_INT0_vect)
 
 ISR(PORTA_INT0_vect)
 {
-	isr_servo_in(&servoIn);
+	//isr_servo_in(&servoIn);
 }
