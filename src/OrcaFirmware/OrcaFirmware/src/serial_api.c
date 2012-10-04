@@ -57,24 +57,30 @@ SERIAL_API_PACKET_t tx_command_packet;
 static void parse_command_packet(void);
 
 /**************************************************************************
-* This method executes an received command.
+* \brief This method executes an received command.
 **************************************************************************/
 static void execute_command(void);
 
 /**************************************************************************
-* Sets new servo position
+* \brief Sets new servo position
 **************************************************************************/
 static void command_set_servo_pos(void);
 
 /**************************************************************************
-/* Gets the actual position of a servo
+* \brief Gets the actual position of a servo
 **************************************************************************/
 static void command_get_servo_pos(void);
+
+/**************************************************************************
+* \brief Returns the position of all servos
+**************************************************************************/
+static void command_get_all_servo_pos(void);
 
 /* Enabled API commands */
 struct api_command commands[] = {
 	{ 0x0001, command_set_servo_pos},
-	{ 0x0002, command_get_servo_pos}
+	{ 0x0002, command_get_servo_pos},
+	{ 0x0003, command_get_all_servo_pos}
 };
 
 
@@ -84,6 +90,8 @@ struct api_command commands[] = {
 
 /**
 * \brief This function sets a new position for a servo.
+*
+* Command Type: 0x00001
 */
 static void command_set_servo_pos(void)
 {
@@ -107,6 +115,8 @@ static void command_set_servo_pos(void)
 
 /**
 * \brief This function returns the actual position of a servo.
+*
+* Comman Type: 0x0002
 */
 static void command_get_servo_pos(void)
 {
@@ -123,6 +133,17 @@ static void command_get_servo_pos(void)
 	//usart_putchar(USART_SERIAL_API, '\n');
 	//char resp[] = "200";
 	//write_command(resp);
+}
+
+
+/**************************************************************************
+* \brief Returns the position of all servos
+*
+* Commant Type: 0x0003
+**************************************************************************/
+static void command_get_all_servo_pos(void)
+{
+	
 }
 
 
@@ -161,6 +182,7 @@ static void execute_command(void)
 	for (i = 0; i < ARRAY_SIZE(commands); i++) {
 		if (commands[i].command_type == rx_command_packet.command &&
 			commands[i].function != NULL) {
+			// Execute the command function
 			commands[i].function();
 		}
 	}
@@ -200,7 +222,7 @@ static void parse_command_packet(void)
 	// Set the stop delimiter
 	rx_command_packet.stop_delimiter = command_buff.buff[index];
 	
-	// Check the crc checksum
+	// Calculate and check the CRC checksum
 	uint8_t crc_data[MAX_PACKET_LENGTH];
 	uint16_t crc_data_length = command_buff.index - 2;
 	memcpy(crc_data, command_buff.buff, crc_data_length * sizeof(uint8_t));
