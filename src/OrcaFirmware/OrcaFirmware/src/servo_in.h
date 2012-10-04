@@ -36,17 +36,7 @@ typedef struct SERVO_IN {
 	volatile uint16_t servo5;						/*!< brief Actual value on Servo Port 5 IN */
 	volatile uint16_t servo6;						/*!< brief Actual value on Servo Port 6 IN */
 	volatile uint16_t servo7;						/*!< brief Actual value on Servo Port 7 IN */
-	volatile uint16_t servo1StartCount;				/*!< brief Timer start value for Servo 1 */
-	volatile uint16_t servo2StartCount;				/*!< brief Timer start value for Servo 2 */
-	volatile uint16_t servo3StartCount;				/*!< brief Timer start value for Servo 3 */
-	volatile uint16_t servo4StartCount;				/*!< brief Timer start value for Servo 4 */
-	volatile uint16_t servo5StartCount;				/*!< brief Timer start value for Servo 5 */
-	volatile uint16_t servo6StartCount;				/*!< brief Timer start value for Servo 6 */
-	volatile uint16_t servo7StartCount;				/*!< brief Timer start value for Servo 7 */
-	volatile uint8_t lastInput;						/*!< brief The last Servo Port input value (for detecting edges on the input pin) */
 }SERVO_IN_t;
 
 void servo_in_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo);
-void isr_servo_in(SERVO_IN_t *servo);
-
 #endif /* SERVO_IN_H_ */

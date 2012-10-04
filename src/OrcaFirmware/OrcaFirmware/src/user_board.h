@@ -66,11 +66,6 @@
 //---------------------------------------------------------------------
 #define BOARD_LED_ERR_GPIO		IOPORT_CREATE_PIN(PORTK, 7)		/*!< \brief Error LED */
 #define BOARD_LED_STAT_GPIO		IOPORT_CREATE_PIN(PORTK, 6)		/*!< \brief State LED */
-#define Stat_LED_ON()			ioport_set_pin_high(BOARD_LED_STAT_GPIO)
-#define Stat_LED_OFF()			ioport_set_pin_low(BOARD_LED_STAT_GPIO)
-#define Err_LED_ON()			ioport_set_pin_high(BOARD_LED_ERR_GPIO)
-#define Err_LED_OFF()			ioport_set_pin_low(BOARD_LED_ERR_GPIO)
-
 
 //---------------------------------------------------------------------
 //	GPIO Connections Of Push Buttons

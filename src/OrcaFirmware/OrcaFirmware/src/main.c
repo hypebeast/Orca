@@ -26,6 +26,7 @@
 #include "flight_controller.h"
 #include "voltage_sens.h"
 #include "MPU6000.h"
+#include "user_interface.h"
 
 /* global variables */
 BOARD_CONFIG_t board;  								/*!< \brief board module */
@@ -37,7 +38,7 @@ MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing un
 
 unsigned long ulFcTickCounter = 0;			/*!< \brief Flight Controller system tick counter */
 unsigned long ulVsTickCounter = 0;			/*!< \brief Voltage sensor system tick counter */
-
+unsigned long ulUiTickCounter = 0;			/*!< \brief User Interface system tick counter */
 
 /*! \brief Entry point for the program.
  *
@@ -47,15 +48,6 @@ int main (void)
 {
 	// Initialize all basic board functions
 	orca_init();
-	
-	mpu_6000_get_new_data();
-	
-	// test stuff
-	Stat_LED_ON();
-	Err_LED_ON();
-		
-	//mpu_6000_get_z_acc_offset(motionProcessingUnit);
-	mpu_6000_get_product_id();
 		
 	// Loop forever
 	while(1)
@@ -128,7 +120,7 @@ void orca_init(void)
 	/* Initialize and start the System Timer */
 	rtc_init();
 	rtc_set_callback(system_timer);
-	rtc_set_alarm(5);
+	rtc_set_alarm(1);
 	rtc_set_alarm_relative(0);
 
 	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
@@ -138,6 +130,9 @@ void orca_init(void)
 	cpu_irq_enable();
 
 	delay_ms(300);
+	
+	rtc_set_time(0);
+	user_interface_stat_led_pattern(USER_INTERFACE_LED_BLINKING);
 }
 
 uint16_t i2c_intern_init(void)
@@ -161,7 +156,7 @@ uint16_t i2c_intern_init(void)
 /**************************************************************************
 * \brief System Timer Callback
 *	This function is called periodically every 10 ms. Use this function 
-*	for scheduling. /n
+*	for scheduling tasks. /n
 *
 * \param *time time
 *
@@ -171,12 +166,12 @@ void system_timer(uint32_t time)
 {
 	ulFcTickCounter++;
 	ulVsTickCounter++;
+	ulUiTickCounter++;
 	
 	/* Call the flight Controller every 10 ms */ 
 	if(ulFcTickCounter >= 1)
 	{
 		mpu_6000_task();
-		//flight_controller_task(&flightController);
 		ulFcTickCounter = 0;		
 	}
 	
@@ -186,15 +181,16 @@ void system_timer(uint32_t time)
 		voltage_sens_task(&voltageSensor);
 		ulVsTickCounter = 0;
 	}
+	
+	/* Update the user interface every 50 ms */
+	if(ulUiTickCounter >= 5)
+	{
+		user_interface_update_LEDs();
+		ulUiTickCounter = 0;
+	}
 
 	rtc_set_alarm(1);
 	rtc_set_time(0);
-}
-
-
-ISR(PORTH_INT0_vect)
-{
-	isr_servo_in(&servoIn);	
 }
 
 

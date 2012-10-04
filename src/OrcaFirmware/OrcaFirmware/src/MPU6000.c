@@ -105,7 +105,7 @@ uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit)
 	delay_ms(1);
 	
 	/* Init the filter module */
-	filters_init(&mpufilter);
+	filter_init(&mpufilter, FILTER_Q_ANGLE_CONF, FILTER_Q_GYRO_CONF, FILTER_R_ANGLE_CONF);
 	
 	return SYSTEM_INFO_TRUE;
 }
@@ -296,9 +296,9 @@ uint8_t mpu_6000_get_new_data(void)
 	mpu->xAcc = (float)mpuXAcc / accDiv; //Save the X-Acceleration in g
 	mpu->yAcc = (float)mpuYAcc / accDiv; //Save the Y-Acceleration in g
 	mpu->zAcc = (float)mpuZAcc / accDiv; //Save the Z-Acceleration in g
-	mpu->xGyr = (float)mpuXGyr / gyrDiv; //Save the X-rate of rotation in deg/ms
-	mpu->yGyr = (float)mpuYGyr / gyrDiv; //Save the Y-rate of rotation in deg/ms
-	mpu->zGyr = (float)mpuZGyr / gyrDiv; //Save the Z-rate of rotation in deg/ms
+	mpu->xGyr = (float)mpuXGyr / gyrDiv; //Save the X-rate of rotation in deg/s
+	mpu->yGyr = (float)mpuYGyr / gyrDiv; //Save the Y-rate of rotation in deg/s
+	mpu->zGyr = (float)mpuZGyr / gyrDiv; //Save the Z-rate of rotation in deg/s
 	
 	return true;
 }
@@ -315,11 +315,15 @@ uint8_t mpu_6000_task(void)
 {
 	mpu->time += 10000;
 	mpu_6000_get_new_data();
-	filters_calculate_six_degrees_of_freedom(mpu->time, mpu->xAcc, mpu->yAcc, mpu->zAcc, mpu->xGyr, mpu->yGyr, mpu->zGyr);
 	
-	mpu->estaxr = mpufilter.axr;
-	mpu->estayr = mpufilter.ayr;
-	mpu->estazr = mpufilter.azr;
+	mpufilter.xAcc = -(mpu->xAcc);
+	mpufilter.yAcc = mpu->yAcc;
+	mpufilter.zAcc = -(mpu->zAcc);
+	mpufilter.xGyr = -(mpu->xGyr);
+	mpufilter.yGyr = mpu->yGyr;
+	mpufilter.zGyr = mpu->zGyr;
+	
+	filter_task(mpu->time);
 }
 
 void isr_mpu_6000_int_pin(void)

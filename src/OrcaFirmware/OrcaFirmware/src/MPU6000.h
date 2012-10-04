@@ -34,10 +34,10 @@
 #define MPU_6000_ACCEL_AFS_FACTOR_4g	8192.0f
 #define MPU_6000_ACCEL_AFS_FACTOR_8g	4096.0f
 #define MPU_6000_ACCEL_AFS_FACTOR_16g	2048.0f
-#define MPU_6000_GYRO_FS_FACTOR_250		131000.0f
-#define MPU_6000_GYRO_FS_FACTOR_500		65500.0f	
-#define MPU_6000_GYRO_FS_FACTOR_1000	32800.0f	
-#define MPU_6000_GYRO_FS_FACTOR_2000	16400.0f
+#define MPU_6000_GYRO_FS_FACTOR_250		131.0f
+#define MPU_6000_GYRO_FS_FACTOR_500		65.5f	
+#define MPU_6000_GYRO_FS_FACTOR_1000	32.8f	
+#define MPU_6000_GYRO_FS_FACTOR_2000	16.4f
 		
 //---------------------------------------------------------------------
 //	MPU Register 107 – Power Management 1, Page 41
@@ -188,12 +188,9 @@ typedef struct MOTION_PROCESSING_UNIT{
 	float xAcc;								/*!< brief X-Acceleration in g */
 	float yAcc;								/*!< brief Y-Acceleration in g */
 	float zAcc;								/*!< brief Z-Acceleration in g */
-	float xGyr;								/*!< brief X-rate of rotation in deg/ms */
-	float yGyr;								/*!< brief Y-rate of rotation in deg/ms */
-	float zGyr;								/*!< brief Z-rate of rotation in deg/ms */
-	float estaxr;							/*!< brief estimated  x angle */
-	float estayr;							/*!< brief estimated  y angle */
-	float estazr;							/*!< brief estimated  z angle */
+	float xGyr;								/*!< brief X-rate of rotation in deg/s */
+	float yGyr;								/*!< brief Y-rate of rotation in deg/s */
+	float zGyr;								/*!< brief Z-rate of rotation in deg/s */
 }MOTION_PROCESSING_UNIT_t;
 
 uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit);
