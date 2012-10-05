@@ -108,13 +108,21 @@
 //---------------------------------------------------------------------
 //	GPIO Serial Data Flash
 //---------------------------------------------------------------------
-#define BOARD_SERIAL_DATA_FLASH_SPI           &USARTF0
+#define BOARD_SERIAL_DATA_FLASH_SPI           &SPIF
 #define BOARD_SERIAL_DATA_FLASH_CS            IOPORT_CREATE_PIN(PORTF,4)
 #define BOARD_SERIAL_DATA_FLASH_MASTER_SCK    IOPORT_CREATE_PIN(PORTF,7)  // SCK as output
 #define BOARD_SERIAL_DATA_FLASH_MASTER_MOSI   IOPORT_CREATE_PIN(PORTF,5)  // MOSI as output
 #define BOARD_SERIAL_DATA_FLASH_MASTER_MISO   IOPORT_CREATE_PIN(PORTF,6)  // MISO as input
 #define BOARD_SERIAL_DATA_FLASH_SPI_CLK_MASK  SYSCLK_PORT_F
 
+#define AT45DBX_USES_SPI_MASTER_SERVICE
+#define AT45DBX_MEM_SIZE            AT45DBX_4MB
+#define AT45DBX_MEM_CNT             1
+#define AT45DBX_SPI_MODULE          BOARD_SERIAL_DATA_FLASH_SPI
+#define AT45DBX_SPI_FIRST_NPCS      AT45DBX_SPI_NPCS
+#define AT45DBX_SPI_MASTER_SPEED    12000000
+#define AT45DBX_SPI_BITS            8
+#define AT45DBX_CS					BOARD_SERIAL_DATA_FLASH_CS
 //---------------------------------------------------------------------
 //	GPIO I2C
 //---------------------------------------------------------------------

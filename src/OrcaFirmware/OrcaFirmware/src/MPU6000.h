@@ -18,8 +18,8 @@
 #define MPU_6000_GYRO_FS_CONF			MPU_6000_GYRO_FS_2000		/*!< brief Used full scale range of the gyroscope */
 #define MPU_6000_ACC_AFS_CONF			MPU_6000_ACCEL_AFS_4g		/*!< brief Used full scale range of the accelerometer */
 #define MPU_6000_SMPRT_DIV_CONF			0x04						/*!< brief Used sample rate divider */
-#define MPU_6000_ISR_LVL				PORT_INT0LVL_HI_gc		/*!< brief Servo Input ISR Level */	
-
+#define MPU_6000_ISR_LVL				PORT_INT0LVL_HI_gc			/*!< brief Servo Input ISR Level */	
+#define MPU_6000_CAL_CYCLE				50
 //---------------------------------------------------------------------
 //	General
 //---------------------------------------------------------------------
@@ -201,4 +201,5 @@ uint16_t mpu_6000_reset(void);
 void isr_mpu_6000_int_pin(void);
 uint8_t mpu_6000_get_new_data(void);
 uint8_t mpu_6000_task(void);
+uint8_t mpu_6000_calibrate(void);
 #endif /* MPU6000_H_ */
