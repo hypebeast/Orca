@@ -1,26 +1,26 @@
 /* This file has been prepared for Doxygen automatic documentation generation.*/
-/*! \\file *********************************************************************
+/*! \file *********************************************************************
  *
- * \\brief
- *			Servo Input source file./n
+ * \brief
+ *			Servo Input source file.\n
  *
  *			
  *
  *
- * \\par Application note:
+ * \par Application note:
  *
- * \\author
+ * \author
  *      f-ruml
  *
- * \\par Device
+ * \par Device
  * 		ATxmega 128A1 \n
- * \\par File
- * 		servo_in.c \\n
- * \\par Date
- * 		 05.06.2012  \\n
- * \\todo
+ * \par File
+ * 		servo_in.c \n
+ * \par Date
+ * 		 05.06.2012  \n
+ * \todo
  *
- * \\par History
+ * \par History
  * 		 -v0.01 first version
  *****************************************************************************/
 

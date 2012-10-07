@@ -13,7 +13,7 @@
 
 #include "MPU6000.h"
 #include "system_info.h"
-#include "filters.h"
+
 uint16_t mpu_6000_read_accelerometer_measurements(void);
 uint16_t mpu_6000_read_gyroscope_measurements(void);
 uint16_t mpu_6000_write(uint8_t addr, uint8_t value);
@@ -21,7 +21,6 @@ uint16_t mpu_6000_read(uint8_t addr, uint8_t number, uint8_t *datarec);
 
 MOTION_PROCESSING_UNIT_t *mpu;
 PORT_t *mpuIntPort = &BOARD_MPU_6000_INT_PORT;
-FILTER_DATA_t mpufilter; /*!< \brief filter module */
 
 int16_t mpuXAcc = 0;	/*!< brief x-accelerometer value */
 int16_t mpuYAcc = 0;	/*!< brief y-accelerometer value */
@@ -110,10 +109,7 @@ uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit)
 	/* Configure the gyroscope sensor */
 	mpu_6000_write(MPU_6000_GYRO_CONFIG_ADDR, (MPU_6000_GYRO_FS_CONF)<<MPU_6000_GYRO_FS_SEL_bp);
 	delay_ms(1);
-	
-	/* Init the filter module */
-	filter_init(&mpufilter, FILTER_Q_ANGLE_CONF, FILTER_Q_GYRO_CONF, FILTER_R_ANGLE_CONF);
-	
+		
 	return SYSTEM_INFO_TRUE;
 }
 
@@ -360,19 +356,31 @@ uint8_t mpu_6000_calibrate(void)
 *
 * \\return  product id
 ***************************************************************************/
+uint8_t mpu_6000_save_data_to_filter(FILTER_DATA_t *filter)
+{
+	filter->xAcc = -(mpu->xAcc);
+	filter->yAcc = mpu->yAcc;
+	filter->zAcc = -(mpu->zAcc);
+	filter->xGyr = -(mpu->xGyr);
+	filter->yGyr = mpu->yGyr;
+	filter->zGyr = mpu->zGyr;
+	
+	return true;
+}
+
+/**************************************************************************
+* \\brief MPU 6000 get new data
+*	Get the acceleration and rate of rotation measurements from the mpu,
+*   convert and save the new value in the mpu struct . /n
+*
+* \\param *mpu MPU data structure
+*
+* \\return  product id
+***************************************************************************/
 uint8_t mpu_6000_task(void)
 {
 	mpu->time += 10000;
 	mpu_6000_get_new_data();
-	
-	mpufilter.xAcc = -(mpu->xAcc);
-	mpufilter.yAcc = mpu->yAcc;
-	mpufilter.zAcc = -(mpu->zAcc);
-	mpufilter.xGyr = -(mpu->xGyr);
-	mpufilter.yGyr = mpu->yGyr;
-	mpufilter.zGyr = mpu->zGyr;
-	
-	filter_task(mpu->time);
 }
 
 void isr_mpu_6000_int_pin(void)

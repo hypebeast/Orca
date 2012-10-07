@@ -10,6 +10,7 @@
 #define MPU6000_H_
 
 #include "user_board.h"
+#include "filters.h"
 
 //---------------------------------------------------------------------
 //	MPU 6000 Startup Settings
@@ -202,4 +203,5 @@ void isr_mpu_6000_int_pin(void);
 uint8_t mpu_6000_get_new_data(void);
 uint8_t mpu_6000_task(void);
 uint8_t mpu_6000_calibrate(void);
+uint8_t mpu_6000_save_data_to_filter(FILTER_DATA_t *filter);
 #endif /* MPU6000_H_ */

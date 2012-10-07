@@ -28,6 +28,7 @@
 #include "MPU6000.h"
 #include "user_interface.h"
 #include "serial_flash.h"
+#include "filters.h"
 
 /* global variables */
 BOARD_CONFIG_t board;  								/*!< \brief board module */
@@ -35,6 +36,7 @@ SERVO_IN_t servoIn;									/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
 VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
 MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing unit module */
+FILTER_DATA_t orcafilter;							/*!< \brief filter module */
 ORCA_FLASH_SETTINGS_t orcaSettings;					/*!< \brief orca settings module */
 
 unsigned long ulFcTickCounter = 0;			/*!< \brief Flight Controller system tick counter */
@@ -47,14 +49,17 @@ unsigned long ulUiTickCounter = 0;			/*!< \brief User Interface system tick coun
  */
 int main (void)
 {
-	// Initialize all basic board functions
+	/* Initialize all basic board functions */
 	orca_init();
+	
+	/* Uncomment this method to restore the factory settings on the next startup */
+	//serial_flash_factory_reset();
 	
 	/* Calibrate the accelerometer and the gyroscopes */
 	mpu_6000_calibrate();
 	
 	user_interface_stat_led_pattern(USER_INTERFACE_LED_SINGLE_FLASH);
-		
+			
 	// Loop forever
 	while(1)
 	{
@@ -77,7 +82,7 @@ void orca_init(void)
 {
 	//struct pll_config pcfg;
 	
-	// Disable all interrupts
+	/* Disable all interrupts */
 	cpu_irq_disable();
 	
 	/* Initialize clock */	
@@ -128,7 +133,10 @@ void orca_init(void)
 	
 	/* Initialize the gyro/acc sensor*/
 	mpu_6000_init(&motionProcessingUnit);
-		
+	
+	/* Initialize the filter module */
+	filter_init(&orcafilter, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
+			
 	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
 	pmic_init();
 
@@ -186,7 +194,12 @@ void system_timer(uint32_t time)
 		/* Wait until MPU 6000 is calibrated */
 		if(motionProcessingUnit.state == MPU_6000_STATE_RUN)
 		{
+			/* Get new data from the mpu6000 */
 			mpu_6000_task();
+			/* Save the new measuremnts to the filter module */
+			mpu_6000_save_data_to_filter(&orcafilter);	
+			/* Do the kalman filter */
+			filter_task(motionProcessingUnit.time);
 		}
 		ulFcTickCounter = 0;		
 	}
