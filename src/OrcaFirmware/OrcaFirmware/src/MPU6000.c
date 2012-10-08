@@ -13,7 +13,7 @@
 
 #include "MPU6000.h"
 #include "system_info.h"
-#include "filters.h"
+
 uint16_t mpu_6000_read_accelerometer_measurements(void);
 uint16_t mpu_6000_read_gyroscope_measurements(void);
 uint16_t mpu_6000_write(uint8_t addr, uint8_t value);
@@ -21,7 +21,6 @@ uint16_t mpu_6000_read(uint8_t addr, uint8_t number, uint8_t *datarec);
 
 MOTION_PROCESSING_UNIT_t *mpu;
 PORT_t *mpuIntPort = &BOARD_MPU_6000_INT_PORT;
-FILTER_DATA_t mpufilter; /*!< \brief filter module */
 
 int16_t mpuXAcc = 0;	/*!< brief x-accelerometer value */
 int16_t mpuYAcc = 0;	/*!< brief y-accelerometer value */
@@ -29,6 +28,12 @@ int16_t mpuZAcc = 0;	/*!< brief z-accelerometer value */
 int16_t mpuXGyr = 0;	/*!< brief x-gyroscope value */
 int16_t mpuYGyr = 0;	/*!< brief y-gyroscope value */
 int16_t mpuZGyr = 0;	/*!< brief z-gyroscope value */
+float mpuXAccOffs = 0;	/*!< brief x-accelerometer offset */
+float mpuYAccOffs = 0;	/*!< brief y-accelerometer offset */
+float mpuZAccOffs = 0;	/*!< brief z-accelerometer offset */
+float mpuXGyrOffs = 0;	/*!< brief x-gyroscope offset */
+float mpuYGyrOffs = 0;	/*!< brief y-gyroscope offset */
+float mpuZGyrOffs = 0;	/*!< brief z-gyroscope offset */
 float accDiv = 0;
 float gyrDiv = 0;
 
@@ -43,6 +48,7 @@ uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit)
 {
 	mpu = mProcessingUnit;
 	
+	mpu->state = MPU_6000_STATE_INIT;
 	mpu->accAfs = MPU_6000_ACC_AFS_CONF;
 	mpu->gyrfs = MPU_6000_GYRO_FS_CONF;
 	mpu->xAcc = 0;
@@ -103,10 +109,7 @@ uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit)
 	/* Configure the gyroscope sensor */
 	mpu_6000_write(MPU_6000_GYRO_CONFIG_ADDR, (MPU_6000_GYRO_FS_CONF)<<MPU_6000_GYRO_FS_SEL_bp);
 	delay_ms(1);
-	
-	/* Init the filter module */
-	filters_init(&mpufilter);
-	
+		
 	return SYSTEM_INFO_TRUE;
 }
 
@@ -293,15 +296,78 @@ uint8_t mpu_6000_get_new_data(void)
 	mpu_6000_read_gyroscope_measurements();
 	
 	/* Scaling and save all measurements */
-	mpu->xAcc = (float)mpuXAcc / accDiv; //Save the X-Acceleration in g
-	mpu->yAcc = (float)mpuYAcc / accDiv; //Save the Y-Acceleration in g
-	mpu->zAcc = (float)mpuZAcc / accDiv; //Save the Z-Acceleration in g
-	mpu->xGyr = (float)mpuXGyr / gyrDiv; //Save the X-rate of rotation in deg/ms
-	mpu->yGyr = (float)mpuYGyr / gyrDiv; //Save the Y-rate of rotation in deg/ms
-	mpu->zGyr = (float)mpuZGyr / gyrDiv; //Save the Z-rate of rotation in deg/ms
+	mpu->xAcc = ((float)mpuXAcc / accDiv) - mpuXAccOffs; //Save the X-Acceleration in g
+	mpu->yAcc = ((float)mpuYAcc / accDiv) - mpuYAccOffs; //Save the Y-Acceleration in g
+	mpu->zAcc = ((float)mpuZAcc / accDiv) - mpuZAccOffs; //Save the Z-Acceleration in g
+	mpu->xGyr = ((float)mpuXGyr / gyrDiv) - mpuXGyrOffs; //Save the X-rate of rotation in deg/s
+	mpu->yGyr = ((float)mpuYGyr / gyrDiv) - mpuYGyrOffs; //Save the Y-rate of rotation in deg/s
+	mpu->zGyr = ((float)mpuZGyr / gyrDiv) - mpuZGyrOffs; //Save the Z-rate of rotation in deg/s
 	
 	return true;
 }
+
+/**************************************************************************
+* \\brief MPU 6000 calibrate sensor
+*	Get the acceleration and rate of rotation measurements from the mpu,
+*   convert and save the new value in the mpu struct . /n
+*
+* \\param *mpu MPU data structure
+*
+* \\return  product id
+***************************************************************************/
+uint8_t mpu_6000_calibrate(void)
+{
+	float xAccAvg=0, yAccAvg=0, zAccAvg=0, xGyrAvg=0, yGyrAvg=0, zGyrAvg=0; 
+	uint16_t i = 0;
+	
+	/* Read all Acc and Gyro axis */
+	for(i=0; i<=MPU_6000_CAL_CYCLE; i++)
+	{
+		delay_ms(50);
+
+		mpu_6000_read_accelerometer_measurements();
+		mpu_6000_read_gyroscope_measurements();
+	
+		/* Scaling and save all measurements */
+		xAccAvg += (float)mpuXAcc / accDiv; //Save the X-Acceleration in g
+		yAccAvg += (float)mpuYAcc / accDiv; //Save the Y-Acceleration in g
+		zAccAvg += ((float)mpuZAcc / accDiv)-1; //Save the Z-Acceleration in g
+		xGyrAvg += (float)mpuXGyr / gyrDiv; //Save the X-rate of rotation in deg/s
+		yGyrAvg += (float)mpuYGyr / gyrDiv; //Save the Y-rate of rotation in deg/s
+		zGyrAvg += (float)mpuZGyr / gyrDiv; //Save the Z-rate of rotation in deg/s
+	}
+	
+	mpuXAccOffs = xAccAvg / MPU_6000_CAL_CYCLE;
+	mpuYAccOffs = yAccAvg / MPU_6000_CAL_CYCLE;
+	mpuZAccOffs = zAccAvg / MPU_6000_CAL_CYCLE;
+	mpuXGyrOffs = xGyrAvg / MPU_6000_CAL_CYCLE;
+	mpuYGyrOffs = yGyrAvg / MPU_6000_CAL_CYCLE;
+	mpuZGyrOffs = zGyrAvg / MPU_6000_CAL_CYCLE;
+	
+	mpu->state = MPU_6000_STATE_RUN;
+	return true;
+}
+/**************************************************************************
+* \\brief MPU 6000 get new data
+*	Get the acceleration and rate of rotation measurements from the mpu,
+*   convert and save the new value in the mpu struct . /n
+*
+* \\param *mpu MPU data structure
+*
+* \\return  product id
+***************************************************************************/
+uint8_t mpu_6000_save_data_to_filter(FILTER_DATA_t *filter)
+{
+	filter->xAcc = -(mpu->xAcc);
+	filter->yAcc = mpu->yAcc;
+	filter->zAcc = -(mpu->zAcc);
+	filter->xGyr = -(mpu->xGyr);
+	filter->yGyr = mpu->yGyr;
+	filter->zGyr = mpu->zGyr;
+	
+	return true;
+}
+
 /**************************************************************************
 * \\brief MPU 6000 get new data
 *	Get the acceleration and rate of rotation measurements from the mpu,
@@ -315,11 +381,6 @@ uint8_t mpu_6000_task(void)
 {
 	mpu->time += 10000;
 	mpu_6000_get_new_data();
-	filters_calculate_six_degrees_of_freedom(mpu->time, mpu->xAcc, mpu->yAcc, mpu->zAcc, mpu->xGyr, mpu->yGyr, mpu->zGyr);
-	
-	mpu->estaxr = mpufilter.axr;
-	mpu->estayr = mpufilter.ayr;
-	mpu->estazr = mpufilter.azr;
 }
 
 void isr_mpu_6000_int_pin(void)

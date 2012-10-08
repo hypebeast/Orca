@@ -34,6 +34,8 @@ enum system_message{
 	SYSTEM_INFO_MPU_SENSOR_ACC_READ_ERR			=0x0040,	/*!< brief MPU acceleration I2C read error. */
 	SYSTEM_INFO_MPU_SENSOR_GYRO_READ_ERR		=0x0041,	/*!< brief MPU gyro I2C read error. */
 	SYSTEM_INFO_MPU_SENSOR_ACC_WRITE_ERR		=0x0042,	/*!< brief MPU gyro I2C write error. */
+	/* User Interface */
+	SYSTEM_INFO_UI_LED_PATTERN_ERR				=0x0050,	/*!< brief Wron LED pattern. */
 };
 
 /*! \enum errlvl

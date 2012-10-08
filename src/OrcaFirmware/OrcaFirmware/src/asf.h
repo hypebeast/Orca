@@ -73,6 +73,13 @@
 // From module: MEMORY - NVM - Non Volatile Memory
 #include <nvm.h>
 
+// From module: SPI - Serial Peripheral Interface
+#include <spi.h>
+
+// From module: SPI - XMEGA implementation
+#include <spi_master.h>
+#include <spi_master.h>
+
 // From module: TIMING - Clock Control - XMEGA A1/A3/A3B/A4/D implementation
 #include <sysclk.h>
 
