@@ -27,12 +27,14 @@ import binascii
 import Queue
 import time
 
-try:
-    from PyQt4 import pyqtSignal
-except ImportError:
-    print "No PyQt found!"
-    import sys
-    sys.exit(2)
+from PyQt4.QtCore import QObject, pyqtSignal
+
+#try:
+#    from PyQt4 import pyqtSignal
+#except ImportError:
+#    print "No PyQt found!"
+#    import sys
+#    sys.exit(2)
 
 from crc8 import crc8
 from logger import Logger
@@ -75,7 +77,7 @@ class ResponseStatus:
     START_RECEIVED = 1
 
 
-class SerialConnection:
+class SerialConnection(QObject):
     """
     This class handles the serial connection with the flight controller.
     """
@@ -92,6 +94,8 @@ class SerialConnection:
                  bytesize=DEFAULT_BYTESIZE,
                  stopbits=DEFAULT_STOPBITS,
                  xonxoff=DEFAULT_XONXOFF):
+        QObject.__init__(self)
+        
         self.serial_connection = None
         self.port = port
         self.baudrate = baudrate

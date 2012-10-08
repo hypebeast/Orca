@@ -18,8 +18,8 @@
 
 
 # This is only needed for Python v2 but is harmless for Python v3.
-import sip
-sip.setapi('QVariant', 2)
+#import sip
+#sip.setapi('QVariant', 2)
 
 try:
     from PyQt4 import QtGui, QtCore
@@ -34,6 +34,8 @@ except:
 	print "No PyQwt found!"
 	import sys
 	sys.exit(2)
+
+from PlotData import PlotData
 
 
 class ScopeWidget(Qwt.QwtPlot):
@@ -60,6 +62,10 @@ class ScopeWidget(Qwt.QwtPlot):
 
 	def stop(self):
 		pass
+
+	def _init_plots(self, dataFields):
+		for field in dataFields:
+			self.plotCurves.append(PlotData(field))
 
 	def _on_timer(self):
 		self._update_scope()

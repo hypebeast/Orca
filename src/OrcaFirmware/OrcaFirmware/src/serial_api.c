@@ -306,7 +306,7 @@ void serial_api_task(void)
 */
 void serial_api_init()
 {	
-	// Enable the system clock for USARTE0
+	// Enable the system clock for the serial interface
 	sysclk_enable_peripheral_clock(USART_SERIAL_API_INTERFACE);
 	
 	// Use USARTE0 and initialize buffers

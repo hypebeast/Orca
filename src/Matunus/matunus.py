@@ -32,9 +32,9 @@ __appName__ = 'Matunus'
 __version__ = '0.1.0'
 __author__ = 'Sebastian Ruml'
 
-# Check that at least Python 2.7 is running
-if sys.version_info < (2, 7):
-    print ('Python version must be at least 2.7.')
+# Check that at least Python 2.6 is running
+if sys.version_info < (2, 6):
+    print ('Python version must be at least 2.6.')
     sys.exit(1)
 
 #if platform.system() != "Darwin":

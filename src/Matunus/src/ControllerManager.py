@@ -21,12 +21,14 @@ __author__ = 'Sebastian Ruml'
 
 import time
 
-try:
-    from PyQt4 import pyqtSignal
-except ImportError:
-    print "No PyQt found!"
-    import sys
-    sys.exit(2)
+from PyQt4.QtCore import QObject, pyqtSignal
+
+#try:
+#    from PyQt4 import pyqtSignal
+#except ImportError:
+#    print "No PyQt found!"
+#    import sys
+#    sys.exit(2)
 
 from SerialConnection import SerialConnection
 from ApiCommands import CommandTypes, ServoPositionMessage, GetBoardStatusMessage
@@ -35,7 +37,7 @@ from logger import Logger
 from utils import get_all_from_queue 
 
 
-class ControllerManager():
+class ControllerManager(QObject):
 	"""
 	This class manages the communication with the controller, e.g. the
 	connection, status updates, etc.

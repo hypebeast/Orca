@@ -21,16 +21,18 @@ __author__ = 'Sebastian Ruml'
 import os
 
 # This is only needed for Python v2 but is harmless for Python v3.
-import sip
-sip.setapi('QVariant', 2)
+#import sip
+#sip.setapi('QVariant', 2)
 
-try:
-    from PyQt4 import QtGui, QtCore, QtSvg
-    from PyQt4.Qt import Qt
-except ImportError:
-    print "No PyQt found!"
-    import sys
-    sys.exit(2)
+from PyQt4 import QtGui, QtCore, QtSvg
+
+#try:
+#    from PyQt4 import QtGui, QtCore, QtSvg
+    #from PyQt4.Qt import Qt
+#except ImportError:
+#    print "No PyQt found!"
+#    import sys
+#    sys.exit(2)
 
 
 import defs

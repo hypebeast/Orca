@@ -18,12 +18,14 @@
 
 __author__ = "Sebastian Ruml"
 
-try:
-    from PyQt4 import QtGui, QtCore, QtSvg
-except ImportError:
-    print "No PyQt found!"
-    import sys
-    sys.exit(2)
+from PyQt4 import QtGui, QtCore, QtSvg
+
+#try:
+#    from PyQt4 import QtGui, QtCore, QtSvg
+#except ImportError:
+#    print "No PyQt found!"
+#    import sys
+#    sys.exit(2)
 
 import os
 import defs

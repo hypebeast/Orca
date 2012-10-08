@@ -20,15 +20,17 @@ __author__ = 'Sebastian Ruml'
 
 
 # This is only needed for Python v2 but is harmless for Python v3.
-import sip
-sip.setapi('QVariant', 2)
+#import sip
+#sip.setapi('QVariant', 2)
 
-try:
-    from PyQt4 import QtGui
-except ImportError:
-    print "No PyQt found!"
-    import sys
-    sys.exit(2)
+from PyQt4 import QtGui
+
+#try:
+#    from PyQt4 import QtGui
+#except ImportError:
+#    print "No PyQt found!"
+#    import sys
+#    sys.exit(2)
 
 from PositionBar import PositionBar
 
