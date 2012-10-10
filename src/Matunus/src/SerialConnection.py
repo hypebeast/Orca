@@ -47,7 +47,7 @@ LF_MODES = ('LF', 'CR', 'CR/LF')
 NEWLINECHARACTER = '\r\n'
 
 DEFAULT_PORT = 0
-DEFAULT_BAUDRATE = 9600
+DEFAULT_BAUDRATE = 57600
 DEFAULT_PARITY = serial.PARITY_NONE
 DEFAULT_BYTESIZE = serial.EIGHTBITS
 DEFAULT_STOPBITS = serial.STOPBITS_ONE
@@ -213,7 +213,8 @@ class SerialConnection(QObject):
                     data = data + self.serial_connection.read(n)
 
                 if data is not None and len(data) > 0:
-                    #self._logger.debug("Received data: %02x" % ord(data))
+                    #bytes = ''.join('%02x' % ord(b) for b in data)
+                    #self._logger.debug("Received data: " + bytes)
                     for byte in data:
                         # Get an integer value for checking the start or stop byte
                         value = ord(byte)
@@ -228,11 +229,13 @@ class SerialConnection(QObject):
                                 self.responseStatus = ResponseStatus.IDLE
                                 self.responseBuffer.append(byte)
                                 self.processReceivedMessage(self.responseBuffer)
+                            elif value == self.START_BYTE:
+                                self.responseBuffer.append(byte)
                             else:
                                 self.responseBuffer.append(byte)
 
                 # Wait for some time
-                time.sleep(self.reader_interval)
+                #time.sleep(self.reader_interval)
         except serial.SerialException, e:
             self.reader_alive = False
 

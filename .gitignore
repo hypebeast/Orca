@@ -9,6 +9,6 @@ Release
 .project
 .pydevproject
 documents
-docs
+bib
 build
 dist

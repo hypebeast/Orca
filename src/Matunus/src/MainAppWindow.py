@@ -20,19 +20,12 @@
 
 __author__ = 'Sebastian Ruml'
 
-# This is only needed for Python v2 but is harmless for Python v3.
-#import sip
-#sip.setapi('QVariant', 2)
-
-from PyQt4 import QtGui, QtCore
-
-#try:
-#    from PyQt4 import QtGui, QtCore
-#except ImportError:
-#    print "Error"
-#    print "No PyQt found!"
-#    import sys
-#    sys.exit(2)
+try:
+    from PyQt4 import QtGui, QtCore
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
 import os
 import sys
@@ -40,6 +33,7 @@ from threading import Thread
 import time
 
 from MainPage import MainPage
+from InfoPanel import InfoPanel
 from ConfigurationPage import ConfigurationPage
 from FlightControlPage import FlightControlPage
 from ScopePage import ScopePage
@@ -88,6 +82,10 @@ class MainAppWindow(QtGui.QMainWindow):
     def __init__(self, options=None, args=None):
         super(MainAppWindow, self).__init__()
 
+        # Save options and arguments for later
+        self.options = options
+        self.args = args
+
         # Initialize logger
         self._logger = Logger()
         if options.debug:
@@ -117,7 +115,6 @@ class MainAppWindow(QtGui.QMainWindow):
             ports = utils.enumerate_serial_ports()
             for i, port in enumerate(ports):
                 self.availableComPorts.append(port)
-
         elif os.name == 'posix':
             self.comPorts = [{"name": u"/dev/ttys0", "value": 0},
                              {"name": u"/dev/ttys1", "value": 1},
@@ -157,30 +154,17 @@ class MainAppWindow(QtGui.QMainWindow):
         self._logger.info("Startup done!")
 
     def createUi(self):
-        self.mainLayout = QtGui.QVBoxLayout()
+        # Main layout
+        self.mainLayout = QtGui.QHBoxLayout()
 
-        # Connection box
-        self.topGroupBox = QtGui.QGroupBox("Connection")
-        self.topGroupBox.setMaximumHeight(70)
-        topLayout = QtGui.QHBoxLayout()
-        self.bConnect = QtGui.QPushButton("Connect")
-        self.bConnect.clicked.connect(self.connectToController)
-        topLayout.addWidget(self.bConnect)
-        topLayout.addSpacing(15)
-        topLayout.addStretch()
-        lComPort = QtGui.QLabel("Com Port: ")
-        topLayout.addWidget(lComPort)
-        self.cbComPort = QtGui.QComboBox()
-        #for comPort in self.comPorts:
-        #    self.cbComPort.addItem(comPort["name"])
-        for comPort in self.availableComPorts:
-            self.cbComPort.addItem(comPort)
-        self.cbComPort.currentIndexChanged.connect(self.comPortChanged)
-        if len(self.availableComPorts) > 0:
-            self.controllerManager.set_serial_port(self.availableComPorts[0])
-        topLayout.addWidget(self.cbComPort)
-        self.topGroupBox.setLayout(topLayout)
-        self.mainLayout.addWidget(self.topGroupBox)
+        # Info panel
+        self.infoPanel = InfoPanel(self.availableComPorts, self.controllerManager)
+        self.infoPanel.bConnect.clicked.connect(self.connectToController)
+        self.mainLayout.addWidget(self.infoPanel)
+
+        # Layout for the page area
+        self.pageAreaLayout = QtGui.QVBoxLayout()
+        self.mainLayout.addLayout(self.pageAreaLayout)
 
         # Status Bar
         self.lStatusBarLabel = QtGui.QLabel()
@@ -192,33 +176,37 @@ class MainAppWindow(QtGui.QMainWindow):
         self.mainContainer.setTabPosition(QtGui.QTabWidget.South)
         self.mainContainer.setTabShape(QtGui.QTabWidget.Rounded)
 
+        # Home page
         self.mainPage = MainPage()
         self.pages.append(self.mainPage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "config.png"))
         self.mainContainer.addTab(self.mainPage, icon, "Home")
 
+        # Flight display page
         self.flightDisplay = FlightDisplay()
         self.pages.append(self.flightDisplay)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "flight_display.png"))
         self.mainContainer.addTab(self.flightDisplay, icon, "Flight Display")
 
-        self.flightControlPage = FlightControlPage()
-        self.pages.append(self.flightControlPage)
-        icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "joystick.png"))
+        #self.flightControlPage = FlightControlPage()
+        #self.pages.append(self.flightControlPage)
+        #icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "joystick.png"))
         #self.mainContainer.addTab(self.flightControlPage, icon, "Flight Control")
         
+        # Configuration page
         self.configurationPage = ConfigurationPage(self.controllerManager)
         self.pages.append(self.configurationPage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "config.png"))
         self.mainContainer.addTab(self.configurationPage, icon, "Configuration")
 
+        # Scope page
         self.scopePage = ScopePage(self.controllerManager)
         self.pages.append(self.scopePage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "scopes.png"))
         self.mainContainer.addTab(self.scopePage, icon, "Scopes")
 
         # Add the main containter to the main layout
-        self.mainLayout.addWidget(self.mainContainer)
+        self.pageAreaLayout.addWidget(self.mainContainer)
 
         widget = QtGui.QWidget()
         widget.setLayout(self.mainLayout)
@@ -247,10 +235,8 @@ class MainAppWindow(QtGui.QMainWindow):
     def updateUi(self):
         if self.controllerManager.connected():
             self.lStatusBarLabel.setText("<b>Connected</b>")
-            self.cbComPort.setEnabled(False)
         else:
             self.lStatusBarLabel.setText("<b>Disconnected</b>")
-            self.cbComPort.setEnabled(True)
 
     def connectToController(self):
         if not self.controllerManager.connected():
@@ -266,8 +252,8 @@ class MainAppWindow(QtGui.QMainWindow):
                 self.statusBar().showMessage("Connected!", 2000)
                 self.lStatusBarLabel.setText("<b>Connected</b>")
                 self.updateUi()
-                self.mainPage.setSystemStatus("Ready")
-                self.mainPage.setSystemMessage("Connected to the controller")
+                self.infoPanel.setSystemStatus("Ready")
+                self.infoPanel.setSystemMessage("Connected to the controller")
                 self.bConnect.setText("Disconnect")
             except SerialError as ex:
                 msgBox = QtGui.QMessageBox()
@@ -288,8 +274,8 @@ class MainAppWindow(QtGui.QMainWindow):
             self.statusBar().showMessage("Disconnected!", 2000)
             self.lStatusBarLabel.setText("<b>Connected</b>")
             self.updateUi()
-            self.mainPage.setSystemStatus("Not Connected")
-            self.mainPage.setSystemMessage("Disconnected from the controller")
+            self.infoPanel.setSystemStatus("Not Connected")
+            self.infoPanel.setSystemMessage("Disconnected from the controller")
             self.bConnect.setText("Connect")
 
     def selectControllerClicked(self):

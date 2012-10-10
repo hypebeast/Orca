@@ -53,7 +53,7 @@ class OutputPage(QtGui.QWidget):
         palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor(111, 88, 100))
 
         # Servo 1
-        groupBox1 = QtGui.QGroupBox("Servo 1 (Left)")
+        groupBox1 = QtGui.QGroupBox("Channel 1")
         groupBox1.setMinimumHeight(70)
         self.servo1Control = ServoControlWidget(self.controller, servo_nr=1)
         hBox = QtGui.QHBoxLayout()
@@ -63,7 +63,7 @@ class OutputPage(QtGui.QWidget):
         mainLayout.addWidget(groupBox1)
 
         # Servo 2
-        groupBox2 = QtGui.QGroupBox("Servo 2 (Right)")
+        groupBox2 = QtGui.QGroupBox("Channel 2")
         groupBox2.setMinimumHeight(70)
         self.servo2Control = ServoControlWidget(self.controller, servo_nr=2)
         hBox = QtGui.QHBoxLayout()
@@ -73,7 +73,7 @@ class OutputPage(QtGui.QWidget):
         mainLayout.addWidget(groupBox2)
 
         # Engine 1 (left)
-        groupBox = QtGui.QGroupBox("Engine 1 (Left)")
+        groupBox = QtGui.QGroupBox("Channel 3")
         groupBox.setMinimumHeight(70)
         self.engine1Control = EngineControlWidget(self.controller, engine_nr=1)
         hBox = QtGui.QHBoxLayout()
@@ -83,7 +83,7 @@ class OutputPage(QtGui.QWidget):
         mainLayout.addWidget(groupBox)
 
         # Engine 2 (right)
-        groupBox = QtGui.QGroupBox("Engine 2 (Left)")
+        groupBox = QtGui.QGroupBox("Channel 4")
         groupBox.setMinimumHeight(70)
         self.engine1Control = EngineControlWidget(self.controller, engine_nr=2)
         hBox = QtGui.QHBoxLayout()
@@ -93,7 +93,7 @@ class OutputPage(QtGui.QWidget):
         mainLayout.addWidget(groupBox)
 
         # Engine 3 (rear)
-        groupBox = QtGui.QGroupBox("Engine 3 (Left)")
+        groupBox = QtGui.QGroupBox("Channel 5")
         groupBox.setMinimumHeight(70)
         self.engine1Control = EngineControlWidget(self.controller, engine_nr=3)
         hBox = QtGui.QHBoxLayout()
