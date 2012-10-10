@@ -58,6 +58,7 @@ int main (void)
 	/* Calibrate the accelerometer and the gyroscopes */
 	mpu_6000_calibrate();
 	
+	/* Set the LEDs to their initial state */
 	user_interface_stat_led_pattern(USER_INTERFACE_LED_SINGLE_FLASH);
 			
 	// Loop forever
@@ -98,7 +99,7 @@ void orca_init(void)
 	//sysclk_set_prescalers(SYSCLK_PSADIV_1, SYSCLK_PSBCDIV_1_1);
 	//sysclk_set_source(SYSCLK_SRC_PLL);
 	
-	/* Init delay functions */
+	/* Initialize delay functions */
 	delay_init(sysclk_get_cpu_hz());
 	
 	/* Board Init */
@@ -151,8 +152,6 @@ void orca_init(void)
 	rtc_set_alarm(1);
 	rtc_set_alarm_relative(0);
 	rtc_set_time(0);
-	
-	user_interface_stat_led_pattern(USER_INTERFACE_LED_BLINKING);
 }
 
 uint16_t i2c_intern_init(void)
@@ -196,7 +195,7 @@ void system_timer(uint32_t time)
 		{
 			/* Get new data from the mpu6000 */
 			mpu_6000_task();
-			/* Save the new measuremnts to the filter module */
+			/* Save the new measurements to the filter module */
 			mpu_6000_save_data_to_filter(&orcafilter);	
 			/* Do the kalman filter */
 			filter_task(motionProcessingUnit.time);

@@ -376,12 +376,34 @@ void serial_api_task(void)
 				command_buff.buff[command_buff.index] = PACKET_START_BYTE;
 				command_buff.index++;
 			}
+			// New start byte received, but we already received a start byte. In this
+			// case we just add the byte to the buffer
+			else {
+				if (command_buff.index < MAX_PACKET_LENGTH - 1) {
+					command_buff.buff[command_buff.index] = received_byte;
+					command_buff.index++;
+				}
+				else {
+					// Reset everything
+					command_buff.index = 0;
+					command_buff.start_received = false;
+					memset(command_buff.buff, 0, sizeof(command_buff.buff));
+				}
+			}
 			break;
 			
 			// Stop byte received
 			case PACKET_STOP_BYTE:
 			if (command_buff.start_received) {
 				if (command_buff.index > 0) {
+					// Simple check if we received an stop byte at the start of a package
+					// TODO: Extend this check
+					if (command_buff.index < 5) {
+						command_buff.buff[command_buff.index] = received_byte;
+						command_buff.index++;
+						break;
+					}
+					
 					command_buff.buff[command_buff.index] = PACKET_STOP_BYTE;
 					
 					// Parse received command
@@ -436,7 +458,8 @@ void serial_api_init(void)
 	// Set baudrate to 9600 bps; scale factor is set to zero
 	// BSEL = ((I/O clock frequency)/(2^(ScaleFactor)*16*Baudrate))-1
 	// BSEL for 9600 bps => 207
-	USART_Baudrate_Set(USART_data.usart, 207, 0);
+	// BSEL for 57600 bps => 33 (33.722)
+	USART_Baudrate_Set(USART_data.usart, 34, 0);
 	
 	// Enable both RX and TX
 	USART_Rx_Enable(USART_data.usart);
