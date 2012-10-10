@@ -20,6 +20,8 @@ __author__ = 'Sebastian Ruml'
 
 
 import time
+import threading
+import binascii
 
 from PyQt4.QtCore import QObject, pyqtSignal
 
@@ -50,18 +52,20 @@ class ControllerManager(QObject):
 	board_status_updated = pyqtSignal()
 
 	def __init__(self):
+		QObject.__init__(self)
+
 		# Serial connection
 		self.serial = SerialConnection()
 		self.serial.set_port(0)
 		self.serial.message_received.connect(self._onMessageReceived)
 
-        # Board status data object
+        # Board status object
 		self.boardStatus = BoardStatus()
 
         # Status reader
 		self.statusReaderThread = None
 		self.statusReaderIsAlive = False
-		self.statusReaderUpdateInterval = 0.1 # Update interval in seconds
+		self.statusReaderUpdateInterval = 2.0 # Update interval in seconds
 
         # Status queries
 		self.status_queries = [
@@ -71,23 +75,21 @@ class ControllerManager(QObject):
 		# Indicates if new data from the board was received
 		#self.hasNewData = False
 
-		####
-		# Signals
-		####
-
-		# TODO: New data available signal
+		self._logger = Logger()
 
 	def connect(self, port=0):
 		"""Connects to the flight controller"""
 		self.serial.connect()
 
-		# TODO: Start the status reader
+		# Start reading the board status
+		self._startStatusReader()
 
 	def disconnect(self):
 		"""Disconnects from the flight controller"""
 		self.serial.disconnect()
 
-		# TODO: Stop the status reader
+		# Stop reading the board status
+		self._stopStatusReader()
 
 	def set_serial_port(self, port):
 		self.serial.set_port(port)
@@ -102,26 +104,32 @@ class ControllerManager(QObject):
 		"""
 		Starts the status readers.
 		"""
+		# Already started?
 		if self.statusReaderIsAlive:
 			return
 
-		self.statusReaderThread = Thread(target=self._sendStatusRequest)
+		# Create thread and start reading the board status
+		self.statusReaderIsAlive = True
+		self.statusReaderThread = threading.Thread(target=self._statusReader)
 		self.statusReaderThread.setDaemon = True
 		self.statusReaderThread.start()
-		self.statusReaderIsAlive = True
 
 	def _stopStatusReader(self):
+		"""
+		Stops the status reader.
+		"""
 		if not self.statusReaderIsAlive:
 			return
 
 		self.statusReaderAlive = False
-		self.serialReaderThread.join()
+		self.statusReaderThread.join()
 
-	def _sendStatusRequest(self):
+	def _statusReader(self):
 		"""
 		Sends status requests to the flight controller board.
 		"""
 		while self.statusReaderIsAlive:
+			self._logger.debug("Sending new status query")
 			message = GetBoardStatusMessage()
 			self.serial.writeMessage(message)
 
@@ -132,8 +140,9 @@ class ControllerManager(QObject):
 		Callback method which is called when a new messages was received from
 		the serial connection.
 		"""
-		messages = list(get_all_from_queue(self.serial.message_queue))
+		messages = list(get_all_from_queue(self.serial.messageQueue))
 		if len(messages) > 0:
+			self._logger.debug("New status response received")
 			for message in messages:
 				self._updateStatus(message[0], message[1])
 
@@ -144,6 +153,8 @@ class ControllerManager(QObject):
 		"""
 		self.boardStatus.updateDataFromMessage(message, timestamp)
 
+		self.boardStatus.printStatus()
+
 		# Emit signal
 		self.board_status_updated.emit()
 
@@ -153,7 +164,7 @@ class ControllerManager(QObject):
 
 	def setServoPos(self, servo_nr=1, pos=0):
 		"""Moves the specified servo to the given position."""
-		message = ServoPositionCommand(servo_nr, pos)
+		message = ServoPositionMessage(servo_nr, pos)
 		self.serial.writeMessage(message)
 
 	def getServoPos(self, servo_nr=1):

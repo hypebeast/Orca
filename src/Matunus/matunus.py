@@ -33,18 +33,13 @@ __version__ = '0.1.0'
 __author__ = 'Sebastian Ruml'
 
 # Check that at least Python 2.6 is running
-if sys.version_info < (2, 6):
+if sys.version_info < (2, 6, 0):
     print ('Python version must be at least 2.6.')
     sys.exit(1)
 
 #if platform.system() != "Darwin":
     #print ('Mac OS X are supported!')
     #sys.exit(1)
-
-# find out if they are asking for help
-HELP = False
-for val in sys.argv:
-    if val == '-h' or val == '--help': HELP = True
 
 def main():
     """
@@ -57,8 +52,22 @@ def main():
     app_defs.IconsPath = os.path.join(app_defs.DataPath, "icons")
     app_defs.ArtworkPath = os.path.join(app_defs.DataPath, "artwork")
 
+    # Command line arguments
+    parser = OptionParser()
+    parser.add_option("-v", "--version", dest="version", action="store_true",
+                        help="Prints the version and exists", default=False)
+    parser.add_option("-d", "--debug", dest="debug", action="store_true",
+                        help="Prints debug information to stdout", default=False)
+    parser.add_option("-q", "--quit", dest="verbose", action="store_false",
+                        help="Don't print status message to stdout", default=True)
+    options, args = parser.parse_args()
+
+    if options.version:
+        print __appName__ + " v" + __version__
+        sys.exit(2)
+
     # Start the application
-    app = MainAppWindow.App()
+    app = MainAppWindow.App(options, args)
 
 
 if __name__ == '__main__':

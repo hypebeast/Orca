@@ -18,22 +18,23 @@
 
 __author__ = 'Sebastian Ruml'
 
-from PyQt4 import QtGui, QtCore
 
-#try:
-#    from PyQt4 import QtGui, QtCore
-#except ImportError:
-#    print "No PyQt found!"
-#    import sys
-#    sys.exit(2)
+try:
+    from PyQt4 import QtGui, QtCore
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
 
 import defs
 from ScopeWidget import ScopeWidget
+from logger import Logger
 
 
 class ScopePage(QtGui.QWidget):
     """
+    This page holds all scope widgetes.
     """
     def __init__(self, boardController):
         super(ScopePage, self).__init__()
@@ -41,18 +42,45 @@ class ScopePage(QtGui.QWidget):
         if boardController is None:
             raise "Error!"
 
+        self.boardController = boardController
         self.scopes = list()
         self.app_defs = defs.AppDefs()
-        self.createUi()
+        self._logger = Logger()
+        self._createUi()
 
-    def createUi(self):
-        self.mainLayout = QtGui.QHBoxLayout()
+    def _createUi(self):
+        """Initializes the UI."""
+        self.mainLayout = QtGui.QVBoxLayout()
+        self._addScopes()
 
-    def addScopes(self):
-        pass
+        groupBox = QtGui.QGroupBox("Scope Control")
+        groupBox.setMaximumHeight(90)
+        groupBox.setMinimumHeight(90)
+        layout = QtGui.QHBoxLayout()
+        groupBox.setLayout(layout)
+        self.startButton = QtGui.QPushButton("Start")
+        layout.addWidget(self.startButton)
+        self.stopButton = QtGui.QPushButton("Stop")
+        layout.addWidget(self.stopButton)
+        layout.addStretch()
+        self.mainLayout.addWidget(groupBox)
+
+        self.setLayout(self.mainLayout)
+
+    def _addScopes(self):
+        """Adds all scopes to the GUI."""
+        self.scope1 = ScopeWidget(['test1', 'test2'], self.boardController)
+        self.mainLayout.addWidget(self.scope1)
+        self.scopes.append(self.scope1)
+
+        self.scope2 = ScopeWidget(['test3', 'test4'], self.boardController)
+        self.mainLayout.addWidget(self.scope2)
+        self.scopes.append(self.scope2)
 
     def start(self):
+        """Starts scoping."""
         pass
 
     def stop(self):
+        """Stops scoping."""
         pass

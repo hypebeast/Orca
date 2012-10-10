@@ -26,6 +26,7 @@ import struct
 import binascii
 import Queue
 import time
+import array
 
 from PyQt4.QtCore import QObject, pyqtSignal
 
@@ -95,7 +96,7 @@ class SerialConnection(QObject):
                  stopbits=DEFAULT_STOPBITS,
                  xonxoff=DEFAULT_XONXOFF):
         QObject.__init__(self)
-        
+
         self.serial_connection = None
         self.port = port
         self.baudrate = baudrate
@@ -110,8 +111,8 @@ class SerialConnection(QObject):
         self.reader_alive = False
         self.newResponse = False
         self.responseStatus = ResponseStatus.IDLE
-        self.responseBuffer = []
-        self.reader_interval = 0.5 # Update interval in seconds
+        self.responseBuffer = array.array('c')
+        self.reader_interval = 0.05 # Update interval in seconds
 
         # This queue contains the received messages. The messages are stored as
         # tuples in the following format: (message, timestamp).
@@ -190,7 +191,11 @@ class SerialConnection(QObject):
         if self.serial_connection is None or not self.connected or command is None:
             return
 
-        self.serial_connection.write(command.getMessage())
+        packet = command.getPacket()
+        hexdata = ''.join('%02x' % ord(chr(byte)) for byte in packet)
+        self._logger.debug(hexdata)
+
+        self.serial_connection.write(command.getPacket())
         #self.serial_connection.flush()
 
     def scan(self):
@@ -200,34 +205,42 @@ class SerialConnection(QObject):
         """Reads data from the serial line"""
         try:
             while self.connected and self.reader_alive:
-                #data = character(self.serial_connection.read(1))
+                # Read one byte, blocking
                 data = self.serial_connection.read(1)
-                #print "Data: " + data
+                # Look if there is more
+                n = self.serial_connection.inWaiting()
+                if n:
+                    data = data + self.serial_connection.read(n)
 
-                if data is not None:
-                    print "Received data: " + data
+                if data is not None and len(data) > 0:
+                    #self._logger.debug("Received data: %02x" % ord(data))
+                    for byte in data:
+                        # Get an integer value for checking the start or stop byte
+                        value = ord(byte)
+                        #self._logger.debug("Received data: %02x" % ord(byte))
+                        if self.responseStatus == ResponseStatus.IDLE:
+                            if value == self.START_BYTE:
+                                self.responseStatus = ResponseStatus.START_RECEIVED
+                                self.responseBuffer = array.array('c')
+                                self.responseBuffer.append(byte)
+                        elif self.responseStatus == ResponseStatus.START_RECEIVED:
+                            if value == self.STOP_BYTE:
+                                self.responseStatus = ResponseStatus.IDLE
+                                self.responseBuffer.append(byte)
+                                self.processReceivedMessage(self.responseBuffer)
+                            else:
+                                self.responseBuffer.append(byte)
 
-                    if self.responseStatus == ResponseStatus.IDLE:
-                        if data == self.START_BYTE:
-                            self.responseStatus = ResponseStatus.RECEIVING
-                            self.responseBuffer = []
-                            self.responseBuffer.append(data)
-                    elif self.responseStatus == ResponseStatus.RECEIVING:
-                        if data == self.STOP_BYTE:
-                            self.responseStatus = ResponseStatus.IDLE
-                            self.responseBuffer.append(data)
-                            self.processReceivedMessage(self.responseBuffer)
-                        else:
-                            self.responseBuffer.append(data)
-
+                # Wait for some time
                 time.sleep(self.reader_interval)
-
         except serial.SerialException, e:
             self.reader_alive = False
-            raise
 
     def processReceivedMessage(self, buffer):
-        """Processes a received message packet."""
+        """
+        Processes a received message packet. It's called when a new message
+        was received.
+        """
         message = MessageFactory.getMessage(buffer)
 
         timestamp = time.clock()

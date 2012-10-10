@@ -28,11 +28,11 @@
 USART_data_t USART_data;
 
 /**************************************************************************
- * \brief This structure represents an input buffer for incoming API commands.
+ * \brief This structure represents an input buffer for incoming packets.
  **************************************************************************/
 static struct {
 	uint8_t buff[MAX_PACKET_LENGTH]; /** Buffer for the command packet */
-	unsigned int index; /** Index */
+	unsigned int index; /** Index for the buffer */
 	bool start_received; /** Flag that indicates if a start delimiter was received */
 } command_buff;
 
@@ -56,9 +56,9 @@ SERIAL_API_PACKET_t tx_command_packet;
 **************************************************************************/
 static void parse_command_packet(void);
 
-/**************************************************************************
-* \brief This method executes an received command.
-**************************************************************************/
+/******************************************************************************
+* \brief This method executes the appropriate function for the received command.
+*******************************************************************************/
 static void execute_command(void);
 
 /**************************************************************************
@@ -76,11 +76,18 @@ static void command_get_servo_pos(void);
 **************************************************************************/
 static void command_get_all_servo_pos(void);
 
+/**************************************************************************
+* \brief Returns the board status.
+**************************************************************************/
+static void command_get_board_status(void);
+
+
 /* Enabled API commands */
 struct api_command commands[] = {
 	{ 0x0001, command_set_servo_pos},
 	{ 0x0002, command_get_servo_pos},
-	{ 0x0003, command_get_all_servo_pos}
+	{ 0x0003, command_get_all_servo_pos},
+	{ 0x0010, command_get_board_status}
 };
 
 
@@ -95,28 +102,29 @@ struct api_command commands[] = {
 */
 static void command_set_servo_pos(void)
 {
-	uint8_t servo_nr = -1;
-	uint8_t position = 0;
+	uint8_t servo_nr = 0;
+	uint16_t position = 0;
 	
 	// Get the parameters
-	//servo_nr = received_command_packet.data[0];
-	//position = received_command_packet.data[1];
+	servo_nr = rx_command_packet.data[0];
+	position = (position << 8) | rx_command_packet.data[2];
+	position = (position << 8) | rx_command_packet.data[1];
 	
-	if (servo_nr < 0)
+	if (servo_nr < 0 || position > 180)
 	{
 		return;
 	}
 	
 	// Set the new position
-	//servo_set_pos_degree(servo_nr, position);
-	servo_set_pos_degree(servo_nr, 90);
+	servo_set_pos_degree(servo_nr, position);
+	//servo_set_pos_degree(servo_nr, 90);
 }
 
 
 /**
 * \brief This function returns the actual position of a servo.
 *
-* Comman Type: 0x0002
+* Command Type: 0x0002
 */
 static void command_get_servo_pos(void)
 {
@@ -139,13 +147,114 @@ static void command_get_servo_pos(void)
 /**************************************************************************
 * \brief Returns the position of all servos
 *
-* Commant Type: 0x0003
+* Command Type: 0x0003
 **************************************************************************/
 static void command_get_all_servo_pos(void)
 {
 	
 }
 
+/**************************************************************************
+* \brief Returns the board status.
+*
+* Command Type: 0x0010
+**************************************************************************/
+static void command_get_board_status(void)
+{
+	uint8_t data[43];
+	int index = 0;
+	
+	// Get all status values
+	uint16_t outChannel1 = servo_get_pos_degree(1);
+	uint16_t outChannel2 = servo_get_pos_degree(2);
+	uint16_t outChannel3 = servo_get_pos_degree(3);
+	uint16_t outChannel4 = servo_get_pos_degree(4);
+	uint16_t outChannel5 = servo_get_pos_degree(5);
+	uint16_t outChannel6 = servo_get_pos_degree(6);
+	uint16_t inChannel1 = 0;
+	uint16_t inChannel2 = 0;
+	uint16_t inChannel3 = 0;
+	uint16_t inChannel4 = 0;
+	uint16_t inChannel5 = 0;
+	uint16_t inChannel6 = 0;
+	uint16_t accX = 0;
+	uint16_t accY = 0;
+	uint16_t accZ = 0;
+	uint16_t gyroX = 0;
+	uint16_t gyroY = 0;
+	uint16_t gyroZ = 0;
+		
+	// Start byte
+	data[index++] = PACKET_START_BYTE;
+	// Message type
+	data[index++] = 0x10;
+	// Command type
+	uint16_t cmdtype = 0x0010;
+	memcpy(data + index, &cmdtype, 2);
+	index += 2;
+	// Data Length
+	data[index++] = 36;
+	// Output Channel 1
+	memcpy(data + index, &outChannel1, 2);
+	index += 2;
+	// Output channel 2
+	memcpy(data + index, &outChannel2, 2);
+	index += 2;
+	// Output channel 3
+	memcpy(data + index, &outChannel3, 2);
+	index += 2;
+	// Output channel 4
+	memcpy(data + index, &outChannel4, 2);
+	index += 2;
+	// Output channel 5
+	memcpy(data + index, &outChannel5, 2);
+	index += 2;
+	// Output channel 6
+	memcpy(data + index, &outChannel6, 2);
+	index += 2;
+	// Input Channel 1
+	memcpy(data + index, &inChannel1, 2);
+	index += 2;
+	// Input Channel 2
+	memcpy(data + index, &inChannel2, 2);
+	index += 2;
+	// Input Channel 3
+	memcpy(data + index, &inChannel3, 2);
+	index += 2;
+	// Input Channel 4
+	memcpy(data + index, &inChannel4, 2);
+	index += 2;
+	// Input Channel 5
+	memcpy(data + index, &inChannel5, 2);
+	index += 2;
+	// Input Channel 6
+	memcpy(data + index, &inChannel6, 2);
+	index += 2;
+	// Acceleration X
+	memcpy(data + index, &accX, 2);
+	index += 2;
+	// Acceleration Y
+	memcpy(data + index, &accY, 2);
+	index += 2;
+	// Acceleration Z
+	memcpy(data + index, &accZ, 2);
+	index += 2;
+	// Gyro X
+	memcpy(data + index, &gyroX, 2);
+	index += 2;
+	// Gyro Y
+	memcpy(data + index, &gyroY, 2);
+	index += 2;
+	// Gyro Z
+	memcpy(data + index, &gyroZ, 2);
+	index += 2;
+	// CRC
+	data[index++] = 0x88;
+	// Stop byte
+	data[index] = PACKET_STOP_BYTE;
+		
+	write_packet(data, 43);
+}
 
 /**************************************************************************
 * This method checks if the given character is a whitespace character.
@@ -156,24 +265,29 @@ static char is_whitespace(char c)
 }
 
 
-/**
-* \brief This function writes the given data to the serial connection.
-*/
-void write_command(char *data)
-{
-	uint16_t cl = strlen(data);
-	
-	for (int i = 0; i < cl; i++) {
-		//usart_putchar(USART_SERIAL_API_INTERFACE, data[i]);
+/**************************************************************************
+* \brief Writes the given packet to the serial connection.
+*
+* \param data		Pointer to the data
+* \param size		Length of the data in bytes
+**************************************************************************/
+void write_packet(uint8_t *data, uint16_t length)
+{	
+	int i = 0;
+	while (i < length)
+	{
+		bool byteToBuffer;
+		byteToBuffer = USART_TXBuffer_PutByte(&USART_data, data[i]);
+		if (byteToBuffer)
+		{
+			i++;
+		}
 	}
-	
-	//usart_putchar(USART_SERIAL_API_INTERFACE, '\r');
-	//usart_putchar(USART_SERIAL_API_INTERFACE, '\n');
 }
 
 
 /**************************************************************************
-* This method executes an received command.
+* This method executes the appropriate function for the received command.
 **************************************************************************/
 static void execute_command(void)
 {
@@ -190,13 +304,11 @@ static void execute_command(void)
 
 
 /**************************************************************************
-* \brief This method parses a received command packet.
+* \brief This method parses a received packet.
 **************************************************************************/
 static void parse_command_packet(void)
 {
 	uint16_t index = 0;
-	
-	// TODO: Reset the received command struct
 	
 	// The first byte is the start delimiter
 	rx_command_packet.start_delimiter = command_buff.buff[index++];
@@ -206,8 +318,9 @@ static void parse_command_packet(void)
 	
 	// Byte four and five contains the command type
 	rx_command_packet.command = 0;
-	rx_command_packet.command = (rx_command_packet.command << 8) | command_buff.buff[index++];
-	rx_command_packet.command = (rx_command_packet.command << 8) | command_buff.buff[index++];
+	rx_command_packet.command = (rx_command_packet.command << 8) | command_buff.buff[index+1];
+	rx_command_packet.command = (rx_command_packet.command << 8) | command_buff.buff[index];
+	index += 2;
 	
 	// Byte six contains the data length
 	rx_command_packet.data_length = command_buff.buff[index++];
@@ -242,9 +355,9 @@ static void parse_command_packet(void)
 	execute_command();
 }
 
-/**
-* Main worker method for the serial API.
-*/
+/**************************************************************************
+* \brief Main worker method for the serial API.
+**************************************************************************/
 void serial_api_task(void)
 {
 	//uint8_t received_byte = usart_getchar(USART_SERIAL_API);
@@ -301,10 +414,10 @@ void serial_api_task(void)
 	}
 }
 
-/**
-* This method initializes the serial interface.
-*/
-void serial_api_init()
+/**************************************************************************
+* \brief This function initializes the serial interface.
+**************************************************************************/
+void serial_api_init(void)
 {	
 	// Enable the system clock for the serial interface
 	sysclk_enable_peripheral_clock(USART_SERIAL_API_INTERFACE);

@@ -45,11 +45,20 @@ class MessageTypes:
 
 
 class MessageFactory:
+    """
+    Factory for messages.
+    """
     @staticmethod
-    def getMessage(self, data):
+    def getMessage(data):
         """This message returns an API message from the given data array"""
+        def getCommandType(data):
+            if data is None or len(data) < 2:
+                return None
+
+            return struct.unpack_from("H", data, 2)[0]
+            
         # Get the command type
-        command_type = self._getCommandType(data)
+        command_type = getCommandType(data)
 
         message = None
         if command_type == CommandTypes.GET_SERVO_POS:
@@ -60,12 +69,6 @@ class MessageFactory:
             message = GetBoardStatusMessage().fromPacket(data)
 
         return message
-
-    def _getCommandType(self, data):
-        if data is None or len(data < 2):
-            return None
-
-        return struct.unpack_from("H", data, 2)
 
 
 class BaseMessage:
@@ -90,9 +93,9 @@ class BaseMessage:
         pass
 
     @staticmethod
-    def fromPacket(self, package):
+    def fromPacket(package):
         """
-        Creates a new message object from the given data array.
+        Creates a new message object from the given package.
         Every class that inherets this class must override this method
         """
         pass
@@ -102,7 +105,7 @@ class BaseMessage:
         Returns the encoded message as a byte array.
         
         Params:
-        data: An array of dictionaries which contains the arguments and their corresponding lengths
+        data: An array of dictionaries which contains the arguments and their corresponding format character
               Format = [{"value": value, "format": format character}]
         """
         package = bytearray()
@@ -110,11 +113,13 @@ class BaseMessage:
         # Start byte
         package.extend(struct.pack("B", self.START_BYTE))
         # Message type
-        package.extend(struct.pack("B", self.self.messageType))
+        package.extend(struct.pack("B", self.messageType))
         # Command type
         package.extend(struct.pack("H", self.commandType))
+        # Data length
+        package.extend(struct.pack("B", len(data)))
         # Encode the data
-        package = self._packData(package, data)
+        self._packData(package, data)
         # CRC
         package.extend(struct.pack("B", self._calcCrc(package, data)))
         # Stop Byte
@@ -135,16 +140,14 @@ class BaseMessage:
             format = argument["format"]
             package.extend(struct.pack(argument["format"], argument["value"]))
 
-        return package
-
     def _calcCrc(self, package, data):
         """Calculates the CRC8 for the given package and returns it."""
         msg = bytearray()
 
         msg.extend(struct.pack("B", self.START_BYTE))
-        msg.extend(struct.pack("B", self.self.messageType))
+        msg.extend(struct.pack("B", self.messageType))
         msg.extend(struct.pack("H", self.commandType))
-        msg = self._packData(msg, data)
+        self._packData(msg, data)
 
         crc = crc8()
         return crc.crc(msg)
@@ -191,7 +194,7 @@ class GetServoPositionMessage(BaseMessage):
         return self._encodePackage(data)
 
     @staticmethod
-    def fromPacket(self, package):
+    def fromPacket(package):
         # Get the command type
         command_type = struct.unpack_from("H", package, 2)
 
@@ -240,11 +243,13 @@ class GetBoardStatusMessage(BaseMessage):
         return self._encodePackage([])
 
     @staticmethod
-    def fromPacket(self, package):
-        # Get the command type
-        command_type = struct.unpack_from("H", package, 2)
+    def fromPacket(package):
+        hexvalues = ''.join('%02x' % ord(byte) for byte in package)
+        print "Status message: " + hexvalues
 
-        if command_type[0] is not CommandTypes.GET_SERVO_POS:
+        # Check for the right command type
+        command_type = struct.unpack_from("H", package, 2)
+        if command_type[0] is not CommandTypes.GET_BOARD_STATUS:
             return None
 
         message = GetBoardStatusMessage()

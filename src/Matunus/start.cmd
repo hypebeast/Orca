@@ -1,1 +1,1 @@
-"C:\Python26\python.exe" matunus.py
+"C:\Python26\python.exe" matunus.py -d

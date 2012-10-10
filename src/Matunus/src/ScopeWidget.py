@@ -22,7 +22,7 @@
 #sip.setapi('QVariant', 2)
 
 try:
-    from PyQt4 import QtGui, QtCore
+    from PyQt4 import QtGui, QtCore, Qt
 except ImportError:
     print "No PyQt found!"
     import sys
@@ -50,28 +50,60 @@ class ScopeWidget(Qwt.QwtPlot):
 
 		self.boardController = boardController
 		self.boardController.board_status_updated.connect(self._on_status_updated)
+		self.boardStatus = self.boardController.boardStatus
 		self.plotCurves = list()
+		
+		# This timer updates the plot curves
 		self.updateTimer = QtCore.QTimer()
 		QtCore.QObject.connect(self.updateTimer, QtCore.SIGNAL('timeout()'), self._on_timer)
 		self.updateInterval = 0.5
 
-		self.has_new_data = False
+		self.setCanvasBackground(Qt.Qt.black)
+		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time')
+		self.setAxisScale(Qwt.QwtPlot.xBottom, 0, 10, 1)
+		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Temperature')
+		self.setAxisScale(Qwt.QwtPlot.yLeft, 0, 250, 40)
+		self.replot()
+
+		self.isRunning = False
+
+		# Init all plot curves
+		self._init_plots(dataFields)
 
 	def start(self):
+		"""
+		Starts plotting.
+		"""
 		self.updateTimer.start(self.updateInterval * 1000.0)
+		self.isRunning = True
 
 	def stop(self):
-		pass
+		"""
+		Stops plotting.
+		"""
+		self.isRunning = False
 
 	def _init_plots(self, dataFields):
+		"""
+		Initializes all plots.
+		"""
 		for field in dataFields:
-			self.plotCurves.append(PlotData(field))
+			self.plotCurves.append(PlotData(self, field))
 
 	def _on_timer(self):
+		"""
+		Called by the timer.
+		"""
 		self._update_scope()
 
 	def _update_scope(self):
-		pass
+		for curve in self.plotCurves:
+			curve.updateCurve()
+
+		self.replot()
 
 	def _on_status_updated(self):
-		pass
+		if self.isRunning:
+			data = dict(timestamp=self.boardStatus.lastUpdate,
+						value=self.boardStatus.outputChannel1)
+			self.plotCurves[0].appendData(data)

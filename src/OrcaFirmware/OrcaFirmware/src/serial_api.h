@@ -24,8 +24,8 @@
 #define USART_SERIAL_PARITY              USART_PMODE_DISABLED_gc
 #define USART_SERIAL_STOP_BIT            true
 
-#define DATA_BUFFER_LENGTH 256
-#define MAX_PACKET_LENGTH (1+1+2+1+DATA_BUFFER_LENGTH+1+1)
+#define MAX_DATA_LENGTH 256
+#define MAX_PACKET_LENGTH (1+1+2+1+MAX_DATA_LENGTH+1+1)
 #define PACKET_START_BYTE 0x8D
 #define PACKET_STOP_BYTE 0x7E
 
@@ -78,23 +78,23 @@ typedef struct Usart_and_buffer
 	USART_Buffer_t buffer;
 } USART_data_t;
 
-/**
-* \brief This struct maps 
-*/
+/******************************************************************************
+* \brief This struct maps a specific command type to the processing function.
+******************************************************************************/
 struct api_command {
 	uint16_t command_type;
 	void (*function)();
 };
 
-/**************************************************************************
+/******************************************************************************
 * \brief This struct defines a serial API command.
-***************************************************************************/
+******************************************************************************/
 typedef struct serial_api_packet {
 	uint8_t start_delimiter; /** The start delimiter */
 	uint8_t message_type; /** The type of the message */
 	uint16_t command; /** The command ID */
 	uint8_t data_length; /** The length of the data */
-	uint8_t data[DATA_BUFFER_LENGTH]; /** The actual data */
+	uint8_t data[MAX_DATA_LENGTH]; /** The actual data */
 	uint8_t crc; /** CRC checksum for this message */
 	uint8_t stop_delimiter; /** The final stop delimiter */
 } SERIAL_API_PACKET_t;
@@ -207,10 +207,22 @@ uint8_t USART_RXBuffer_GetByte(USART_data_t * usart_data);
 bool USART_RXComplete(USART_data_t * usart_data);
 void USART_DataRegEmpty(USART_data_t * usart_data);
 
-void serial_api_init();
+/**************************************************************************
+* \brief This function initializes the serial interface.
+**************************************************************************/
+void serial_api_init(void);
+
+/**************************************************************************
+* \brief Main worker method for the serial API.
+**************************************************************************/
 void serial_api_task(void);
-void write_command(char *data);
-void create_command_packet(void);
-void write_command_packet(void);
+
+/**************************************************************************
+* \brief Writes the given packet to the serial connection.
+*
+* \param data		Pointer to the data
+* \param length		Length of the data in bytes
+**************************************************************************/
+void write_packet(uint8_t *data, uint16_t length);
 
 #endif /* SERIALAPI_H_ */

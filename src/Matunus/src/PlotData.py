@@ -19,6 +19,13 @@
 __author__ = 'Sebastian Ruml'
 
 try:
+	from PyQt4 import QtGui
+except:
+	print "No PyQt found!"
+	import sys
+	sys.exit(2)
+
+try:
 	import PyQt4.Qwt5 as Qwt 
 except:
 	print "No PyQwt found!"
@@ -28,23 +35,35 @@ except:
 
 class PlotData:
 	"""
-	Base class that keeps the data for each curve in the plot.
+	This class represents one plot curve and it's data.
 	"""
-	def __init__(self, dataField):
-		self.dataField = field
+	def __init__(self, plot, dataField):
+		if not plot or not dataField:
+			raise Exception
+
+		self.plot = plot
+		self.dataField = dataField
 		self.data = list()
+		self.xData = list()	
+		self.yData = list()
 		# This is the power to which each value must be raised
 		self.scalePower = 0
 		self.yMinimum = 0
 		self.yMaximum = 0
-		self.xWindowSize
-		self.curve = Qwt.QwtPlotCurve()
-		self.xData = list()
-		self.yData = list()
+		self.xWindowSize = 0
+		self.curve = Qwt.QwtPlotCurve('')
+		self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
+		pen = QtGui.QPen(QtGui.QColor('limegreen'))
+		pen.setWidth(2)
+		self.curve.setPen(pen)
+		self.curve.attach(self.plot)
+		
+	def updateCurve():
+		# TODO: Adjust the axes scale
+		self.self.curve.setData(self.xData, self.yData)
 
-	def updatePlotCurveData():
-		pass
-
-	def append(self, data):
+	def appendData(self, data):
 		"""Append new data to the plot"""
-		pass
+		self.data.append((data['timestamp'], data['value']))
+		self.xData = [s[0] for s in self.data]
+		self.yData = [s[1] for s in self.data]

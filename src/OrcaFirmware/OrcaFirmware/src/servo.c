@@ -101,10 +101,10 @@ void servo_set_pos_degree(uint8_t servo_nr, float pos)
 */
 uint16_t servo_get_pos_degree(uint8_t servo_nr)
 {
-	float pos = 0;
+	uint16_t pos = 0;
 	
 	pos =  servo_compare_period[servo_nr-1] * SERVO_TICK_DURATION; // Calculate the pulse width
-	pos = pos - (SERVO_PULSE_WIDTH_OFFSET) / SERVO_TICKS_PER_DEGREE;
+	pos = (pos - SERVO_PULSE_WIDTH_OFFSET) / SERVO_TICKS_PER_DEGREE; // Calculate the position
 	
 	return pos;
 }

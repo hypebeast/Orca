@@ -51,6 +51,7 @@ from SettingsDialog import SettingsDialog
 from ControllerManager import ControllerManager
 from logger import Logger
 import defs
+import utils
 
 
 class SelectControllerDialog(QtGui.QDialog):
@@ -84,8 +85,14 @@ class MainAppWindow(QtGui.QMainWindow):
     """
     Main window of the application.
     """
-    def __init__(self):
+    def __init__(self, options=None, args=None):
         super(MainAppWindow, self).__init__()
+
+        # Initialize logger
+        self._logger = Logger()
+        if options.debug:
+            self._logger.set_level("DEBUG")
+        self._logger.info("Starting Matunus...")
 
         # Serial connection
         if os.name == 'nt':
@@ -104,6 +111,13 @@ class MainAppWindow(QtGui.QMainWindow):
                              {'name': u"COM13", "value": 12},
                              {'name': u"COM14", "value": 13},
                              {'name': u"COM15", "value": 14}]
+
+            # Find available COM ports
+            self.availableComPorts = list()
+            ports = utils.enumerate_serial_ports()
+            for i, port in enumerate(ports):
+                self.availableComPorts.append(port)
+
         elif os.name == 'posix':
             self.comPorts = [{"name": u"/dev/ttys0", "value": 0},
                              {"name": u"/dev/ttys1", "value": 1},
@@ -124,17 +138,9 @@ class MainAppWindow(QtGui.QMainWindow):
         self.appDefs = defs.AppDefs()
 
         # TODO: Load configuration
-        
-        # Initialize logger
-        self._logger = Logger()
-        self._logger.info("Starting Matunus...")
 
         # Flight controller manager
         self.controllerManager = ControllerManager()
-
-        # Serial connection
-        #self.controllerManager = SerialConnection()
-        #self.controllerManager.set_port(0)
 
         # Create UI
         self.createUi()
@@ -165,9 +171,13 @@ class MainAppWindow(QtGui.QMainWindow):
         lComPort = QtGui.QLabel("Com Port: ")
         topLayout.addWidget(lComPort)
         self.cbComPort = QtGui.QComboBox()
-        for comPort in self.comPorts:
-            self.cbComPort.addItem(comPort["name"])
+        #for comPort in self.comPorts:
+        #    self.cbComPort.addItem(comPort["name"])
+        for comPort in self.availableComPorts:
+            self.cbComPort.addItem(comPort)
         self.cbComPort.currentIndexChanged.connect(self.comPortChanged)
+        if len(self.availableComPorts) > 0:
+            self.controllerManager.set_serial_port(self.availableComPorts[0])
         topLayout.addWidget(self.cbComPort)
         self.topGroupBox.setLayout(topLayout)
         self.mainLayout.addWidget(self.topGroupBox)
@@ -289,7 +299,8 @@ class MainAppWindow(QtGui.QMainWindow):
         dialog.show()
 
     def comPortChanged(self, index):
-        self.controllerManager.set_serial_port(self.comPorts[index]["value"])
+        #self.controllerManager.set_serial_port(self.comPorts[index]["value"])
+        self.controllerManager.set_serial_port(self.availableComPorts[index])
 
     def showSettingsDialog(self):
         dlg = SettingsDialog()
@@ -302,6 +313,6 @@ class App():
         Run the app.
         """
         app = QtGui.QApplication(sys.argv)
-        mainWin = MainAppWindow()
+        mainWin = MainAppWindow(options, args)
         mainWin.show()
         sys.exit(app.exec_())

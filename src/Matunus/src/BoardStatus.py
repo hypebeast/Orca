@@ -21,16 +21,18 @@ __author__ = 'Sebastian Ruml'
 
 from logger import Logger
 from ApiCommands import CommandTypes
+from logger import Logger
 
 
 class BoardStatus(object):
 	"""
 	This class holds the current status of the flight controller.
 	"""
-
 	def __init__(self):
 		self.dataFields = None
-		self.lastUpdate = 0
+		self._lastUpdate = 0
+
+		self._logger = Logger()
 
 		# Add all fields
 		self._addFields()
@@ -63,7 +65,11 @@ class BoardStatus(object):
 		pass
 
 	def getValue(self, name):
-		pass
+		for field in self.dataFields:
+			if field['name'] == name:
+				return field['value']
+
+		return None
 
 	def updateDataFromMessage(self, message, timestamp):
 		"""
@@ -75,7 +81,7 @@ class BoardStatus(object):
 		if message.commandType == CommandTypes.GET_SERVO_POS:
 			pass
 		elif message.commandType == CommandTypes.GET_BOARD_STATUS:
-			self.lastUpdate = timestamp
+			self._lastUpdate = timestamp
 			for field in self.dataFields:
 				if field['name'] == "outputChannel1":
 					field['value'] = message.outputChannel1
@@ -117,3 +123,98 @@ class BoardStatus(object):
 			return
 
 		#self.hasNewData = True
+
+	@property
+	def outputChannel1(self):
+		return self.getValue('outputChannel1')
+
+	@property
+	def outputChannel2(self):
+		return self.getValue('outputChannel2')
+
+	@property
+	def outputChannel3(self):
+		return self.getValue('outputChannel3')
+
+	@property
+	def outputChannel4(self):
+		return self.getValue('outputChannel4')
+
+	@property
+	def outputChannel5(self):
+		return self.getValue('outputChannel5')
+
+	@property
+	def outputChannel6(self):
+		return self.getValue('outputChannel6')
+
+	@property
+	def inputChannel1(self):
+		return self.getValue('inputChannel1')
+
+	@property
+	def inputChannel2(self):
+		return self.getValue('inputChannel2')
+
+	@property
+	def inputChannel3(self):
+		return self.getValue('inputChannel3')
+
+	@property
+	def inputChannel4(self):
+		return self.getValue('inputChannel4')
+
+	@property
+	def inputChannel5(self):
+		return self.getValue('inputChannel5')
+
+	@property
+	def inputChannel6(self):
+		return self.getValue('inputChannel6')
+
+	@property
+	def accelerationX(self):
+		return self.getValue('accelerationX')
+
+	@property
+	def accelerationY(self):
+		return self.getValue('accelerationY')
+
+	@property
+	def accelerationZ(self):
+		return self.getValue('accelerationZ')
+
+	@property
+	def gyroX(self):
+		return self.getValue('gyroX')
+
+	@property
+	def gyroY(self):
+		return self.getValue('gyroY')
+
+	@property
+	def gyroZ(self):
+		return self.getValue('gyroZ')
+
+	@property
+	def lastUpdate(self):
+		return self._lastUpdate
+
+	def printStatus(self):
+		"""
+		Prints the current status to stdout.
+		"""
+		self._logger.info("Board Status")
+		self._logger.info("--------------------------")
+		self._logger.info("\tOutput Channel 1: %s" % self.outputChannel1)
+		self._logger.info("\tOutput Channel 2: %s" % self.outputChannel2)
+		self._logger.info("\tOutput Channel 3: %s" % self.outputChannel3)
+		self._logger.info("\tOutput Channel 4: %s" % self.outputChannel4)
+		self._logger.info("\tOutput Channel 5: %s" % self.outputChannel5)
+		self._logger.info("\tOutput Channel 6: %s" % self.outputChannel6)
+		self._logger.info("\tInput Channel 1: %s" % self.inputChannel1)
+		self._logger.info("\tInput Channel 2: %s" % self.inputChannel2)
+		self._logger.info("\tInput Channel 3: %s" % self.inputChannel3)
+		self._logger.info("\tInput Channel 4: %s" % self.inputChannel4)
+		self._logger.info("\tInput Channel 5: %s" % self.inputChannel5)
+		self._logger.info("\tInput Channel 6: %s" % self.inputChannel6)

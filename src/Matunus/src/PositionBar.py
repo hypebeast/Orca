@@ -22,15 +22,13 @@ __author__ = 'Sebastian Ruml'
 #import sip
 #sip.setapi('QVariant', 2)
 
-from PyQt4 import QtGui, QtCore
-
-#try:
-#    from PyQt4 import QtGui, QtCore
-    #from PyQt4.Qt import Qt
-#except ImportError:
-#    print "No PyQt found!"
-#    import sys
-#    sys.exit(2)
+try:
+    from PyQt4 import QtGui, QtCore
+    from PyQt4.Qt import Qt
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
 
 class PositionBar(QtGui.QWidget):
