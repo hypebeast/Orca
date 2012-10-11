@@ -118,7 +118,7 @@ void orca_init(void)
 	servo_init();
 	
 	/* flight controller subsystem init */
-	flight_controller_init(&board, &servoIn, &flightController);
+	flight_controller_init(&board, &servoIn, &orcafilter, &flightController);
 
 	/* Initialize the serial interface */
 	serial_api_init();
