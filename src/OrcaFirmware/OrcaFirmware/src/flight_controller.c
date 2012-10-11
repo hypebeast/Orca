@@ -82,7 +82,8 @@ int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 	int16_t actuatingRoll = 0;
 	
 	/* Sollwert für Rollwinkel berechnen. Sollwert wird von der Fernsteuerung vorgegeben. */
-	rollSetValue = (flightController->rcServoIn->servo2) * (FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/1000);
+	rollSetValue = (flightController->rcServoIn->servo2) * 
+					(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
 	
 	/*  */
 	actuatingRoll = pid_Controller((int16_t)rollSetValue,(int16_t)actualSensorData->roll,&rollPid);
@@ -218,6 +219,7 @@ int flight_controller_task(FLIGHT_CONTROLLER_t *flightController)
 	if(flightController->mode && FLIGHT_CONTROLLER_MODE_RC)
 	{
 		//Note: Do not change the call sequence!
+		flight_controller_calc_roll(flightController);		
 		flight_controller_calc_left_edf(flightController);
 		flight_controller_calc_right_edf(flightController);
 		flight_controller_calc_left_servo(flightController);

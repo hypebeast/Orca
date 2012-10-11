@@ -14,9 +14,10 @@
  *  \param i_factor  Integral term.  
  *  \param d_factor  Derivate term.  
  *  \param pid  Struct with PID status.  
- */   
+ */ 
+
+// Set up PID controller parameters    
 void pid_Init(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_DATA *pid)   
-// Set up PID controller parameters   
 {   
   // Start values for PID controller   
   pid->sumError = 0;   

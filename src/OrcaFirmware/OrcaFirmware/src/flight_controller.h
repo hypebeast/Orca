@@ -48,6 +48,9 @@
 //	Supported Flight Controller Modes
 //---------------------------------------------------------------------
 #define FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF				20.0f	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_AILERON_MIN_VALUE_CONF			1130	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_AILERON_MAX_VALUE_CONF			1948	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF			(FLIGHT_CONTROLLER_AILERON_MAX_VALUE_CONF -	FLIGHT_CONTROLLER_AILERON_MIN_VALUE_CONF)/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
 
 /*! Flight Controller Struct */
 typedef struct FLIGHT_CONTROLLER {

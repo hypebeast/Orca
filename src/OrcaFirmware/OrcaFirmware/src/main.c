@@ -32,7 +32,7 @@
 
 /* global variables */
 BOARD_CONFIG_t board;  								/*!< \brief board module */
-SERVO_IN_t servoIn;									/*!< \brief servo input module */
+SERVO_IN_t servoInput;									/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
 VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
 MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing unit module */
@@ -52,6 +52,7 @@ int main (void)
 	/* Initialize all basic board functions */
 	orca_init();
 	
+	user_interface_stat_led_pattern(USER_INTERFACE_LED_BLINKING);
 	/* Uncomment this method to restore the factory settings on the next startup */
 	//serial_flash_factory_reset();
 	
@@ -112,13 +113,13 @@ void orca_init(void)
 	}
 		
 	/* servo in subsystem init */
-	servo_in_init(&board, &servoIn);
+	servo_in_init(&board, &servoInput);
 	
 	/* Initialize the servo output subsystem */
 	servo_init();
 	
 	/* flight controller subsystem init */
-	flight_controller_init(&board, &servoIn, &orcafilter, &flightController);
+	flight_controller_init(&board, &servoInput, &orcafilter, &flightController);
 
 	/* Initialize the serial interface */
 	serial_api_init();
