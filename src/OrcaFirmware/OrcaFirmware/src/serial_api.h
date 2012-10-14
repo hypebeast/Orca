@@ -30,9 +30,9 @@
 #define PACKET_STOP_BYTE 0x7E
 
 /* \brief  Receive buffer size: 2,4,8,16,32,64,128 or 256 bytes. */
-#define USART_RX_BUFFER_SIZE 64
+#define USART_RX_BUFFER_SIZE 256
 /* \brief Transmit buffer size: 2,4,8,16,32,64,128 or 256 bytes */
-#define USART_TX_BUFFER_SIZE 64
+#define USART_TX_BUFFER_SIZE 256
 /* \brief Receive buffer mask. */
 #define USART_RX_BUFFER_MASK ( USART_RX_BUFFER_SIZE - 1 )
 /* \brief Transmit buffer mask. */
@@ -77,6 +77,16 @@ typedef struct Usart_and_buffer
 	/* \brief Data buffer. */
 	USART_Buffer_t buffer;
 } USART_data_t;
+
+/******************************************************************************
+* \brief Buffer structure for a received message.
+******************************************************************************/
+typedef struct command_buffer {
+	uint8_t buff[MAX_PACKET_LENGTH]; /** Buffer for the command packet */
+	unsigned int index; /** Index for the buffer */
+	bool start_received; /** Flag that indicates if a start delimiter was received */
+	bool processing_active; /** Flag that indicates if a messages is processed */
+} Command_Buffer_t;
 
 /******************************************************************************
 * \brief This struct maps a specific command type to the processing function.

@@ -69,11 +69,11 @@ class ScopePage(QtGui.QWidget):
 
     def _addScopes(self):
         """Adds all scopes to the GUI."""
-        self.scope1 = ScopeWidget(['test1', 'test2'], self.boardController)
+        self.scope1 = ScopeWidget(self.boardController, ['test1', 'test2'])
         self.mainLayout.addWidget(self.scope1)
         self.scopes.append(self.scope1)
 
-        self.scope2 = ScopeWidget(['test3', 'test4'], self.boardController)
+        self.scope2 = ScopeWidget(self.boardController, ['test3', 'test4'])
         self.mainLayout.addWidget(self.scope2)
         self.scopes.append(self.scope2)
 

@@ -22,6 +22,7 @@
 #define SERVO3_TIMER TCD1
 #define SERVO5_TIMER TCE1
 
+#define SERVO_NUMBER_OF_OUTPUT_CHANNELS 6 // Number of output channels
 #define SERVO_F_CPU 32000000.0f // TODO: Remove this constant!
 #define SERVO_TIMER_OVERFLOW_PERIOD 20 // PWM period (in ms)
 #define SERVO_PRESCALER_VALUE 8 // Prescaler value
@@ -31,7 +32,7 @@
 #define SERVO_UPPER_PULSE_WIDTH 2.35f // in ms
 #define SERVO_PULSE_WIDTH_OFFSET SERVO_LOWER_PULSE_WIDTH
 #define SERVO_PULSE_WIDTH (SERVO_UPPER_PULSE_WIDTH - SERVO_LOWER_PULSE_WIDTH) // in ms
-#define SERVO_TICKS_PER_DEGREE (SERVO_PULSE_WIDTH/180.0f)
+#define SERVO_PULS_WIDTH_PER_DEGREE (SERVO_PULSE_WIDTH/180.0f)
 
 
 /**
@@ -55,5 +56,7 @@ uint16_t servo_get_pos_degree(uint8_t servo_nr);
 void servo_set_pos_pulse_width(uint8_t servo_nr, uint16_t duration);
 void servo_set_pos_ticks(uint8_t servo_nr, uint16_t pos);
 uint16_t servo_get_pos_ticks(uint8_t servo_nr);
+void servo_set_pos_percentage(uint8_t servo_nr, uint8_t pos);
+uint8_t servo_get_pos_percentage(uint8_t servo_nr);
 
 #endif /* SERVO_H_ */
