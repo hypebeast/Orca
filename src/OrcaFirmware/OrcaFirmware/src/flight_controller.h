@@ -10,6 +10,7 @@
 #define FLIGHT_CONTROLLER_H_
 
 #include "servo_in.h"
+#include "filters.h"
 
 //---------------------------------------------------------------------
 //	Supported Flight Controller Modes
@@ -43,6 +44,14 @@
 #define FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR			1.7f	/*!< brief Aussteuerweg für Servo links und rechts durch Elevator */
 #define FLIGHT_CONTROLLER_RUDDER_FACTOR					1.0f	/*!< brief Factor für die Rudder Addition für Servo links und rechts */
 
+//---------------------------------------------------------------------
+//	Supported Flight Controller Modes
+//---------------------------------------------------------------------
+#define FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF				20.0f	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_AILERON_MIN_VALUE_CONF			1130	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_AILERON_MAX_VALUE_CONF			1948	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF			(FLIGHT_CONTROLLER_AILERON_MAX_VALUE_CONF -	FLIGHT_CONTROLLER_AILERON_MIN_VALUE_CONF)/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+
 /*! Flight Controller Struct */
 typedef struct FLIGHT_CONTROLLER {
 	volatile uint16_t mode;					/*!< brief Selected flight controller mode */	
@@ -55,12 +64,12 @@ typedef struct FLIGHT_CONTROLLER {
 }FLIGHT_CONTROLLER_t;
 
 
-void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FLIGHT_CONTROLLER_t *flightController);
+void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_left_servo(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_task(FLIGHT_CONTROLLER_t *flightController);
-
+int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController);
 #endif /* FLIGHT_CONTROLLER_H_ */

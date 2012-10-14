@@ -37,7 +37,10 @@
 #include "user_board.h"
 #include "system_info.h"
 #include "servo.h"
+#include "pid.h"
 
+pidData_t rollPid;
+FILTER_DATA_t *actualSensorData;
 
 /**************************************************************************
 * \\brief Flight Controller Initialization
@@ -49,18 +52,42 @@
 *
 * \\return  ---
 ***************************************************************************/
-void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FLIGHT_CONTROLLER_t *flightController)
+void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController)
 {
 	//TODO: Do all init stuff here
 	
+	actualSensorData = filter;
 	/* RC is used */
 	if(board->mode && BOARD_MODE_TRANSMITTER)
 	{
 		flightController->mode |= FLIGHT_CONTROLLER_MODE_RC;
 		flightController->rcServoIn = servo;
 	}		
-		
+	
+	/* Roll PID Init */
+	pid_Init(128,128,128,&rollPid);	
 }	
+
+/**************************************************************************
+* \\brief Flight Controller Calculate Left EDF
+*
+*
+* \\param *flightController Flight Controller data structure
+*
+* \\return  ---
+***************************************************************************/
+int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
+{
+	float rollSetValue = 0;
+	int16_t actuatingRoll = 0;
+	
+	/* Sollwert für Rollwinkel berechnen. Sollwert wird von der Fernsteuerung vorgegeben. */
+	rollSetValue = (flightController->rcServoIn->servo2) * 
+					(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
+	
+	/*  */
+	actuatingRoll = pid_Controller((int16_t)rollSetValue,(int16_t)actualSensorData->roll,&rollPid);
+}
 
 /**************************************************************************
 * \\brief Flight Controller Calculate Left EDF
@@ -192,6 +219,7 @@ int flight_controller_task(FLIGHT_CONTROLLER_t *flightController)
 	if(flightController->mode && FLIGHT_CONTROLLER_MODE_RC)
 	{
 		//Note: Do not change the call sequence!
+		flight_controller_calc_roll(flightController);		
 		flight_controller_calc_left_edf(flightController);
 		flight_controller_calc_right_edf(flightController);
 		flight_controller_calc_left_servo(flightController);
