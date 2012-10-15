@@ -9,8 +9,8 @@
 
 #include "servo.h"
 
-
-uint16_t servo_compare_period[6];
+// Timer compare values for all output channels
+uint16_t servo_compare_period[SERVO_NUMBER_OF_OUTPUT_CHANNELS];
 
 
 /**
@@ -27,12 +27,9 @@ void servo_set_frequency()
 */
 void servo_init()
 {	
-	servo_compare_period[0] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;
-	servo_compare_period[1] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;
-	servo_compare_period[2] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;
-	servo_compare_period[3] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;	
-	servo_compare_period[4] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;
-	servo_compare_period[5] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;	
+	for (int i = 0, i < SERVO_NUMBER_OF_OUTPUT_CHANNELS; i++) {
+		servo_compare_period[i] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;
+	}
 	
 	// Enable timers/counters TCC1, TCD1, TCE1
 	tc_enable(&SERVO1_TIMER);
@@ -81,18 +78,34 @@ void servo_init()
 */
 void servo_set_pos_degree(uint8_t servo_nr, float pos)
 {
+	if (servo_nr < 1 || servo_nr > SERVO_NUMBER_OF_OUTPUT_CHANNELS) {
+		return;
+	}
+	
 	if (pos < 0 || pos > 180)
 		return;
 		
 	// Calculate the pulse width for the given position
-	float pulse_width = SERVO_PULSE_WIDTH_OFFSET + (SERVO_TICKS_PER_DEGREE * pos);
+	float pulse_width = SERVO_PULSE_WIDTH_OFFSET + (SERVO_PULS_WIDTH_PER_DEGREE * pos);
 	servo_compare_period[servo_nr-1] = pulse_width / SERVO_TICK_DURATION;
 	
 	if (servo_nr == 1) {
 		tc_write_cc(&SERVO1_TIMER, TC_CCA, servo_compare_period[servo_nr-1]);
 	}
-	else {
+	if (servo_nr == 2) {
 		tc_write_cc(&SERVO1_TIMER, TC_CCB, servo_compare_period[servo_nr-1]);
+	}
+	if (servo_nr == 3) {
+		tc_write_cc(&SERVO3_TIMER, TC_CCA, servo_compare_period[servo_nr-1]);
+	}
+	if (servo_nr == 4) {
+		tc_write_cc(&SERVO3_TIMER, TC_CCB, servo_compare_period[servo_nr-1]);
+	}
+	if (servo_nr == 5) {
+		tc_write_cc(&SERVO5_TIMER, TC_CCA, servo_compare_period[servo_nr-1]);
+	}
+	if (servo_nr == 6) {
+		tc_write_cc(&SERVO5_TIMER, TC_CCB, servo_compare_period[servo_nr-1]);
 	}
 }
 
@@ -101,10 +114,14 @@ void servo_set_pos_degree(uint8_t servo_nr, float pos)
 */
 uint16_t servo_get_pos_degree(uint8_t servo_nr)
 {
+	if (servo_nr < 1 || servo_nr > SERVO_NUMBER_OF_OUTPUT_CHANNELS) {
+		return;
+	}
+	
 	uint16_t pos = 0;
 	
-	pos =  servo_compare_period[servo_nr-1] * SERVO_TICK_DURATION; // Calculate the pulse width
-	pos = (pos - SERVO_PULSE_WIDTH_OFFSET) / SERVO_TICKS_PER_DEGREE; // Calculate the position
+	float pulse_width =  servo_compare_period[servo_nr-1] * SERVO_TICK_DURATION; // Calculate the pulse width
+	pos = (pulse_width - SERVO_PULSE_WIDTH_OFFSET) / SERVO_PULS_WIDTH_PER_DEGREE; // Calculate the position
 	
 	return pos;
 }
@@ -115,6 +132,10 @@ uint16_t servo_get_pos_degree(uint8_t servo_nr)
 */
 void servo_set_pos_ticks(uint8_t servo_nr, uint16_t pos)
 {
+	if (servo_nr < 1 || servo_nr > SERVO_NUMBER_OF_OUTPUT_CHANNELS) {
+		return;
+	}
+	
 	if (pos < 500 || pos > 2500)
 		return;
 		
@@ -147,5 +168,37 @@ void servo_set_pos_ticks(uint8_t servo_nr, uint16_t pos)
 */
 uint16_t servo_get_pos_ticks(uint8_t servo_nr)
 {
-	// TODO
+	if (servo_nr < 1 || servo_nr > SERVO_NUMBER_OF_OUTPUT_CHANNELS) {
+		return;
+	}
+	
+	return servo_compare_period[servo_nr - 1];
 }
+
+/**************************************************************************
+* \brief Sets the given output value to the specified output channel. 
+* 
+* The value range is from 0 to 100 %.
+**************************************************************************/
+void servo_set_pos_percentage(uint8_t servo_nr, uint8_t pos)
+{
+	if (servo_nr < 1 || servo_nr > SERVO_NUMBER_OF_OUTPUT_CHANNELS) {
+		return;
+	}
+	
+	// TODO
+}	
+
+/**************************************************************************
+* \brief Returns current output value for tge specified output channel.
+*
+* Values are from 0 to 100 %.
+**************************************************************************/
+uint8_t servo_get_pos_percentage(uint8_t servo_nr)
+{
+	if (servo_nr < 1 || servo_nr > SERVO_NUMBER_OF_OUTPUT_CHANNELS) {
+		return;
+	}
+	
+	// TODO
+}	

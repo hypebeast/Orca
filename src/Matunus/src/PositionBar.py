@@ -171,11 +171,11 @@ class PositionBar(QtGui.QWidget):
             newPosPercentage = (float(cursorPosX) / float(self.getBarWidth())) * 100.0
             self.value = float((valueRange / 100.0) * newPosPercentage)
 
-            # Emit signal
-            self.valueChanged.emit(self.value)
-
             # Repaint the widget
             self.repaint()
+
+            # Emit signal
+            self.valueChanged.emit(self.value)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:

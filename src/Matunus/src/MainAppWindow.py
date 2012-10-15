@@ -254,7 +254,6 @@ class MainAppWindow(QtGui.QMainWindow):
                 self.updateUi()
                 self.infoPanel.setSystemStatus("Ready")
                 self.infoPanel.setSystemMessage("Connected to the controller")
-                self.bConnect.setText("Disconnect")
             except SerialError as ex:
                 msgBox = QtGui.QMessageBox()
                 msgBox.setWindowTitle("Serial Error")
@@ -276,7 +275,6 @@ class MainAppWindow(QtGui.QMainWindow):
             self.updateUi()
             self.infoPanel.setSystemStatus("Not Connected")
             self.infoPanel.setSystemMessage("Disconnected from the controller")
-            self.bConnect.setText("Connect")
 
     def selectControllerClicked(self):
         print "Select controller clicked"

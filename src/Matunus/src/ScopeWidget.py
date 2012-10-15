@@ -17,10 +17,6 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-# This is only needed for Python v2 but is harmless for Python v3.
-#import sip
-#sip.setapi('QVariant', 2)
-
 try:
     from PyQt4 import QtGui, QtCore, Qt
 except ImportError:
@@ -42,7 +38,15 @@ class ScopeWidget(Qwt.QwtPlot):
 	"""
 	Widget that contains one scope.
 	"""
-	def __init__(self, dataFields, boardController):
+	def __init__(self, boardController, dataFields):
+		"""
+		Constructor
+
+		Params:
+
+		- boardController: The board controller object
+		- dataFields: 
+		"""
 		Qwt.QwtPlot.__init__(self)
 
 		if dataFields is None or boardController is None:

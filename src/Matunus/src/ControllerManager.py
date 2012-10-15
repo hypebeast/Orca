@@ -48,7 +48,7 @@ class ControllerManager(QObject):
 	# Update interval in ms
 	UPDATE_INTERVAL = 1000
 
-	# This signals is emitted if the board status was updated
+	# This signals is emitted when the board status was updated
 	board_status_updated = pyqtSignal()
 
 	def __init__(self):
@@ -65,7 +65,7 @@ class ControllerManager(QObject):
         # Status reader
 		self.statusReaderThread = None
 		self.statusReaderIsAlive = False
-		self.statusReaderUpdateInterval = 2.0 # Update interval in seconds
+		self.statusReaderUpdateInterval = 1.0 # Update interval in seconds
 
         # Status queries
 		self.status_queries = [

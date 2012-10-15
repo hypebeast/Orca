@@ -47,7 +47,7 @@ LF_MODES = ('LF', 'CR', 'CR/LF')
 NEWLINECHARACTER = '\r\n'
 
 DEFAULT_PORT = 0
-DEFAULT_BAUDRATE = 57600
+DEFAULT_BAUDRATE = 9600
 DEFAULT_PARITY = serial.PARITY_NONE
 DEFAULT_BYTESIZE = serial.EIGHTBITS
 DEFAULT_STOPBITS = serial.STOPBITS_ONE
@@ -112,7 +112,7 @@ class SerialConnection(QObject):
         self.newResponse = False
         self.responseStatus = ResponseStatus.IDLE
         self.responseBuffer = array.array('c')
-        self.reader_interval = 0.05 # Update interval in seconds
+        self.reader_interval = 0.01 # Update interval in seconds
 
         # This queue contains the received messages. The messages are stored as
         # tuples in the following format: (message, timestamp).

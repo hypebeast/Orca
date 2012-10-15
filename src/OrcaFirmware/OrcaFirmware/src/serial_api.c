@@ -24,17 +24,15 @@
 // Variables
 //////////////////////////////////////////////////////////////////////////
 
-/*! USART data struct. */
+/**************************************************************************
+ * \brief USART data struct.
+ **************************************************************************/
 USART_data_t USART_data;
 
 /**************************************************************************
- * \brief This structure represents an input buffer for incoming packets.
+ * \brief Input buffer for incoming packets.
  **************************************************************************/
-static struct {
-	uint8_t buff[MAX_PACKET_LENGTH]; /** Buffer for the command packet */
-	unsigned int index; /** Index for the buffer */
-	bool start_received; /** Flag that indicates if a start delimiter was received */
-} command_buff;
+Command_Buffer_t command_buff;
 
 /**************************************************************************
  * \brief RX command packet
@@ -363,8 +361,12 @@ void serial_api_task(void)
 	//uint8_t received_byte = usart_getchar(USART_SERIAL_API);
 	uint8_t received_byte;
 	
-	if (USART_RXBufferData_Available(&USART_data)) {
+	while(USART_RXBufferData_Available(&USART_data)) {
 		received_byte = USART_RXBuffer_GetByte(&USART_data);
+		
+		//if (command_buff.processing_active) {
+			//return;
+		//}
 		
 		// Process the received byte
 		switch (received_byte) {
@@ -373,7 +375,7 @@ void serial_api_task(void)
 			if (!command_buff.start_received) {
 				command_buff.index = 0;
 				command_buff.start_received = true;
-				command_buff.buff[command_buff.index] = PACKET_START_BYTE;
+				command_buff.buff[command_buff.index] = received_byte;
 				command_buff.index++;
 			}
 			// New start byte received, but we already received a start byte. In this
@@ -398,13 +400,15 @@ void serial_api_task(void)
 				if (command_buff.index > 0) {
 					// Simple check if we received an stop byte at the start of a package
 					// TODO: Extend this check
-					if (command_buff.index < 5) {
-						command_buff.buff[command_buff.index] = received_byte;
-						command_buff.index++;
-						break;
-					}
+					//if (command_buff.index < 4) {
+						//command_buff.buff[command_buff.index] = received_byte;
+						//command_buff.index++;
+						//break;
+					//}
 					
-					command_buff.buff[command_buff.index] = PACKET_STOP_BYTE;
+					command_buff.buff[command_buff.index] = received_byte;
+					
+					command_buff.processing_active = true;
 					
 					// Parse received command
 					parse_command_packet();
@@ -412,6 +416,7 @@ void serial_api_task(void)
 					// Reset the command buffer
 					command_buff.index = 0;
 					command_buff.start_received = false;
+					command_buff.processing_active = false;
 					memset(command_buff.buff, 0, sizeof(command_buff.buff));
 				}
 			}
@@ -433,7 +438,7 @@ void serial_api_task(void)
 			}
 			break;
 		}
-	}
+	}		
 }
 
 /**************************************************************************
@@ -459,15 +464,16 @@ void serial_api_init(void)
 	// BSEL = ((I/O clock frequency)/(2^(ScaleFactor)*16*Baudrate))-1
 	// BSEL for 9600 bps => 207
 	// BSEL for 57600 bps => 33 (33.722)
-	USART_Baudrate_Set(USART_data.usart, 34, 0);
-	
-	// Enable both RX and TX
-	USART_Rx_Enable(USART_data.usart);
-	USART_Tx_Enable(USART_data.usart);
+	USART_Baudrate_Set(USART_data.usart, 207, 0);
 	
 	// Initialize command buffer
 	command_buff.index = 0;
 	command_buff.start_received = false;
+	command_buff.processing_active = false;
+	
+	// Enable both RX and TX
+	USART_Rx_Enable(USART_data.usart);
+	USART_Tx_Enable(USART_data.usart);
 }
 
 /*! \brief Initializes buffer and selects what USART module to use.
