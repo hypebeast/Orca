@@ -70,6 +70,8 @@ int main (void)
 		
 		// Flight controller
 		flight_controller_task(&flightController);
+		
+
 	}
 	
 	return 0;
@@ -188,7 +190,7 @@ void system_timer(uint32_t time)
 	ulVsTickCounter++;
 	ulUiTickCounter++;
 	
-	/* Call the flight Controller every 10 ms */ 
+	/* Call the flight Controller every 10 ms */
 	if(ulFcTickCounter >= 1)
 	{
 		/* Wait until MPU 6000 is calibrated */
@@ -197,27 +199,27 @@ void system_timer(uint32_t time)
 			/* Get new data from the mpu6000 */
 			mpu_6000_task();
 			/* Save the new measurements to the filter module */
-			mpu_6000_save_data_to_filter(&orcafilter);	
+			mpu_6000_save_data_to_filter(&orcafilter);
 			/* Do the kalman filter */
 			filter_task(motionProcessingUnit.time);
 		}
-		ulFcTickCounter = 0;		
+		ulFcTickCounter = 0;
 	}
-	
+			
 	/* Call the voltage sensor every 500 */
 	if(ulVsTickCounter >= 50)
 	{
 		voltage_sens_task(&voltageSensor);
 		ulVsTickCounter = 0;
 	}
-	
+			
 	/* Update the user interface every 50 ms */
 	if(ulUiTickCounter >= 5)
 	{
 		user_interface_update_LEDs();
 		ulUiTickCounter = 0;
 	}
-
+	
 	rtc_set_alarm(1);
 	rtc_set_time(0);
 }

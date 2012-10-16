@@ -82,8 +82,8 @@ typedef struct Usart_and_buffer
 * \brief Buffer structure for a received message.
 ******************************************************************************/
 typedef struct command_buffer {
-	uint8_t buff[MAX_PACKET_LENGTH]; /** Buffer for the command packet */
 	unsigned int index; /** Index for the buffer */
+	uint8_t buff[MAX_PACKET_LENGTH]; /** Buffer for the command packet */
 	bool start_received; /** Flag that indicates if a start delimiter was received */
 	bool processing_active; /** Flag that indicates if a messages is processed */
 } Command_Buffer_t;
