@@ -191,9 +191,9 @@ class SerialConnection(QObject):
         if self.serial_connection is None or not self.connected or command is None:
             return
 
-        packet = command.getPacket()
-        hexdata = ''.join('%02x' % ord(chr(byte)) for byte in packet)
-        self._logger.debug(hexdata)
+        #packet = command.getPacket()
+        #hexdata = ''.join('%02x' % ord(chr(byte)) for byte in packet)
+        #self._logger.debug(hexdata)
 
         self.serial_connection.write(command.getPacket())
         #self.serial_connection.flush()

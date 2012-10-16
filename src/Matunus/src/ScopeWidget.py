@@ -18,7 +18,7 @@
 
 
 try:
-    from PyQt4 import QtGui, QtCore, Qt
+    from PyQt4 import QtCore, Qt
 except ImportError:
     print "No PyQt found!"
     import sys
@@ -45,7 +45,7 @@ class ScopeWidget(Qwt.QwtPlot):
 		Params:
 
 		- boardController: The board controller object
-		- dataFields: 
+		- dataFields: Data fields to watch
 		"""
 		Qwt.QwtPlot.__init__(self)
 
@@ -101,9 +101,11 @@ class ScopeWidget(Qwt.QwtPlot):
 		self._update_scope()
 
 	def _update_scope(self):
+		# Update every curve
 		for curve in self.plotCurves:
 			curve.updateCurve()
 
+		# Replot everything
 		self.replot()
 
 	def _on_status_updated(self):

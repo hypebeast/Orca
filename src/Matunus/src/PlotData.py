@@ -58,12 +58,13 @@ class PlotData:
 		self.curve.setPen(pen)
 		self.curve.attach(self.plot)
 		
-	def updateCurve():
+	def updateCurve(self):
+		"""Sets new data to the curve"""
 		# TODO: Adjust the axes scale
-		self.self.curve.setData(self.xData, self.yData)
+		self.curve.setData(self.xData, self.yData)
 
 	def appendData(self, data):
-		"""Append new data to the plot"""
+		"""Appends new data to the plot"""
 		self.data.append((data['timestamp'], data['value']))
 		self.xData = [s[0] for s in self.data]
 		self.yData = [s[1] for s in self.data]

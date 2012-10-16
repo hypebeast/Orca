@@ -20,7 +20,7 @@ __author__ = 'Sebastian Ruml'
 
 
 try:
-    from PyQt4 import QtGui, QtCore
+    from PyQt4 import QtGui
 except ImportError:
     print "No PyQt found!"
     import sys
@@ -41,4 +41,6 @@ class HardwareSettingsPage(QtGui.QWidget):
         self._createUi()
 
     def _createUi(self):
-    	pass
+    	mainLayout = QtGui.QVBoxLayout()
+
+        self.setLayout(mainLayout)

@@ -43,7 +43,6 @@ class ServoControlWidget(QtGui.QWidget):
             raise Exception
 
         self.controller = controller
-
         self.servo_nr = servo_nr
         self.minValue = 0
         self.maxValue = 180
@@ -132,3 +131,6 @@ class ServoControlWidget(QtGui.QWidget):
         self.leServoPosition.setText(str(value))
 
         self.runMoveServo(value)
+
+    def updateServoPosition(self, pos):
+        self.actualPositionServo.display(int(pos))
