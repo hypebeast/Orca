@@ -13,6 +13,7 @@ The following libraries are needed in order ro run Matunus:
 * Python v2.6.x (http://www.python.org/getit/releases/2.6/, http://www.python.org/ftp/python/2.6.2/python-2.6.2.msi)
 * PyQT-Py2.6-gpl-4.5.4-1 (http://pyqwt.sourceforge.net/support/PyQt-Py2.6-gpl-4.5.4-1.exe)
 * PyQwt >= 5.2.0 (http://pyqwt.sourceforge.net/, http://prdownloads.sourceforge.net/pyqwt/PyQwt5.2.0-Python2.6-PyQt4.5.4-NumPy1.3.0-1.exe)
+* numpy-1.3.0 (http://prdownloads.sourceforge.net/numpy/numpy-1.3.0-win32-superpack-python2.6.exe)
 * pySerial v2.6 (http://pyserial.sourceforge.net/)
 
 
