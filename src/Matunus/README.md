@@ -31,7 +31,7 @@ Make sure that you have all dependencies installed. See the section 'Requirement
 
 To run Matunus, type the following in your command line:
 	
-	$ pyton matunus.py.
+	$ pyton matunus.py
 
 Note: If you have more than one Python version installed use the start.cmd (Windows) script and point to your Python 2.6.x binary.
 
