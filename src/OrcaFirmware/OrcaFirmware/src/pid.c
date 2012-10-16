@@ -6,9 +6,13 @@
  */ 
 
 #include "pid.h"
-/*! \brief Initialisation of PID controller parameters.  
+
+float ta = 0;
+unsigned long pidLastMicros = 0;
+
+/*! \brief Initialization of PID controller parameters.  
  *  
- *  Initialise the variables used by the PID algorithm.  
+ *  Initialize the variables used by the PID algorithm.  
  *  
  *  \param p_factor  Proportional term.  
  *  \param i_factor  Integral term.  
@@ -37,14 +41,20 @@ void pid_Init(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_D
  *  Calculates output from setpoint, process value and PID status.  
  *  
  *  \param setPoint  Desired value.  
- *  \param processValue  Measured value.  
+ *  \param processValue  Measured value.
+ *   param time Abtastzeit (us) 
  *  \param pid_st  PID status struct.  
  */   
-int16_t pid_Controller(int16_t setPoint, int16_t processValue, struct PID_DATA *pid_st)   
+int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  time, struct PID_DATA *pid_st)   
 {   
   int16_t error, p_term, d_term;   
   int32_t i_term, ret, temp;   
    
+   	/* Calculate time elapsed since last call (dt) */
+	/*please note that overflows are ok, since for example 0x0001 - 0x00FE will be equal to 2 */
+	ta = (float)(time - pidLastMicros) / 1000000;	
+	pidLastMicros = time;	
+	
   error = setPoint - processValue;   
    
   // Calculate Pterm and limit error overflow   
@@ -70,11 +80,11 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, struct PID_DATA *
   }   
   else{   
     pid_st->sumError = temp;   
-    i_term = pid_st->I_Factor * pid_st->sumError;   
+    i_term = (uint16_t)((float)(pid_st->I_Factor) * (float)(pid_st->sumError) * ta);   
   }   
    
   // Calculate Dterm   
-  d_term = pid_st->D_Factor * (pid_st->lastProcessValue - processValue);   
+  d_term = (uint16_t)((float)(pid_st->D_Factor) * ((float)processValue - (float)(pid_st->lastProcessValue)) / ta);   
    
   pid_st->lastProcessValue = processValue;   
    

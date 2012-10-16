@@ -41,6 +41,7 @@
 
 pidData_t rollPid;
 FILTER_DATA_t *actualSensorData;
+int16_t actuatingRoll = 0;
 
 /**************************************************************************
 * \\brief Flight Controller Initialization
@@ -79,14 +80,17 @@ void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FILTER_DAT
 int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 {
 	float rollSetValue = 0;
-	int16_t actuatingRoll = 0;
+	float rollSensorValue = 0;
+
 	
 	/* Sollwert für Rollwinkel berechnen. Sollwert wird von der Fernsteuerung vorgegeben. */
 	rollSetValue = (flightController->rcServoIn->servo2) * 
 					(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
 	
+	rollSetValue *= 1000;
+	rollSensorValue = (actualSensorData->roll) *1000;
 	/*  */
-	actuatingRoll = pid_Controller((int16_t)rollSetValue,(int16_t)actualSensorData->roll,&rollPid);
+	actuatingRoll = pid_Controller((int16_t)rollSetValue, (int16_t)rollSensorValue, 10000, &rollPid) / 1000;	
 }
 
 /**************************************************************************
@@ -102,9 +106,13 @@ int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController)
 	flightController->leftEdfSetPoint = FLIGHT_CONTROLLER_EDF_OFFSET + flightController->rcServoIn->servo3;
 	
 	/* Pitch/Aileron Control */
-	if(flightController->rcServoIn->servo2 > FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
-		flightController->leftEdfSetPoint -= (flightController->rcServoIn->servo2
-												- FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_AILERON_FACTOR;
+	//if(flightController->rcServoIn->servo2 > FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
+		//flightController->leftEdfSetPoint -= (flightController->rcServoIn->servo2
+												//- FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_AILERON_FACTOR;
+	if(actuatingRoll<0)
+	{
+		flightController->leftEdfSetPoint -= (uint16_t)(-1 *actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+	}
 	 
 	return SYSTEM_INFO_TRUE;	
 }
@@ -122,10 +130,13 @@ int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController)
 	flightController->rightEdfSetPoint = FLIGHT_CONTROLLER_EDF_OFFSET + flightController->rcServoIn->servo3;
 	
 	/* Pitch/Aileron Control */
-	if(flightController->rcServoIn->servo2 < FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
-		flightController->rightEdfSetPoint -= (FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH
-												- flightController->rcServoIn->servo2)*FLIGHT_CONTROLLER_AILERON_FACTOR;
-		
+	//if(flightController->rcServoIn->servo2 < FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
+		//flightController->rightEdfSetPoint -= (FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH
+												//- flightController->rcServoIn->servo2)*FLIGHT_CONTROLLER_AILERON_FACTOR;
+	if(actuatingRoll>0)
+	{
+		flightController->rightEdfSetPoint -= (uint16_t)(actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+	}	
 	return SYSTEM_INFO_TRUE;	
 }
 

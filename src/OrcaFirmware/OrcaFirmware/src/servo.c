@@ -27,7 +27,7 @@ void servo_set_frequency()
 */
 void servo_init()
 {	
-	for (int i = 0, i < SERVO_NUMBER_OF_OUTPUT_CHANNELS; i++) {
+	for (int i = 0; i < SERVO_NUMBER_OF_OUTPUT_CHANNELS; i++) {
 		servo_compare_period[i] = SERVO_LOWER_PULSE_WIDTH / SERVO_TICK_DURATION;
 	}
 	

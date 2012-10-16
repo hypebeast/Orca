@@ -314,10 +314,9 @@ static void parse_command_packet(void)
 	// The second byte contains the message type
 	rx_command_packet.message_type = command_buff.buff[index++];
 	
-	// Byte four and five contains the command type
-	rx_command_packet.command = 0;
-	rx_command_packet.command = (rx_command_packet.command << 8) | command_buff.buff[index+1];
-	rx_command_packet.command = (rx_command_packet.command << 8) | command_buff.buff[index];
+	// Byte four and five contains the command type	
+	rx_command_packet.command = (uint16_t)(((command_buff.buff[index+1]) << 8)|command_buff.buff[index]);
+	
 	index += 2;
 	
 	// Byte six contains the data length
@@ -396,7 +395,7 @@ void serial_api_task(void)
 			
 			// Stop byte received
 			case PACKET_STOP_BYTE:
-			if (command_buff.start_received) {
+			if ((command_buff.start_received)==true) {
 				if (command_buff.index > 0) {
 					// Simple check if we received an stop byte at the start of a package
 					// TODO: Extend this check
@@ -412,7 +411,7 @@ void serial_api_task(void)
 					
 					// Parse received command
 					parse_command_packet();
-					
+			
 					// Reset the command buffer
 					command_buff.index = 0;
 					command_buff.start_received = false;
@@ -422,8 +421,8 @@ void serial_api_task(void)
 			}
 			break;
 			
-			default:
 			// Only get the byte if the start byte was received
+			default:
 			if (command_buff.start_received) {
 				if (command_buff.index < MAX_PACKET_LENGTH - 1) {
 					command_buff.buff[command_buff.index] = received_byte;
@@ -451,14 +450,14 @@ void serial_api_init(void)
 	
 	// Use USARTE0 and initialize buffers
 	USART_InterruptDriver_Initialize(&USART_data, BOARD_USART_USB_INTERFACE,
-									 USART_DREINTLVL_LO_gc);
+									 USART_DREINTLVL_HI_gc);
 	
 	// USARTE0, 8 data bits, no parity, 1 stop bit
 	USART_Format_Set(USART_data.usart, USART_CHSIZE_8BIT_gc,
 					 USART_PMODE_DISABLED_gc, false);
 	
 	// Enable RXC interrupt
-	USART_RxdInterruptLevel_Set(USART_data.usart, USART_RXCINTLVL_LO_gc);
+	USART_RxdInterruptLevel_Set(USART_data.usart, USART_RXCINTLVL_HI_gc);
 	
 	// Set baudrate to 9600 bps; scale factor is set to zero
 	// BSEL = ((I/O clock frequency)/(2^(ScaleFactor)*16*Baudrate))-1
@@ -518,7 +517,7 @@ bool USART_RXComplete(USART_data_t * usart_data)
 	uint8_t tempRX_Tail = bufPtr->RX_Tail;
 	uint8_t data = usart_data->usart->DATA;
 
-	if (tempRX_Head == tempRX_Tail) {
+	if(tempRX_Head == tempRX_Tail){
 	  	ans = false;
 	}else{
 		ans = true;
