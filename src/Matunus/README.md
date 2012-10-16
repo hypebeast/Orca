@@ -17,10 +17,13 @@ TODO
 ## Installation
 
 1. Clone the repository
+
 	$ git clone https://github.com/hypebeast/Orca.git Orca
 	$ cd Orca/src/Matunus
+
 2. Make sure that you have all dependencies installed. See the section 'Requirements' for more information. Install instructions for PyQwt can be found here: http://pyqwt.sourceforge.net/download.html
 3. Run Matunus:
+	
 	$ pyton matunus.py.
 
 Note: If you have more than one Python version installed use the start.cmd (Windows) script and point to your Python 2.6.x binary.
