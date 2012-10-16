@@ -18,3 +18,27 @@
 
 __author__ = 'Sebastian Ruml'
 
+
+try:
+    from PyQt4 import QtGui, QtCore
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
+
+import defs
+
+
+class HardwareSettingsPage(QtGui.QWidget):
+    def __init__(self, controllerManager=None):
+        super(HardwareSettingsPage, self).__init__()
+
+        if controllerManager is None:
+            raise Exception
+
+        self.controllerManager = controllerManager
+        self.app_defs = defs.AppDefs()
+        self._createUi()
+
+    def _createUi(self):
+    	pass

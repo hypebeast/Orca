@@ -21,7 +21,7 @@ __author__ = 'Sebastian Ruml'
 import os
 
 try:
-    from PyQt4 import QtGui, QtCore, QtSvg
+    from PyQt4 import QtGui, QtCore, QtSvg, QtXml
     from PyQt4.Qt import Qt
 except ImportError:
     print "No PyQt found!"
@@ -29,13 +29,50 @@ except ImportError:
     sys.exit(2)
 
 import defs
+from SvgDocument import SvgDocument
 
 
-class BoardStatusGadget(QtGui.QWidget):
-	def __init__(self):
-		super(BoardStatusGadget, self).__init__()
+class UavStatusGadget(QtGui.QWidget):
+    """
+    SVG widget for displaying the basic UAV status.
+    """
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
 
-		self._initUI()
+        self.app_defs = defs.AppDefs()
+        fileName = os.path.join(self.app_defs.ArtworkPath, "flight_controller_status.svg")
+
+        self.svgDocument = SvgDocument(fileName)
+
+        self.linkElement = self.svgDocument.elementById("linkStatus").toElement()
+
+        self._initUI()
 
     def _initUI(self):
-    	pass
+        self.setMinimumWidth(100)
+        self.setMinimumHeight(100)
+
+    def paintEvent(self, e):
+        qp = QtGui.QPainter()
+        qp.begin(self)
+        self._drawWidget(qp)
+        qp.end()
+
+    def _drawWidget(self, qp):
+        svgRenderer = QtSvg.QSvgRenderer()
+        svgRenderer.load(self.svgDocument.document.toByteArray())
+        svgRenderer.render(qp)
+
+    def setLinkStatus(self, enabled=False):
+        color = "#FF0000"
+        if enabled:
+            color = "#00ff00"
+        else:
+            color = "#FF0000"
+
+        styleText = str(self.linkElement.attribute("style"))
+        # Find and replace the 'fill' text
+        startIndex = styleText.find("fill:")
+        newStyleText = styleText.replace(styleText[startIndex:startIndex+12], "fill:"+color)
+
+        self.linkElement.setAttribute(QtCore.QString("style"), QtCore.QString(newStyleText))

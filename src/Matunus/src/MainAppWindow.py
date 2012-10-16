@@ -112,9 +112,9 @@ class MainAppWindow(QtGui.QMainWindow):
 
             # Find available COM ports
             self.availableComPorts = list()
-            ports = utils.enumerate_serial_ports()
-            for i, port in enumerate(ports):
-                self.availableComPorts.append(port)
+            #ports = utils.enumerate_serial_ports()
+            #for i, port in enumerate(ports):
+                #self.availableComPorts.append(port)
         elif os.name == 'posix':
             self.comPorts = [{"name": u"/dev/ttys0", "value": 0},
                              {"name": u"/dev/ttys1", "value": 1},

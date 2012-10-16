@@ -28,6 +28,8 @@ except ImportError:
     sys.exit(2)
 
 from StatusLabel import StatusLabel
+from UavStatusGadget import UavStatusGadget
+
 
 class InfoPanel(QtGui.QWidget):
 	def __init__(self, comPorts, boardController):
@@ -36,8 +38,8 @@ class InfoPanel(QtGui.QWidget):
 		self.comPorts = comPorts
 		self.boardController = boardController
 
-		self.setMinimumWidth(300)
-		self.setMaximumWidth(300)
+		self.setMinimumWidth(320)
+		self.setMaximumWidth(320)
 
 		# Create the UI
 		self._createUi()
@@ -86,6 +88,13 @@ class InfoPanel(QtGui.QWidget):
 		self.systemMessage = StatusLabel()
 		self.mainLayout.addWidget(self.systemMessage)
 
+		# UAV status overview
+		self.uavStatusGadget = UavStatusGadget()
+		self.uavStatusGadget.setMinimumWidth(300)
+		self.uavStatusGadget.setMinimumHeight(250)
+		self.uavStatusGadget.setLinkStatus(False)
+		self.mainLayout.addWidget(self.uavStatusGadget)
+
 		self.mainLayout.addStretch()
 		self.setLayout(self.mainLayout)
 
@@ -95,9 +104,11 @@ class InfoPanel(QtGui.QWidget):
 	def _onbConnectClicked(self):
 		if not self.boardController.connected():
 			self.cbComPort.setEnabled(False)
+			self.uavStatusGadget.setLinkStatus(False)
 			self.bConnect.setText("Disconnect")
 		else:
 			self.cbComPort.setEnabled(True)
+			self.uavStatusGadget.setLinkStatus(True)
 			self.bConnect.setText("Connect")
 
 	def paintEvent(self, e):

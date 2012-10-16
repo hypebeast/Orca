@@ -76,7 +76,7 @@ def enumerate_serial_ports():
     try:
         key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
     except WindowsError:
-        raise IterationError
+        raise Exception
 
     for i in itertools.count():
         try:

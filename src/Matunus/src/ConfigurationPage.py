@@ -21,20 +21,19 @@ __author__ = 'Sebastian Ruml'
 
 import os
 
-from PyQt4 import QtGui, QtCore
-
-#try:
-#    from PyQt4 import QtGui, QtCore
-#except ImportError:
-#    print "No PyQt found!"
-#    import sys
-#    sys.exit(2)
+try:
+    from PyQt4 import QtGui, QtCore
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
 from OutputPage import OutputPage
 from ReceiverPage import ReceiverPage
 from AttitudePage import AttitudePage
 from GpsPage import GpsPage
 from StabilizationPage import StabilizationPage
+from HardwareSettingsPage import HardwareSettingsPage
 
 import defs
 
@@ -48,14 +47,17 @@ class ConfigurationPage(QtGui.QWidget):
 
         self.controllerManager = controllerManager
         self.app_defs = defs.AppDefs()
-        self.createUi()
+        self._createUi()
 
-    def createUi(self):
+    def _createUi(self):
         self.mainLayout = QtGui.QHBoxLayout()
         #self.mainLayout.setMargin(20)
 
         # Left side panel (navigation bar)
         model = QtGui.QStandardItemModel()
+        icon = QtGui.QIcon(os.path.join(self.app_defs.IconsPath, "hw_config.png"))
+        item = QtGui.QStandardItem(icon, "HW Settings")
+        model.appendRow(item)
         icon = QtGui.QIcon(os.path.join(self.app_defs.IconsPath, "Transmitter.png"))
         item = QtGui.QStandardItem(icon, "Input")
         model.appendRow(item)
@@ -85,6 +87,9 @@ class ConfigurationPage(QtGui.QWidget):
 
         # Main Container and all pages
         self.mainContainer = QtGui.QStackedLayout()
+
+        page = HardwareSettingsPage(self.controllerManager)
+        self.mainContainer.addWidget(page)
 
         page = ReceiverPage()
         self.mainContainer.addWidget(page)

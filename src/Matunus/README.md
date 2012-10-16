@@ -27,7 +27,7 @@ The following libraries are needed in order ro run Matunus:
 
 Make sure that you have all dependencies installed. See the section 'Requirements' for more information. Install instructions for PyQwt can be found here: http://pyqwt.sourceforge.net/download.html
 
-### 3. Run Matunus:
+### 3. Run Matunus
 
 To run Matunus, type the following in your command line:
 	
