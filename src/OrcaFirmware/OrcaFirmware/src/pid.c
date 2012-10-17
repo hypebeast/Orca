@@ -27,14 +27,13 @@ void pid_Init(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_D
   pid->sumError = 0;   
   pid->lastProcessValue = 0;   
   // Tuning constants for PID loop   
-  pid->P_Factor = p_factor;   
-  pid->I_Factor = i_factor;   
-  pid->D_Factor = d_factor;   
+  pid->P_Factor = p_factor * PID_SCALING_FACTOR;   
+  pid->I_Factor = i_factor * PID_SCALING_FACTOR;   
+  pid->D_Factor = d_factor * PID_SCALING_FACTOR;   
   // Limits to avoid overflow   
   pid->maxError = MAX_INT / (pid->P_Factor + 1);   
   pid->maxSumError = MAX_I_TERM / (pid->I_Factor + 1);   
-}   
-   
+} 
    
 /*! \brief PID control algorithm.  
  *  
@@ -88,7 +87,7 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
    
   pid_st->lastProcessValue = processValue;   
    
-  ret = (p_term + i_term + d_term) / SCALING_FACTOR;   
+  ret = (p_term + i_term + d_term) / PID_SCALING_FACTOR;   
   if(ret > MAX_INT){   
     ret = MAX_INT;   
   }   
@@ -106,4 +105,27 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
 void pid_Reset_Integrator(pidData_t *pid_st)   
 {   
   pid_st->sumError = 0;   
+}
+
+
+/**************************************************************************
+* \brief PID Update Tuning Constants
+*
+* Call this method to update the p, i and d factor of the PID controller.
+*
+* \param p_factor P factor tuning constant
+* \param i_factor I factor tuning constant
+* \param d_factor D factor tuning constant
+* \param *pid PID controller data structure
+*
+* \return  status code
+***************************************************************************/
+void pid_update_tuning_constants(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_DATA *pid)
+{
+	pid->P_Factor = p_factor * PID_SCALING_FACTOR;
+	pid->I_Factor = i_factor * PID_SCALING_FACTOR;
+	pid->D_Factor = d_factor * PID_SCALING_FACTOR;
+	
+	pid->maxError = MAX_INT / (pid->P_Factor + 1);
+	pid->maxSumError = MAX_I_TERM / (pid->I_Factor + 1);
 }   

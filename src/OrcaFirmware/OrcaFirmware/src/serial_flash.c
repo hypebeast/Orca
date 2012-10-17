@@ -28,6 +28,7 @@
 #include "at45dbx.h"
 #include "serial_flash.h"
 #include "filters.h"
+#include "flight_controller.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Variables
@@ -183,7 +184,10 @@ uint16_t serial_flash_init(void)
 	settings->Q_angle = FILTER_Q_ANGLE_CONF;
 	settings->R_angle = FILTER_R_ANGLE_CONF;
 	settings->Q_gyro = FILTER_Q_GYRO_CONF;
-	   
+	settings->pid_roll_p_factor = PID_ROLL_P_FACTOR_CONF;   
+	settings->pid_roll_i_factor = PID_ROLL_I_FACTOR_CONF; 
+	settings->pid_roll_d_factor = PID_ROLL_D_FACTOR_CONF;
+	 
 	/* Write to serial flash */
 	serial_flash_save_settings();
 	

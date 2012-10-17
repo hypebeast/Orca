@@ -32,6 +32,10 @@ typedef struct ORCA_FLASH_SETTINGS
 	float Q_angle;				/*!< brief Startup prozess covariance. In this case, it indicates how much we trust the accelerometer relative to the gyros. */
 	float Q_gyro;				/*!< brief Startup prozess covariance. In this case, it indicates how much we trust the accelerometer relative to the gyros. */
 	float R_angle;				/*!< brief Startup covariance, our observation noise from the accelerometer. */
+	/* PID controller settings */
+	int16_t pid_roll_p_factor;	/*!< brief Startup p factor for the roll PID controller. */
+	int16_t pid_roll_i_factor;	/*!< brief Startup i factor for the roll PID controller. */
+	int16_t pid_roll_d_factor;	/*!< brief Startup d factor for the roll PID controller. */
 } ORCA_FLASH_SETTINGS_t;
 
 

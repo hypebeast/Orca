@@ -53,7 +53,7 @@ int16_t actuatingRoll = 0;
 *
 * \\return  ---
 ***************************************************************************/
-void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController)
+void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settings, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController)
 {
 	//TODO: Do all init stuff here
 	
@@ -66,7 +66,7 @@ void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FILTER_DAT
 	}		
 	
 	/* Roll PID Init */
-	pid_Init(128,128,128,&rollPid);	
+	pid_Init(settings->pid_roll_p_factor, settings->pid_roll_i_factor, settings->pid_roll_d_factor, &rollPid);	
 }	
 
 /**************************************************************************
@@ -215,6 +215,24 @@ int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 		flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH;	
 		
 	return SYSTEM_INFO_TRUE;	
+}
+
+/**************************************************************************
+* \brief Flight Controller Update PID Controller
+*
+* Call this method to update the setting of the specified PID Controller.
+*
+* \TODO: Auf mehrere PID Regler erweitern!
+*
+* \param p_factor P factor tuning constant
+* \param i_factor I factor tuning constant
+* \param d_factor D factor tuning constant
+*
+* \return  status code
+***************************************************************************/
+void flight_controller_update_pid_controller(int16_t p_factor, int16_t i_factor, int16_t d_factor)
+{
+	pid_update_tuning_constants(p_factor, i_factor, d_factor, &rollPid);
 }
 
 /**************************************************************************

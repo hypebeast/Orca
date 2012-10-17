@@ -10,7 +10,7 @@
 #define FILTERS_H_
 
 //---------------------------------------------------------------------
-//	MPU 6000 Startup Settings
+//	Roll Filter Startup Settings
 //  Edit this settings for different configurations
 //---------------------------------------------------------------------
 #define FILTER_R_ANGLE_CONF			0.69f		/*!< brief Startup covariance, our observation noise from the accelerometer. */
