@@ -65,7 +65,7 @@ class ControllerManager(QObject):
         # Status reader
 		self.statusReaderThread = None
 		self.statusReaderIsAlive = False
-		self.statusReaderUpdateInterval = 1.0 # Update interval in seconds
+		self.statusReaderUpdateInterval = 0.5 # Update interval in seconds
 
         # Status queries
 		self.status_queries = [
@@ -129,7 +129,7 @@ class ControllerManager(QObject):
 		Sends status requests to the flight controller board.
 		"""
 		while self.statusReaderIsAlive:
-			self._logger.debug("Sending new status query")
+			#self._logger.debug("Sending new status query")
 			message = GetBoardStatusMessage()
 			self.serial.writeMessage(message)
 
@@ -152,8 +152,7 @@ class ControllerManager(QObject):
 		connection.
 		"""
 		self.boardStatus.updateDataFromMessage(message, timestamp)
-
-		self.boardStatus.printStatus()
+		#self.boardStatus.printStatus()
 
 		# Emit signal
 		self.board_status_updated.emit()

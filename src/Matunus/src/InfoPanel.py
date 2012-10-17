@@ -21,7 +21,7 @@
 __author__ = 'Sebastian Ruml'
 
 try:
-    from PyQt4 import QtGui, QtCore
+    from PyQt4 import QtGui
 except ImportError:
     print "No PyQt found!"
     import sys
@@ -99,16 +99,16 @@ class InfoPanel(QtGui.QWidget):
 		self.setLayout(self.mainLayout)
 
 	def _onComPortChanged(self):
-		self.boardController.set_serial_port(self.comPorts[index])
+		self.boardController.set_serial_port(self.comPorts[self.cbComPort.currentIndex()])
 
 	def _onbConnectClicked(self):
 		if not self.boardController.connected():
 			self.cbComPort.setEnabled(False)
-			self.uavStatusGadget.setLinkStatus(False)
+			self.uavStatusGadget.setLinkStatus(True)
 			self.bConnect.setText("Disconnect")
 		else:
 			self.cbComPort.setEnabled(True)
-			self.uavStatusGadget.setLinkStatus(True)
+			self.uavStatusGadget.setLinkStatus(False)
 			self.bConnect.setText("Connect")
 
 	def paintEvent(self, e):

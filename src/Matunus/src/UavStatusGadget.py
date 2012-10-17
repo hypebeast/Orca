@@ -21,8 +21,7 @@ __author__ = 'Sebastian Ruml'
 import os
 
 try:
-    from PyQt4 import QtGui, QtCore, QtSvg, QtXml
-    from PyQt4.Qt import Qt
+    from PyQt4 import QtGui, QtCore, QtSvg
 except ImportError:
     print "No PyQt found!"
     import sys
@@ -76,3 +75,6 @@ class UavStatusGadget(QtGui.QWidget):
         newStyleText = styleText.replace(styleText[startIndex:startIndex+12], "fill:"+color)
 
         self.linkElement.setAttribute(QtCore.QString("style"), QtCore.QString(newStyleText))
+
+        # Repaint the widget
+        self.repaint()

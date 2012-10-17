@@ -116,7 +116,7 @@ class BaseMessage:
         package.extend(struct.pack("B", self.messageType))
         # Command type
         package.extend(struct.pack("H", self.commandType))
-        # Data length
+        # Data length 
         package.extend(struct.pack("B", len(data)))
         # Encode the data
         self._packData(package, data)
@@ -137,7 +137,6 @@ class BaseMessage:
 
         # Encode all arguments
         for argument in data:
-            format = argument["format"]
             package.extend(struct.pack(argument["format"], argument["value"]))
 
     def _calcCrc(self, package, data):
@@ -244,8 +243,8 @@ class GetBoardStatusMessage(BaseMessage):
 
     @staticmethod
     def fromPacket(package):
-        hexvalues = ''.join('%02x' % ord(byte) for byte in package)
-        print "Status message: " + hexvalues
+        #hexvalues = ''.join('%02x' % ord(byte) for byte in package)
+        #print "Status message: " + hexvalues
 
         # Check for the right command type
         command_type = struct.unpack_from("H", package, 2)

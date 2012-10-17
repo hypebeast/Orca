@@ -122,8 +122,6 @@ class BoardStatus(object):
 		else:
 			return
 
-		#self.hasNewData = True
-
 	@property
 	def outputChannel1(self):
 		return self.getValue('outputChannel1')

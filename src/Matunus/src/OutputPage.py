@@ -44,6 +44,7 @@ class OutputPage(QtGui.QWidget):
             raise Exception
             
         self.controller = controller
+        self.controller.board_status_updated.connect(self._onStatusUpdated)
         self.createUi()
 
     def createUi(self):
@@ -52,53 +53,63 @@ class OutputPage(QtGui.QWidget):
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Foreground, QtGui.QColor(111, 88, 100))
 
-        # Servo 1
+        # Channel 1
         groupBox1 = QtGui.QGroupBox("Channel 1")
         groupBox1.setMinimumHeight(70)
-        self.servo1Control = ServoControlWidget(self.controller, servo_nr=1)
+        self.channel1Control = ServoControlWidget(self.controller, servo_nr=1)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
-        hBox.addWidget(self.servo1Control)
+        hBox.addWidget(self.channel1Control)
         groupBox1.setLayout(hBox)
         mainLayout.addWidget(groupBox1)
 
-        # Servo 2
+        # Channel 2
         groupBox2 = QtGui.QGroupBox("Channel 2")
         groupBox2.setMinimumHeight(70)
-        self.servo2Control = ServoControlWidget(self.controller, servo_nr=2)
+        self.channel2Control = ServoControlWidget(self.controller, servo_nr=2)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
-        hBox.addWidget(self.servo2Control)
+        hBox.addWidget(self.channel2Control)
         groupBox2.setLayout(hBox)
         mainLayout.addWidget(groupBox2)
 
-        # Engine 1 (left)
+        # Channel 3
         groupBox = QtGui.QGroupBox("Channel 3")
         groupBox.setMinimumHeight(70)
-        self.engine1Control = EngineControlWidget(self.controller, engine_nr=1)
+        self.channel3Control = ServoControlWidget(self.controller, servo_nr=3)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
-        hBox.addWidget(self.engine1Control)
+        hBox.addWidget(self.channel3Control)
         groupBox.setLayout(hBox)
         mainLayout.addWidget(groupBox)
 
-        # Engine 2 (right)
+        # Channel 4
         groupBox = QtGui.QGroupBox("Channel 4")
         groupBox.setMinimumHeight(70)
-        self.engine1Control = EngineControlWidget(self.controller, engine_nr=2)
+        self.channel4Control = ServoControlWidget(self.controller, servo_nr=4)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
-        hBox.addWidget(self.engine1Control)
+        hBox.addWidget(self.channel4Control)
         groupBox.setLayout(hBox)
         mainLayout.addWidget(groupBox)
 
-        # Engine 3 (rear)
+        # Channel 5
         groupBox = QtGui.QGroupBox("Channel 5")
         groupBox.setMinimumHeight(70)
-        self.engine1Control = EngineControlWidget(self.controller, engine_nr=3)
+        self.channel5Control = ServoControlWidget(self.controller, servo_nr=5)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
-        hBox.addWidget(self.engine1Control)
+        hBox.addWidget(self.channel5Control)
+        groupBox.setLayout(hBox)
+        mainLayout.addWidget(groupBox)
+
+        # Channel 6
+        groupBox = QtGui.QGroupBox("Channel 6")
+        groupBox.setMinimumHeight(70)
+        self.channel6Control = ServoControlWidget(self.controller, servo_nr=6)
+        hBox = QtGui.QHBoxLayout()
+        hBox.setMargin(2)
+        hBox.addWidget(self.channel6Control)
         groupBox.setLayout(hBox)
         mainLayout.addWidget(groupBox)
 
@@ -122,3 +133,12 @@ class OutputPage(QtGui.QWidget):
 
     def update(self, data):
         pass
+
+    def _onStatusUpdated(self):
+        self.channel1Control.updateServoPosition(self.controller.boardStatus.outputChannel1[0])
+        self.channel2Control.updateServoPosition(self.controller.boardStatus.outputChannel2[0])
+        self.channel3Control.updateServoPosition(self.controller.boardStatus.outputChannel3[0])
+        self.channel4Control.updateServoPosition(self.controller.boardStatus.outputChannel4[0])
+        self.channel5Control.updateServoPosition(self.controller.boardStatus.outputChannel5[0])
+        self.channel6Control.updateServoPosition(self.controller.boardStatus.outputChannel6[0])
+        
