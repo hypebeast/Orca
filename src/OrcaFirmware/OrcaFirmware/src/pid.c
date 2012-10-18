@@ -27,9 +27,9 @@ void pid_Init(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_D
   pid->sumError = 0;   
   pid->lastProcessValue = 0;   
   // Tuning constants for PID loop   
-  pid->P_Factor = p_factor * PID_SCALING_FACTOR;   
-  pid->I_Factor = i_factor * PID_SCALING_FACTOR;   
-  pid->D_Factor = d_factor * PID_SCALING_FACTOR;   
+  pid->P_Factor = p_factor /** PID_SCALING_FACTOR*/;   
+  pid->I_Factor = i_factor /** PID_SCALING_FACTOR*/;   
+  pid->D_Factor = d_factor /** PID_SCALING_FACTOR*/;   
   // Limits to avoid overflow   
   pid->maxError = MAX_INT / (pid->P_Factor + 1);   
   pid->maxSumError = MAX_I_TERM / (pid->I_Factor + 1);   
@@ -51,16 +51,18 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
    
    	/* Calculate time elapsed since last call (dt) */
 	/*please note that overflows are ok, since for example 0x0001 - 0x00FE will be equal to 2 */
-	ta = (float)(time - pidLastMicros) / 1000000;	
-	pidLastMicros = time;	
-	
+	ta = (float)(time) / 1000000;	
+
+	//ta = (float)(time - pidLastMicros) / 1000000;
+	//pidLastMicros = time;
+		
   error = setPoint - processValue;   
    
   // Calculate Pterm and limit error overflow   
   if (error > pid_st->maxError){   
     p_term = MAX_INT;   
   }   
-  else if (error  -pid_st->maxError){   
+  else if (error < -pid_st->maxError){   
     p_term = -MAX_INT;   
   }   
   else{   
@@ -73,7 +75,7 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
     i_term = MAX_I_TERM;   
     pid_st->sumError = pid_st->maxSumError;   
   }   
-  else if(temp  -pid_st->maxSumError){   
+  else if(temp  < -pid_st->maxSumError){   
     i_term = -MAX_I_TERM;   
     pid_st->sumError = -pid_st->maxSumError;   
   }   
@@ -91,7 +93,7 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
   if(ret > MAX_INT){   
     ret = MAX_INT;   
   }   
-  else if(ret  -MAX_INT){   
+  else if(ret < -MAX_INT){   
     ret = -MAX_INT;   
   }   
    

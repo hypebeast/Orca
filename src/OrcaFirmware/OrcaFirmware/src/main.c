@@ -53,8 +53,9 @@ int main (void)
 	orca_init();
 	
 	user_interface_stat_led_pattern(USER_INTERFACE_LED_BLINKING);
+	
 	/* Uncomment this method to restore the factory settings on the next startup */
-	//serial_flash_factory_reset();
+	serial_flash_write_factory_settings();
 	
 	/* Calibrate the accelerometer and the gyroscopes */
 	mpu_6000_calibrate();
