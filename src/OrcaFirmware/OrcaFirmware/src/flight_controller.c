@@ -42,6 +42,7 @@
 pidData_t rollPid;
 FILTER_DATA_t *actualSensorData;
 int16_t actuatingRoll = 0;
+float rollSetValue = 0;
 
 /**************************************************************************
 * \\brief Flight Controller Initialization
@@ -79,7 +80,6 @@ void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settin
 ***************************************************************************/
 int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 {
-	float rollSetValue = 0;
 	float rollSensorValue = 0;
 
 	
@@ -87,10 +87,8 @@ int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 	rollSetValue = ((float)(flightController->rcServoIn->servo2)-1534) * 
 					(float)(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
 	
-	rollSetValue *= 10;
-	rollSensorValue = (actualSensorData->roll) *10;
 	/*  */
-	actuatingRoll = pid_Controller((int16_t)rollSetValue, (int16_t)rollSensorValue, 10000, &rollPid) / 10;	
+	actuatingRoll = pid_Controller((int16_t)(rollSetValue * 10), (int16_t)(actualSensorData->roll * 10), 10000, &rollPid) / 10;	
 }
 
 /**************************************************************************
@@ -233,6 +231,50 @@ int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 void flight_controller_update_pid_controller(int16_t p_factor, int16_t i_factor, int16_t d_factor)
 {
 	pid_update_tuning_constants(p_factor, i_factor, d_factor, &rollPid);
+}
+
+/**************************************************************************
+* \brief Flight Controller Get Actuating Roll
+*
+*  Returns the actuating roll angle in degrees. This is the value calculated
+*  by the PID controller.
+*
+* \param -
+*
+* \return  actuating roll angle
+***************************************************************************/
+float flight_controller_get_actuating_roll_angle(void)
+{
+	return actuatingRoll;
+}
+
+/**************************************************************************
+* \brief Flight Controller Get Actuating Roll
+*
+*  Returns the estimated roll angle in degrees.
+*
+* \param -
+*
+* \return  actuating roll angle
+***************************************************************************/
+float flight_controller_get_sensor_roll_angle(void)
+{
+	return actualSensorData->roll;
+}
+
+/**************************************************************************
+* \brief Flight Controller Get Set Roll Angle
+*
+*  Returns the set roll angle in degrees. The angle is calculated from the 
+*  servo input signals.
+*
+* \param -
+*
+* \return  set roll angle
+***************************************************************************/
+float flight_controller_get_set_roll_angle(void)
+{
+	return rollSetValue;
 }
 
 /**************************************************************************

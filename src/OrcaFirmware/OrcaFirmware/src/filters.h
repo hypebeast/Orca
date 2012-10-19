@@ -64,6 +64,7 @@ typedef struct FILTER_DATA{
 }FILTER_DATA_t;
 
 void filter_init(FILTER_DATA_t *filter, float Q_angle, float Q_gyro, float R_angle);
+void filter_update_constants(float Q_angle, float Q_gyro, float R_angle);
 void filter_task(unsigned long time);
 
 #endif /* FILTERS_H_ */

@@ -369,6 +369,84 @@ uint8_t mpu_6000_save_data_to_filter(FILTER_DATA_t *filter)
 }
 
 /**************************************************************************
+* \\brief MPU 6000 Get x acceleration
+*	Returns the x acceleration in g. /n
+*
+* \\param ---
+*
+* \\return  x acceleration
+***************************************************************************/
+float mpu_6000_get_x_acc(void)
+{
+	return mpu->xAcc;
+}
+
+/**************************************************************************
+* \\brief MPU 6000 Get y acceleration
+*	Returns the y acceleration in g. /n
+*
+* \\param ---
+*
+* \\return  y acceleration
+***************************************************************************/
+float mpu_6000_get_y_acc(void)
+{
+	return mpu->yAcc;
+}
+
+/**************************************************************************
+* \\brief MPU 6000 Get z acceleration
+*	Returns the z acceleration in g. /n
+*
+* \\param ---
+*
+* \\return  z acceleration
+***************************************************************************/
+float mpu_6000_get_z_acc(void)
+{
+	return mpu->zAcc;
+}
+
+/**************************************************************************
+* \\brief MPU 6000 Get x Gyroscope
+*	Returns the x-rate of rotation in deg/s /n
+*
+* \\param ---
+*
+* \\return  x rate
+***************************************************************************/
+float mpu_6000_get_x_gyr(void)
+{
+	return mpu->xGyr;
+}
+
+/**************************************************************************
+* \\brief MPU 6000 Get y Gyroscope
+*	Returns the y-rate of rotation in deg/s /n
+*
+* \\param ---
+*
+* \\return  y rate
+***************************************************************************/
+float mpu_6000_get_y_gyr(void)
+{
+	return mpu->yGyr;
+}
+
+/**************************************************************************
+* \\brief MPU 6000 Get z Gyroscope
+*	Returns the z-rate of rotation in deg/s /n
+*
+* \\param ---
+*
+* \\return  z rate
+***************************************************************************/
+float mpu_6000_get_z_gyr(void)
+{
+	return mpu->zGyr;
+}
+
+/**************************************************************************
 * \\brief MPU 6000 get new data
 *	Get the acceleration and rate of rotation measurements from the mpu,
 *   convert and save the new value in the mpu struct . /n

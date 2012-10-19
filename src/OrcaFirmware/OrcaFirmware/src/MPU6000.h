@@ -204,4 +204,11 @@ uint8_t mpu_6000_get_new_data(void);
 uint8_t mpu_6000_task(void);
 uint8_t mpu_6000_calibrate(void);
 uint8_t mpu_6000_save_data_to_filter(FILTER_DATA_t *filter);
+float mpu_6000_get_x_acc(void);
+float mpu_6000_get_y_acc(void);
+float mpu_6000_get_z_acc(void);
+float mpu_6000_get_x_gyr(void);
+float mpu_6000_get_y_gyr(void);
+float mpu_6000_get_z_gyr(void);
+
 #endif /* MPU6000_H_ */

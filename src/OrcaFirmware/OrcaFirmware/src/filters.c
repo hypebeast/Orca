@@ -31,6 +31,13 @@ void filter_init(FILTER_DATA_t *filter, float Q_angle, float Q_gyro, float R_ang
 	filterdata->R_angle = R_angle;
 }
 
+void filter_update_constants(float Q_angle, float Q_gyro, float R_angle)
+{	
+	filterdata->Q_angle = Q_angle;
+	filterdata->Q_gyro  = Q_gyro;
+	filterdata->R_angle = R_angle;
+}
+
 /*
  * The predict function. Updates 2 variables:
  * our model-state x and the 2x2 matrix P
