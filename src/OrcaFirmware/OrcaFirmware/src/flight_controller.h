@@ -23,8 +23,8 @@
 //	Roll Filter Startup Settings
 //  Edit this settings for different configurations
 //---------------------------------------------------------------------
-#define PID_ROLL_P_FACTOR_CONF			5		/*!< brief Default p factor for the roll PID controller. */
-#define PID_ROLL_I_FACTOR_CONF			2		/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_P_FACTOR_CONF			4000	/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_I_FACTOR_CONF			10		/*!< brief Default p factor for the roll PID controller. */
 #define PID_ROLL_D_FACTOR_CONF			2		/*!< brief Default p factor for the roll PID controller. */
 
 //---------------------------------------------------------------------

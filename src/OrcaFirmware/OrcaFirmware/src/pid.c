@@ -81,11 +81,11 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
   }   
   else{   
     pid_st->sumError = temp;   
-    i_term = (uint16_t)((float)(pid_st->I_Factor) * (float)(pid_st->sumError) * ta);   
+    i_term = (int32_t)((float)(pid_st->I_Factor) * (float)(pid_st->sumError) * ta);   
   }   
    
   // Calculate Dterm   
-  d_term = (uint16_t)((float)(pid_st->D_Factor) * ((float)processValue - (float)(pid_st->lastProcessValue)) / ta);   
+  d_term = (int32_t)((float)(pid_st->D_Factor) * ((float)processValue - (float)(pid_st->lastProcessValue)) / ta);   
    
   pid_st->lastProcessValue = processValue;   
    

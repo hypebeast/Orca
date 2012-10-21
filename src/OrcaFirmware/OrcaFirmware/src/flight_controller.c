@@ -80,9 +80,6 @@ void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settin
 ***************************************************************************/
 int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 {
-	float rollSensorValue = 0;
-
-	
 	/* Sollwert für Rollwinkel berechnen. Sollwert wird von der Fernsteuerung vorgegeben. */
 	rollSetValue = ((float)(flightController->rcServoIn->servo2)-1534) * 
 					(float)(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
@@ -107,9 +104,9 @@ int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController)
 	//if(flightController->rcServoIn->servo2 > FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
 		//flightController->leftEdfSetPoint -= (flightController->rcServoIn->servo2
 												//- FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_AILERON_FACTOR;
-	if(actuatingRoll<0)
+	if(actuatingRoll>0)
 	{
-		flightController->leftEdfSetPoint -= (uint16_t)(-1 *actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		flightController->leftEdfSetPoint -= (uint16_t)(actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
 	}
 	 
 	return SYSTEM_INFO_TRUE;	
@@ -131,9 +128,9 @@ int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController)
 	//if(flightController->rcServoIn->servo2 < FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
 		//flightController->rightEdfSetPoint -= (FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH
 												//- flightController->rcServoIn->servo2)*FLIGHT_CONTROLLER_AILERON_FACTOR;
-	if(actuatingRoll>0)
+	if(actuatingRoll<0)
 	{
-		flightController->rightEdfSetPoint -= (uint16_t)(actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
 	}	
 	return SYSTEM_INFO_TRUE;	
 }
