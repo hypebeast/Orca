@@ -53,8 +53,9 @@ int main (void)
 	orca_init();
 	
 	user_interface_stat_led_pattern(USER_INTERFACE_LED_BLINKING);
+	
 	/* Uncomment this method to restore the factory settings on the next startup */
-	//serial_flash_factory_reset();
+	serial_flash_write_factory_settings();
 	
 	/* Calibrate the accelerometer and the gyroscopes */
 	mpu_6000_calibrate();
@@ -119,7 +120,7 @@ void orca_init(void)
 	servo_init();
 	
 	/* flight controller subsystem init */
-	flight_controller_init(&board, &servoInput, &orcafilter, &flightController);
+	flight_controller_init(&board, &orcaSettings, &servoInput, &orcafilter, &flightController);
 
 	/* Initialize the serial interface */
 	serial_api_init();

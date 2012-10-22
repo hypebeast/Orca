@@ -11,12 +11,21 @@
 
 #include "servo_in.h"
 #include "filters.h"
+#include "serial_flash.h"
 
 //---------------------------------------------------------------------
 //	Supported Flight Controller Modes
 //---------------------------------------------------------------------
 #define FLIGHT_CONTROLLER_MODE_RC		(0x01<<0)		/*!< brief External RC controlled */
 #define FLIGHT_CONTROLLER_MODE_AUTOMATIC (0x01<<1)		/*!< brief Automatic mode */
+
+//---------------------------------------------------------------------
+//	Roll Filter Startup Settings
+//  Edit this settings for different configurations
+//---------------------------------------------------------------------
+#define PID_ROLL_P_FACTOR_CONF			4000	/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_I_FACTOR_CONF			10		/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_D_FACTOR_CONF			2		/*!< brief Default p factor for the roll PID controller. */
 
 //---------------------------------------------------------------------
 //	General Servo Definitions
@@ -64,7 +73,7 @@ typedef struct FLIGHT_CONTROLLER {
 }FLIGHT_CONTROLLER_t;
 
 
-void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController);
+void flight_controller_init(BOARD_CONFIG_t *board,ORCA_FLASH_SETTINGS_t *settings, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_left_servo(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController);
@@ -72,4 +81,9 @@ int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_task(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController);
+void flight_controller_update_pid_controller(int16_t p_factor, int16_t i_factor, int16_t d_factor);
+float flight_controller_get_actuating_roll_angle(void);
+float flight_controller_get_set_roll_angle(void);
+float flight_controller_get_sensor_roll_angle(void);
+
 #endif /* FLIGHT_CONTROLLER_H_ */

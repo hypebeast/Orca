@@ -10,7 +10,7 @@
 #define FILTERS_H_
 
 //---------------------------------------------------------------------
-//	MPU 6000 Startup Settings
+//	Roll Filter Startup Settings
 //  Edit this settings for different configurations
 //---------------------------------------------------------------------
 #define FILTER_R_ANGLE_CONF			0.69f		/*!< brief Startup covariance, our observation noise from the accelerometer. */
@@ -64,6 +64,7 @@ typedef struct FILTER_DATA{
 }FILTER_DATA_t;
 
 void filter_init(FILTER_DATA_t *filter, float Q_angle, float Q_gyro, float R_angle);
+void filter_update_constants(float Q_angle, float Q_gyro, float R_angle);
 void filter_task(unsigned long time);
 
 #endif /* FILTERS_H_ */

@@ -42,6 +42,7 @@
 pidData_t rollPid;
 FILTER_DATA_t *actualSensorData;
 int16_t actuatingRoll = 0;
+float rollSetValue = 0;
 
 /**************************************************************************
 * \\brief Flight Controller Initialization
@@ -53,7 +54,7 @@ int16_t actuatingRoll = 0;
 *
 * \\return  ---
 ***************************************************************************/
-void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController)
+void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settings, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController)
 {
 	//TODO: Do all init stuff here
 	
@@ -66,7 +67,7 @@ void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FILTER_DAT
 	}		
 	
 	/* Roll PID Init */
-	pid_Init(128,128,128,&rollPid);	
+	pid_Init(settings->pid_roll_p_factor, settings->pid_roll_i_factor, settings->pid_roll_d_factor, &rollPid);	
 }	
 
 /**************************************************************************
@@ -79,18 +80,12 @@ void flight_controller_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo, FILTER_DAT
 ***************************************************************************/
 int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 {
-	float rollSetValue = 0;
-	float rollSensorValue = 0;
-
-	
 	/* Sollwert für Rollwinkel berechnen. Sollwert wird von der Fernsteuerung vorgegeben. */
-	rollSetValue = (flightController->rcServoIn->servo2) * 
-					(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
+	rollSetValue = ((float)(flightController->rcServoIn->servo2)-1534) * 
+					(float)(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
 	
-	rollSetValue *= 1000;
-	rollSensorValue = (actualSensorData->roll) *1000;
 	/*  */
-	actuatingRoll = pid_Controller((int16_t)rollSetValue, (int16_t)rollSensorValue, 10000, &rollPid) / 1000;	
+	actuatingRoll = pid_Controller((int16_t)(rollSetValue * 10), (int16_t)(actualSensorData->roll * 10), 10000, &rollPid) / 10;	
 }
 
 /**************************************************************************
@@ -109,9 +104,9 @@ int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController)
 	//if(flightController->rcServoIn->servo2 > FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
 		//flightController->leftEdfSetPoint -= (flightController->rcServoIn->servo2
 												//- FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_AILERON_FACTOR;
-	if(actuatingRoll<0)
+	if(actuatingRoll>0)
 	{
-		flightController->leftEdfSetPoint -= (uint16_t)(-1 *actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		flightController->leftEdfSetPoint -= (uint16_t)(actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
 	}
 	 
 	return SYSTEM_INFO_TRUE;	
@@ -133,9 +128,9 @@ int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController)
 	//if(flightController->rcServoIn->servo2 < FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
 		//flightController->rightEdfSetPoint -= (FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH
 												//- flightController->rcServoIn->servo2)*FLIGHT_CONTROLLER_AILERON_FACTOR;
-	if(actuatingRoll>0)
+	if(actuatingRoll<0)
 	{
-		flightController->rightEdfSetPoint -= (uint16_t)(actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
 	}	
 	return SYSTEM_INFO_TRUE;	
 }
@@ -215,6 +210,68 @@ int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 		flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH;	
 		
 	return SYSTEM_INFO_TRUE;	
+}
+
+/**************************************************************************
+* \brief Flight Controller Update PID Controller
+*
+* Call this method to update the setting of the specified PID Controller.
+*
+* \TODO: Auf mehrere PID Regler erweitern!
+*
+* \param p_factor P factor tuning constant
+* \param i_factor I factor tuning constant
+* \param d_factor D factor tuning constant
+*
+* \return  status code
+***************************************************************************/
+void flight_controller_update_pid_controller(int16_t p_factor, int16_t i_factor, int16_t d_factor)
+{
+	pid_update_tuning_constants(p_factor, i_factor, d_factor, &rollPid);
+}
+
+/**************************************************************************
+* \brief Flight Controller Get Actuating Roll
+*
+*  Returns the actuating roll angle in degrees. This is the value calculated
+*  by the PID controller.
+*
+* \param -
+*
+* \return  actuating roll angle
+***************************************************************************/
+float flight_controller_get_actuating_roll_angle(void)
+{
+	return actuatingRoll;
+}
+
+/**************************************************************************
+* \brief Flight Controller Get Actuating Roll
+*
+*  Returns the estimated roll angle in degrees.
+*
+* \param -
+*
+* \return  actuating roll angle
+***************************************************************************/
+float flight_controller_get_sensor_roll_angle(void)
+{
+	return actualSensorData->roll;
+}
+
+/**************************************************************************
+* \brief Flight Controller Get Set Roll Angle
+*
+*  Returns the set roll angle in degrees. The angle is calculated from the 
+*  servo input signals.
+*
+* \param -
+*
+* \return  set roll angle
+***************************************************************************/
+float flight_controller_get_set_roll_angle(void)
+{
+	return rollSetValue;
 }
 
 /**************************************************************************

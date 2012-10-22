@@ -11,7 +11,7 @@
 
 #include "sysclk.h"
 
-#define SCALING_FACTOR  128 
+#define PID_SCALING_FACTOR  128 
  
 /*! \brief PID Status 
  * 
@@ -50,9 +50,6 @@ typedef struct PID_DATA{
 void pid_Init(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_DATA *pid); 
 int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  time, struct PID_DATA *pid_st);
 void pid_Reset_Integrator(pidData_t *pid_st); 
- 
-
-
-
+void pid_update_tuning_constants(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_DATA *pid); 
 
 #endif /* PID_H_ */
