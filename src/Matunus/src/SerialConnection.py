@@ -22,8 +22,6 @@ __author__ = 'Sebastian Ruml'
 import serial
 import threading
 import sys
-import struct
-import binascii
 import Queue
 import time
 import array
@@ -47,7 +45,7 @@ LF_MODES = ('LF', 'CR', 'CR/LF')
 NEWLINECHARACTER = '\r\n'
 
 DEFAULT_PORT = 0
-DEFAULT_BAUDRATE = 9600
+DEFAULT_BAUDRATE = 57600
 DEFAULT_PARITY = serial.PARITY_NONE
 DEFAULT_BYTESIZE = serial.EIGHTBITS
 DEFAULT_STOPBITS = serial.STOPBITS_ONE
@@ -186,7 +184,7 @@ class SerialConnection(QObject):
 
     def writeMessage(self, command):
         """
-        This method writes the given message packet to the serial communication line.
+        This method writes the given packet to the serial communication line.
         """
         if self.serial_connection is None or not self.connected or command is None:
             return
@@ -195,8 +193,11 @@ class SerialConnection(QObject):
         #hexdata = ''.join('%02x' % ord(chr(byte)) for byte in packet)
         #self._logger.debug(hexdata)
 
-        self.serial_connection.write(command.getPacket())
-        #self.serial_connection.flush()
+        try:
+            self.serial_connection.write(command.getPacket())
+            #self.serial_connection.flush()
+        except:
+            pass
 
     def scan(self):
         pass

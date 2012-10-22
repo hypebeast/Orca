@@ -49,6 +49,60 @@ volatile uint8_t lastServoInput	= 0; //The last Servo Port input value on the po
 //////////////////////////////////////////////////////////////////////////
 static void isr_servo_in(void);
 	
+	
+/**************************************************************************
+ * \brief Returns the current value of the specified servo. The return value
+ *        is the pulse width in ms.
+ * 
+ * \param servo_nr The servo number.
+ *
+ * \return The return value is the pulse width in ms.
+ **************************************************************************/
+uint16_t servo_in_get_current_value(uint8_t servo_nr) {
+	if (servo_nr < 1 || servo_nr > 7) {
+		return;
+	}
+	
+	uint16_t pos = 0;
+	
+	switch (servo_nr)
+	{
+		case 1:
+		pos = servoIn->servo1;
+		break;
+		
+		case 2:
+		pos = servoIn->servo2;
+		break;
+		
+		case 3:
+		pos = servoIn->servo3;
+		break;
+		
+		case 4:
+		pos = servoIn->servo4;
+		break;
+		
+		case 5:
+		pos = servoIn->servo5;
+		break;
+		
+		case 6:
+		pos = servoIn->servo6;
+		break;
+		
+		case 7:
+		pos = servoIn->servo7;
+		break;
+		
+		default:
+		break;
+	}
+	
+	return pos;
+}
+
+
 /**************************************************************************
 * \\brief Servo In Initialization
 *	Initialize the Servo Input Subsystem. Enable Interrupts for the 
@@ -106,7 +160,7 @@ static void isr_servo_in(void)
 	uint8_t readServoInPort = port->IN;
 	uint16_t pulseWidthValue = 0;
 	
-	/* Check for a rising edge on the input pins and dave the timer value */
+	/* Check for a rising edge on the input pins and save the timer value */
 	if((readServoInPort & ~ lastServoInput) & 0b00000001)
 		servo1StartCount = tc->CNT;
 	if((readServoInPort & ~ lastServoInput) & 0b00000010)

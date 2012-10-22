@@ -37,34 +37,68 @@ class PlotData:
 	"""
 	This class represents one plot curve and it's data.
 	"""
-	def __init__(self, plot, dataField):
-		if not plot or not dataField:
+	def __init__(self, plot, field, name):
+		if not plot or not field or not name:
 			raise Exception
 
 		self.plot = plot
-		self.dataField = dataField
+		# Data field name
+		self.dataField = field
+		# Human readable data filed name
+		self.dataName = name
 		self.data = list()
 		self.xData = list()	
 		self.yData = list()
+
 		# This is the power to which each value must be raised
 		self.scalePower = 0
 		self.yMinimum = 0
 		self.yMaximum = 0
-		self.xWindowSize = 0
-		self.curve = Qwt.QwtPlotCurve('')
+		self.xAxisSize = 120 # Max number of data points
+		self.curve = Qwt.QwtPlotCurve(name)
 		self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
 		pen = QtGui.QPen(QtGui.QColor('limegreen'))
-		pen.setWidth(2)
+		pen.setWidth(1)
 		self.curve.setPen(pen)
+		self.curve.setStyle(Qwt.QwtPlotCurve.Lines)
 		self.curve.attach(self.plot)
+
+		# Append some test data
+		#for data in PlotTestData().getData():
+		#	self.appendData(data)
 		
-	def updateCurve(self):
+	def drawCurve(self):
 		"""Sets new data to the curve"""
-		# TODO: Adjust the axes scale
 		self.curve.setData(self.xData, self.yData)
 
-	def appendData(self, data):
-		"""Appends new data to the plot"""
-		self.data.append((data['timestamp'], data['value']))
-		self.xData = [s[0] for s in self.data]
-		self.yData = [s[1] for s in self.data]
+	def updateData(self, boardStatus, timestamp):
+		"""Updates the curve with new data. Is called when new data was received."""
+		self.data.append((timestamp, boardStatus.getValue(self.dataField)))
+
+		# Limit max size of data
+		if len(self.data) > self.xAxisSize:
+			self.data.pop(0)
+
+		# Set new data
+		self.xData = [float(s[0]) for s in self.data]
+		self.yData = [float(s[1]) for s in self.data]
+
+	def setCurveColor(self, color):
+		pen = QtGui.QPen(QtGui.QColor(color))
+		pen.setWidth(2)
+		self.curve.setPen(pen)
+
+	def setXAxisSize(self, size):
+		"""Sets the size (number of points) of the X axis."""
+		self.xAxisSize = size
+
+
+class PlotTestData:
+	def __init__(self):
+		pass
+
+	def getData(self):
+		data = list()
+		for i in range(0, 100):
+			data.append(dict(timestamp=i*2, value=i*4))
+		return data

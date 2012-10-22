@@ -1,8 +1,6 @@
-__author__ = 'Sebastian Ruml'
-
 # Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
-# This file is part of the Matunus project (part of the Orcacopter project)
+# This file is part of the Matunus project (part of the orcacopter project)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,36 +21,33 @@ __author__ = 'Sebastian Ruml'
 
 try:
     from PyQt4 import QtGui
-    from PyQt4 import QtCore
 except ImportError:
     print "No PyQt found!"
     import sys
     sys.exit(2)
 
 
-class StatusLabel(QtGui.QFrame):
+class HeadingLabel(QtGui.QFrame):
     """
-    This class implements a status label for use in HMI applications.
+    This class implements a heading label for use in HMI applications.
     """
     def __init__(self):
-        super(StatusLabel, self).__init__()
+        super(HeadingLabel, self).__init__()
         palette = QtGui.QPalette()
-        palette.setColor(QtGui.QPalette.Background, QtGui.QColor(71, 71, 71))
+        palette.setColor(QtGui.QPalette.Background, QtGui.QColor(51, 51, 51))
+        palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor(255, 0, 0))
 
         self.setAutoFillBackground(True)
         self.setPalette(palette)
-        self.setMinimumHeight(20)
-        #self.setMaximumHeight(50)
-        self.setMinimumWidth(50)
-        self.setGeometry(0, 0, 200, 20)
-        self.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)
-        self.setLineWidth(1)
+        self.setMinimumHeight(10)
+        self.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Raised)
+        self.setLineWidth(2)
 
         layout = QtGui.QHBoxLayout()
-        layout.setMargin(6)
+        layout.setMargin(1)
         self.setLayout(layout)
         self.label = QtGui.QLabel("")
-        self.label.setStyleSheet("QLabel { font: bold; background-color: #474747; color: #40FF1F; }")
+        self.label.setStyleSheet("QLabel { font: bold; color: #FFFFFF; }")
         layout.addWidget(self.label)
 
         self.text = ""
@@ -70,8 +65,14 @@ class StatusLabel(QtGui.QFrame):
     def getText(self):
         return self.text
 
-    def sizeHint(self):
-        return QtCore.QSize(200, 25)
-
     def setSize(self, width, height):
         self.setGeometry(0, 0, width, height)
+
+   	def paintEvent(self, e):
+		qp = QtGui.QPainter()
+		qp.begin(self)
+		self._drawWidget(qp)
+		qp.end()
+
+    def _drawWidget(self, qp):
+    	pass

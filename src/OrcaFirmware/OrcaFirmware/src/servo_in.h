@@ -9,7 +9,7 @@
 #ifndef SERVO_IN_H_
 #define SERVO_IN_H_
 
-#include<stdint.h>
+#include <stdint.h>
 #include "user_board.h"
 #include "system_info.h"
 
@@ -38,5 +38,22 @@ typedef struct SERVO_IN {
 	volatile uint16_t servo7;						/*!< brief Actual value on Servo Port 7 IN */
 }SERVO_IN_t;
 
+
+//////////////////////////////////////////////////////////////////////////
+// Function decelerations
+//////////////////////////////////////////////////////////////////////////
+
+/**************************************************************************
+ * \brief Initializes the input channel subsystem.
+ *
+ * Initializes the input channel subsystem.
+ **************************************************************************/
 void servo_in_init(BOARD_CONFIG_t *board, SERVO_IN_t *servo);
+
+/**************************************************************************
+ * \brief Returns the current value of the specified servo. The return value
+ *        is the pulse width in ms.
+ **************************************************************************/
+uint16_t servo_in_get_current_value(uint8_t servo_nr);
+
 #endif /* SERVO_IN_H_ */

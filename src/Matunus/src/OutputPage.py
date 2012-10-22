@@ -135,10 +135,10 @@ class OutputPage(QtGui.QWidget):
         pass
 
     def _onStatusUpdated(self):
-        self.channel1Control.updateServoPosition(self.controller.boardStatus.outputChannel1[0])
-        self.channel2Control.updateServoPosition(self.controller.boardStatus.outputChannel2[0])
-        self.channel3Control.updateServoPosition(self.controller.boardStatus.outputChannel3[0])
-        self.channel4Control.updateServoPosition(self.controller.boardStatus.outputChannel4[0])
-        self.channel5Control.updateServoPosition(self.controller.boardStatus.outputChannel5[0])
-        self.channel6Control.updateServoPosition(self.controller.boardStatus.outputChannel6[0])
+        self.channel1Control.updateServoPosition(self.controller.boardStatus.outputChannel1)
+        self.channel2Control.updateServoPosition(self.controller.boardStatus.outputChannel2)
+        self.channel3Control.updateServoPosition(self.controller.boardStatus.outputChannel3)
+        self.channel4Control.updateServoPosition(self.controller.boardStatus.outputChannel4)
+        self.channel5Control.updateServoPosition(self.controller.boardStatus.outputChannel5)
+        self.channel6Control.updateServoPosition(self.controller.boardStatus.outputChannel6)
         

@@ -19,35 +19,33 @@ __author__ = 'Sebastian Ruml'
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-# This is only needed for Python v2 but is harmless for Python v3.
-#import sip
-#sip.setapi('QVariant', 2)
+import os
 
-from PyQt4 import QtGui
+try:
+    from PyQt4 import QtGui, QtSvg
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
-#try:
-#    from PyQt4 import QtGui
-#except ImportError:
-#    print "No PyQt found!"
-#    import sys
-#    sys.exit(2)
-
-from StatusLabel import StatusLabel
-
+import defs
 
 class MainPage(QtGui.QWidget):
     def __init__(self):
         super(MainPage, self).__init__()
 
-        self.createUi()
+        self._createUi()
 
-    def createUi(self):
+    def _createUi(self):
         mainLayout = QtGui.QVBoxLayout()
 
         label = QtGui.QLabel("<b><font size=\"8\" color='black'>Matunus</font></b>")
         mainLayout.addWidget(label)
         label = QtGui.QLabel("<font size=\"5\" color='black'>Orca Ground Control Station</font>")
         mainLayout.addWidget(label)
+
+        self.app_defs = defs.AppDefs()
+        self.background = os.path.join(self.app_defs.ArtworkPath, "welcome_background.svg")
 
         # Status group box
         #groupBoxStatus = QtGui.QGroupBox("Status")
@@ -79,6 +77,17 @@ class MainPage(QtGui.QWidget):
         #mainLayout.addWidget(groupBoxStatus)
         mainLayout.addStretch()
         self.setLayout(mainLayout)
+
+    def paintEvent(self, e):
+        qp = QtGui.QPainter()
+        qp.begin(self)
+        #self._drawWidget(qp)
+        qp.end()
+
+    def _drawWidget(self, qp):
+        svgRenderer = QtSvg.QSvgRenderer()
+        svgRenderer.load(self.background)
+        svgRenderer.render(qp)
 
     def setSystemStatus(self, text):
         pass

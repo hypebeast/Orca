@@ -201,8 +201,8 @@ class GetServoPositionMessage(BaseMessage):
             return None
 
         # Parse the data
-        servo_nr = struct.unpack_from("B", package, 5)
-        position = struct.unpack_from("H", package, 6)
+        servo_nr = struct.unpack_from("B", package, 5)[0]
+        position = struct.unpack_from("H", package, 6)[0]
 
         message = GetServoPositionMessage(servo_nr)
         message.messageType = MessageTypes.RESPONSE_MESSAGE
@@ -231,6 +231,7 @@ class GetBoardStatusMessage(BaseMessage):
         self.inputChannel4 = 0
         self.inputChannel5 = 0
         self.inputChannel6 = 0
+        self.inputChannel7 = 0
         self.accelerationX = 0
         self.accelerationY = 0
         self.accelerationZ = 0
@@ -255,23 +256,27 @@ class GetBoardStatusMessage(BaseMessage):
         message.messageType = MessageTypes.RESPONSE_MESSAGE
 
         # Parse the data
-        message.outputChannel1 = struct.unpack_from("H", package, 5)
-        message.outputChannel2 = struct.unpack_from("H", package, 7)
-        message.outputChannel3 = struct.unpack_from("H", package, 9)
-        message.outputChannel4 = struct.unpack_from("H", package, 11)
-        message.outputChannel5 = struct.unpack_from("H", package, 13)
-        message.outputChannel6 = struct.unpack_from("H", package, 15)
-        message.inputChannel1 = struct.unpack_from("H", package, 17)
-        message.inputChannel2 = struct.unpack_from("H", package, 19)
-        message.inputChannel3 = struct.unpack_from("H", package, 21)
-        message.inputChannel4 = struct.unpack_from("H", package, 23)
-        message.inputChannel5 = struct.unpack_from("H", package, 25)
-        message.inputChannel6 = struct.unpack_from("H", package, 27)
-        message.accelerationX = struct.unpack_from("H", package, 29)
-        message.accelerationY = struct.unpack_from("H", package, 31)
-        message.accelerationZ = struct.unpack_from("H", package, 33)
-        message.gyroX = struct.unpack_from("H", package, 35)
-        message.gyroY = struct.unpack_from("H", package, 37)
-        message.gyroZ = struct.unpack_from("H", package, 39)
+        try:
+            message.outputChannel1 = struct.unpack_from("H", package, 5)[0]
+            message.outputChannel2 = struct.unpack_from("H", package, 7)[0]
+            message.outputChannel3 = struct.unpack_from("H", package, 9)[0]
+            message.outputChannel4 = struct.unpack_from("H", package, 11)[0]
+            message.outputChannel5 = struct.unpack_from("H", package, 13)[0]
+            message.outputChannel6 = struct.unpack_from("H", package, 15)[0]
+            message.inputChannel1 = struct.unpack_from("H", package, 17)[0]
+            message.inputChannel2 = struct.unpack_from("H", package, 19)[0]
+            message.inputChannel3 = struct.unpack_from("H", package, 21)[0]
+            message.inputChannel4 = struct.unpack_from("H", package, 23)[0]
+            message.inputChannel5 = struct.unpack_from("H", package, 25)[0]
+            message.inputChannel6 = struct.unpack_from("H", package, 27)[0]
+            message.inputChannel7 = struct.unpack_from("H", package, 29)[0]
+            message.accelerationX = struct.unpack_from("H", package, 31)[0]
+            message.accelerationY = struct.unpack_from("H", package, 33)[0]
+            message.accelerationZ = struct.unpack_from("H", package, 35)[0]
+            message.gyroX = struct.unpack_from("H", package, 37)[0]
+            message.gyroY = struct.unpack_from("H", package, 39)[0]
+            message.gyroZ = struct.unpack_from("H", package, 41)[0]
+        except:
+            pass
 
         return message

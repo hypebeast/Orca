@@ -58,6 +58,7 @@ class ConfigurationPage(QtGui.QWidget):
         icon = QtGui.QIcon(os.path.join(self.app_defs.IconsPath, "hw_config.png"))
         item = QtGui.QStandardItem(icon, "HW Settings")
         model.appendRow(item)
+        # TODO: Add Vehicle config page
         icon = QtGui.QIcon(os.path.join(self.app_defs.IconsPath, "Transmitter.png"))
         item = QtGui.QStandardItem(icon, "Input")
         model.appendRow(item)
@@ -76,7 +77,7 @@ class ConfigurationPage(QtGui.QWidget):
 
         self.navBar = QtGui.QListView()
         self.navBar.setModel(model)
-        self.navBar.setMinimumWidth(50)
+        self.navBar.setMinimumWidth(80)
         self.navBar.setMaximumWidth(80)
         self.navBar.setViewMode(QtGui.QListView.IconMode)
         self.navBar.setSpacing(5)
@@ -88,21 +89,27 @@ class ConfigurationPage(QtGui.QWidget):
         # Main Container and all pages
         self.mainContainer = QtGui.QStackedLayout()
 
+        # Hardware settings
         page = HardwareSettingsPage(self.controllerManager)
         self.mainContainer.addWidget(page)
 
-        page = ReceiverPage()
+        # Input channels
+        page = ReceiverPage(self.controllerManager)
         self.mainContainer.addWidget(page)
 
+        # Output channels
         page = OutputPage(self.controllerManager)
         self.mainContainer.addWidget(page)
 
+        # Attitude
         page = AttitudePage()
         self.mainContainer.addWidget(page)
 
+        # Stabilization
         page = StabilizationPage()
         self.mainContainer.addWidget(page)
 
+        # GPS
         page = GpsPage()
         self.mainContainer.addWidget(page)
 

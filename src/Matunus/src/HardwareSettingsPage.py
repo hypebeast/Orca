@@ -43,4 +43,6 @@ class HardwareSettingsPage(QtGui.QWidget):
     def _createUi(self):
     	mainLayout = QtGui.QVBoxLayout()
 
+        # TODO: Create UI here
+
         self.setLayout(mainLayout)

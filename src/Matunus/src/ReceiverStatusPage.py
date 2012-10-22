@@ -27,20 +27,28 @@ except ImportError:
     sys.exit(2)
 
 from PositionBar import PositionBar
+from HeadingLabel import HeadingLabel
 
 class ReceiverStatusPage(QtGui.QWidget):
-    def __init__(self):
+    def __init__(self, controller):
         super(ReceiverStatusPage, self).__init__()
 
-        self.createUI()
+        if controller is None:
+            raise Exception
 
-    def createUI(self):
+        self.controllerManager = controller
+        self.controllerManager.board_status_updated.connect(self._boardStatusUpdated)
+
+        self._createUI()
+
+    def _createUI(self):
     	mainLayout = QtGui.QVBoxLayout()
     	#mainLayout.setMargin(0)
     	#mainLayout.addSpacing(5)
 
     	# Channel 1
-    	lChannel1 = QtGui.QLabel("<b><font size=\"5\">Channel 1</font></b>")
+        lChannel1 = HeadingLabel()
+        lChannel1.setText("Channel 1")
     	mainLayout.addWidget(lChannel1)
     	layout = QtGui.QHBoxLayout()
     	layout.addSpacing(15)
@@ -60,11 +68,11 @@ class ReceiverStatusPage(QtGui.QWidget):
         layout.addWidget(self.lcdChannel1Value)
         layout.addStretch()
         mainLayout.addLayout(layout)
-
-        mainLayout.addSpacing(15)
+        mainLayout.addSpacing(30)
 
         # Channel 2
-    	lChannel2 = QtGui.QLabel("<b><font size=\"5\">Channel 2</font></b>")
+        lChannel2 = HeadingLabel()
+        lChannel2.setText("Channel 2")
     	mainLayout.addWidget(lChannel2)
     	layout = QtGui.QHBoxLayout()
     	layout.addSpacing(15)
@@ -84,11 +92,11 @@ class ReceiverStatusPage(QtGui.QWidget):
         layout.addWidget(self.lcdChannel2Value)
         layout.addStretch()
         mainLayout.addLayout(layout)
-
-        mainLayout.addSpacing(15)
+        mainLayout.addSpacing(30)
 
         # Channel 3
-    	lChannel3 = QtGui.QLabel("<b><font size=\"5\">Channel 3</font></b>")
+    	lChannel3 = HeadingLabel()
+        lChannel3.setText("Channel 3")
     	mainLayout.addWidget(lChannel3)
     	layout = QtGui.QHBoxLayout()
     	layout.addSpacing(15)
@@ -108,11 +116,11 @@ class ReceiverStatusPage(QtGui.QWidget):
         layout.addWidget(self.lcdChannel3Value)
         layout.addStretch()
         mainLayout.addLayout(layout)
-
-        mainLayout.addSpacing(15)
+        mainLayout.addSpacing(30)
 
         # Channel 4
-    	lChannel4 = QtGui.QLabel("<b><font size=\"5\">Channel 4</font></b>")
+    	lChannel4 = HeadingLabel()
+        lChannel4.setText("Channel 4")
     	mainLayout.addWidget(lChannel4)
     	layout = QtGui.QHBoxLayout()
     	layout.addSpacing(15)
@@ -132,11 +140,11 @@ class ReceiverStatusPage(QtGui.QWidget):
         layout.addWidget(self.lcdChannel4Value)
         layout.addStretch()
         mainLayout.addLayout(layout)
-
-        mainLayout.addSpacing(15)
+        mainLayout.addSpacing(30)
 
         # Channel 5
-    	lChannel5 = QtGui.QLabel("<b><font size=\"5\">Channel 5</font></b>")
+    	lChannel5 = HeadingLabel()
+        lChannel5.setText("Channel 5")
     	mainLayout.addWidget(lChannel5)
     	layout = QtGui.QHBoxLayout()
     	layout.addSpacing(15)
@@ -156,11 +164,11 @@ class ReceiverStatusPage(QtGui.QWidget):
         layout.addWidget(self.lcdChannel5Value)
         layout.addStretch()
         mainLayout.addLayout(layout)
-
-        mainLayout.addSpacing(15)
+        mainLayout.addSpacing(30)
         
          # Channel 6
-        lChannel6 = QtGui.QLabel("<b><font size=\"5\">Channel 6</font></b>")
+        lChannel6 = HeadingLabel()
+        lChannel6.setText("Channel 6")
         mainLayout.addWidget(lChannel6)
         layout = QtGui.QHBoxLayout()
         layout.addSpacing(15)
@@ -180,6 +188,35 @@ class ReceiverStatusPage(QtGui.QWidget):
         layout.addWidget(self.lcdChannel6Value)
         layout.addStretch()
         mainLayout.addLayout(layout)
+        mainLayout.addSpacing(30)
+
+        # Channel 7
+        lChannel7 = HeadingLabel()
+        lChannel7.setText("Channel 7")
+        mainLayout.addWidget(lChannel7)
+        layout = QtGui.QHBoxLayout()
+        layout.addSpacing(15)
+        lValue = QtGui.QLabel("Value")
+        layout.addWidget(lValue)
+        layout.addSpacing(15)
+        self.posBarChannel7 = PositionBar()
+        self.posBarChannel7.setMinimumWidth(250)
+        self.posBarChannel7.setMinimumHeight(30)
+        self.posBarChannel7.setMaximumHeight(30)
+        self.posBarChannel7.setValue(0)
+        self.posBarChannel7.setMoveable(False)
+        layout.addWidget(self.posBarChannel7)
+        self.lcdChannel7Value = QtGui.QLCDNumber()
+        self.lcdChannel7Value.setMaximumHeight(25)
+        self.lcdChannel7Value.setSegmentStyle(QtGui.QLCDNumber.Filled)
+        layout.addWidget(self.lcdChannel7Value)
+        layout.addStretch()
+        mainLayout.addLayout(layout)
 
         mainLayout.addStretch()
         self.setLayout(mainLayout)
+
+    def _boardStatusUpdated(self):
+        boardStatus = self.controllerManager.boardStatus
+
+        #self.posBarChannel1.setValue(boardStatus.inputChannel1)

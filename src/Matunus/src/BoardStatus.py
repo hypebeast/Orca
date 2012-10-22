@@ -19,7 +19,6 @@
 __author__ = 'Sebastian Ruml'
 
 
-from logger import Logger
 from ApiCommands import CommandTypes
 from logger import Logger
 
@@ -53,6 +52,7 @@ class BoardStatus(object):
 		self.dataFields.append({'name': "inputChannel4", 'value': 0})
 		self.dataFields.append({'name': "inputChannel5", 'value': 0})
 		self.dataFields.append({'name': "inputChannel6", 'value': 0})
+		self.dataFields.append({'name': "inputChannel7", 'value': 0})
 		self.dataFields.append({'name': "accelerationX", 'value': 0})
 		self.dataFields.append({'name': "accelerationY", 'value': 0})
 		self.dataFields.append({'name': "accelerationZ", 'value': 0})
@@ -65,13 +65,14 @@ class BoardStatus(object):
 		pass
 
 	def getValue(self, name):
+		"""Returns the value of the specified data field."""
 		for field in self.dataFields:
 			if field['name'] == name:
 				return field['value']
 
 		return None
 
-	def updateDataFromMessage(self, message, timestamp):
+	def updateFromMessage(self, message, timestamp):
 		"""
 		This method takes a dictionary that contains the data values.
 		"""
@@ -107,6 +108,8 @@ class BoardStatus(object):
 					field['value'] = message.inputChannel5
 				elif field['name'] == "inputChannel6":
 					field['value'] = message.inputChannel6
+				elif field['name'] == "inputChannel7":
+					field['value'] = message.inputChannel7
 				elif field['name'] == "accelerationX":
 					field['value'] = message.accelerationX
 				elif field['name'] == "accelerationY":
@@ -171,6 +174,10 @@ class BoardStatus(object):
 		return self.getValue('inputChannel6')
 
 	@property
+	def inputChannel7(self):
+		return self.getValue('inputChannel7')
+
+	@property
 	def accelerationX(self):
 		return self.getValue('accelerationX')
 
@@ -216,6 +223,7 @@ class BoardStatus(object):
 		self._logger.info("\tInput Channel 4: %s" % self.inputChannel4)
 		self._logger.info("\tInput Channel 5: %s" % self.inputChannel5)
 		self._logger.info("\tInput Channel 6: %s" % self.inputChannel6)
+		self._logger.info("\tInput Channel 7: %s" % self.inputChannel7)
 		self._logger.info("\tAcceleration X: %s" % self.accelerationX)
 		self._logger.info("\tAcceleration Y: %s" % self.accelerationY)
 		self._logger.info("\tAcceleration Z: %s" % self.accelerationZ)

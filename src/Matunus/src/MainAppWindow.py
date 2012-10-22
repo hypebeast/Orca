@@ -29,16 +29,11 @@ except ImportError:
 
 import os
 import sys
-from threading import Thread
-import time
 
 from MainPage import MainPage
 from InfoPanel import InfoPanel
 from ConfigurationPage import ConfigurationPage
-from FlightControlPage import FlightControlPage
 from ScopePage import ScopePage
-from GpsPage import GpsPage
-from AttitudePage import AttitudePage
 from FlightDisplay import FlightDisplay
 from SerialConnection import SerialError
 from SettingsDialog import SettingsDialog
@@ -136,7 +131,7 @@ class MainAppWindow(QtGui.QMainWindow):
 
         # TODO: Load configuration
 
-        # Flight controller manager
+        # Provides methods for interacting with the flight controller
         self.controllerManager = ControllerManager()
 
         # Create UI
@@ -243,12 +238,9 @@ class MainAppWindow(QtGui.QMainWindow):
             self.statusBar().showMessage("Connecting to controller...", 2000)
 
             try:    
+                # Connect
                 self.controllerManager.connect()
 
-                # Start reading board status
-                #self.startStatusReader()
-
-                #self.controllerManager.writeCommand(CommandMessage(CommandType.LEDSON))
                 self.statusBar().showMessage("Connected!", 2000)
                 self.lStatusBarLabel.setText("<b>Connected</b>")
                 self.updateUi()
@@ -262,11 +254,7 @@ class MainAppWindow(QtGui.QMainWindow):
                 msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
                 msgBox.setIcon(QtGui.QMessageBox.Warning)
                 msgBox.exec_()
-            
         elif self.controllerManager.connected():
-            # Stop reading board status
-            #self.stopStatusReader()
-
             # Disconnect
             self.controllerManager.disconnect()
 

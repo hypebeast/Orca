@@ -11,6 +11,7 @@
 
 #include "serial_api.h"
 #include "crc8.h"
+#include "servo_in.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -169,12 +170,13 @@ static void command_get_board_status(void)
 	uint16_t outChannel4 = servo_get_pos_degree(4);
 	uint16_t outChannel5 = servo_get_pos_degree(5);
 	uint16_t outChannel6 = servo_get_pos_degree(6);
-	uint16_t inChannel1 = 0;
-	uint16_t inChannel2 = 0;
-	uint16_t inChannel3 = 0;
-	uint16_t inChannel4 = 0;
-	uint16_t inChannel5 = 0;
-	uint16_t inChannel6 = 0;
+	uint16_t inChannel1 = servo_in_get_current_value(1);
+	uint16_t inChannel2 = servo_in_get_current_value(2);
+	uint16_t inChannel3 = servo_in_get_current_value(3);
+	uint16_t inChannel4 = servo_in_get_current_value(4);
+	uint16_t inChannel5 = servo_in_get_current_value(5);
+	uint16_t inChannel6 = servo_in_get_current_value(6);
+	uint16_t inChannel7 = servo_in_get_current_value(7);
 	uint16_t accX = 0;
 	uint16_t accY = 0;
 	uint16_t accZ = 0;
@@ -191,7 +193,7 @@ static void command_get_board_status(void)
 	memcpy(data + index, &cmdtype, 2);
 	index += 2;
 	// Data Length
-	data[index++] = 36;
+	data[index++] = 38;
 	// Output Channel 1
 	memcpy(data + index, &outChannel1, 2);
 	index += 2;
@@ -228,6 +230,9 @@ static void command_get_board_status(void)
 	// Input Channel 6
 	memcpy(data + index, &inChannel6, 2);
 	index += 2;
+	// Input Channel 7
+	memcpy(data + index, &inChannel7, 2);
+	index += 2;
 	// Acceleration X
 	memcpy(data + index, &accX, 2);
 	index += 2;
@@ -251,7 +256,7 @@ static void command_get_board_status(void)
 	// Stop byte
 	data[index] = PACKET_STOP_BYTE;
 		
-	write_packet(data, 43);
+	write_packet(data, index+1);
 }
 
 /**************************************************************************
@@ -463,7 +468,7 @@ void serial_api_init(void)
 	// BSEL = ((I/O clock frequency)/(2^(ScaleFactor)*16*Baudrate))-1
 	// BSEL for 9600 bps => 207
 	// BSEL for 57600 bps => 33 (33.722)
-	USART_Baudrate_Set(USART_data.usart, 207, 0);
+	USART_Baudrate_Set(USART_data.usart, 33, 0);
 	
 	// Initialize command buffer
 	command_buff.index = 0;

@@ -17,6 +17,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+import time
+
 try:
     from PyQt4 import QtCore, Qt
 except ImportError:
@@ -45,7 +47,7 @@ class ScopeWidget(Qwt.QwtPlot):
 		Params:
 
 		- boardController: The board controller object
-		- dataFields: Data fields to watch
+		- dataFields: Tumple with the names of the data fields which should be scoped
 		"""
 		Qwt.QwtPlot.__init__(self)
 
@@ -60,56 +62,104 @@ class ScopeWidget(Qwt.QwtPlot):
 		# This timer updates the plot curves
 		self.updateTimer = QtCore.QTimer()
 		QtCore.QObject.connect(self.updateTimer, QtCore.SIGNAL('timeout()'), self._on_timer)
-		self.updateInterval = 0.5
+		self._updateInterval = 0.5
+		self._scopeLength = 60 # Scope length in seconds
 
+		# Basic plot setup
 		self.setCanvasBackground(Qt.Qt.black)
-		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time')
-		self.setAxisScale(Qwt.QwtPlot.xBottom, 0, 10, 1)
-		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Temperature')
+		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (seconds)')
+		self.setAxisScale(Qwt.QwtPlot.xBottom, 0, self._scopeLength+5, 1)
+		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Values')
 		self.setAxisScale(Qwt.QwtPlot.yLeft, 0, 250, 40)
-		self.replot()
+		
+		# Insert legend
+		self.insertLegend(Qwt.QwtLegend(), Qwt.QwtPlot.BottomLegend)
 
-		self.isRunning = False
+		# Grid
+		grid = Qwt.QwtPlotGrid()
+		grid.setPen(Qt.QPen(Qt.Qt.gray, 1, Qt.Qt.DotLine))
+		grid.attach(self)
+
+		self._isRunning = False
+		self._startTime = 0
+
+		# Assign data fields
+		self.dataFields = dataFields
 
 		# Init all plot curves
-		self._init_plots(dataFields)
+		self._init_plots()
 
 	def start(self):
 		"""
 		Starts plotting.
 		"""
-		self.updateTimer.start(self.updateInterval * 1000.0)
-		self.isRunning = True
+		self._init_plots()
+		self._startTime = time.clock()
+		self.updateTimer.start(self._updateInterval * 1000.0)
+		self._isRunning = True
 
 	def stop(self):
 		"""
 		Stops plotting.
 		"""
-		self.isRunning = False
+		self._startTime = 0
+		self.updateTimer.stop()
+		self._isRunning = False
 
-	def _init_plots(self, dataFields):
+	def setDataFields(self, dataFields):
+		if self._isRunning:
+			return
+
+		self.dataFields = dataFields
+		self._init_plots()
+
+	def _init_plots(self):
 		"""
 		Initializes all plots.
 		"""
-		for field in dataFields:
-			self.plotCurves.append(PlotData(self, field))
+		colors = [Qt.Qt.red, Qt.Qt.green, Qt.Qt.blue, Qt.Qt.cyan, Qt.Qt.magenta,
+				  Qt.Qt.yellow, '#997B59', Qt.Qt.gray]
+		self.plotCurves = list()
+		# Remove all attached curves from the plot
+		self.detachItems()
+		fields = self.dataFields['fields']
+		names = self.dataFields['fieldNames']
+		colorIndex = 0
+		# Add for every data field one plot curve
+		for i in range(0, len(fields)):
+			curve = PlotData(self, fields[i], names[i])
+			# Set color
+			curve.setCurveColor(colors[colorIndex])
+			# Set the max number of data points
+			curve.setXAxisSize(self._scopeLength/self._updateInterval)
+			self.plotCurves.append(curve)
+			colorIndex += 1
+			if colorIndex >= len(colors):
+				colorIndex = 0
 
 	def _on_timer(self):
 		"""
 		Called by the timer.
 		"""
+		# Update the scope
 		self._update_scope()
 
 	def _update_scope(self):
-		# Update every curve
+		"""Updates every scope curve and replots everything."""
+		# Set scale for the x-Axis
+		self.setAxisScale(Qwt.QwtPlot.xBottom, self.plotCurves[0].xData[0],
+			max(self._scopeLength, self.plotCurves[0].xData[-1]), 1)
+
+		# Draw every curve
 		for curve in self.plotCurves:
-			curve.updateCurve()
+			curve.drawCurve()
 
 		# Replot everything
 		self.replot()
 
 	def _on_status_updated(self):
-		if self.isRunning:
-			data = dict(timestamp=self.boardStatus.lastUpdate,
-						value=self.boardStatus.outputChannel1)
-			self.plotCurves[0].appendData(data)
+		"""Updates the plot data. Called when the board status was updated."""
+		if self._isRunning:
+			timestamp = time.clock() - self._startTime
+			for curve in self.plotCurves:
+				curve.updateData(self.boardStatus, timestamp)

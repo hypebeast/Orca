@@ -19,18 +19,12 @@
 __author__ = 'Sebastian Ruml'
 
 
-# This is only needed for Python v2 but is harmless for Python v3.
-#import sip
-#sip.setapi('QVariant', 2)
-
-from PyQt4 import QtGui
-
-#try:
-#    from PyQt4 import QtGui
-#except ImportError:
-#    print "No PyQt found!"
-#    import sys
-#    sys.exit(2)
+try:
+    from PyQt4 import QtGui
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
 from ReceiverStatusPage import ReceiverStatusPage
 from FlightModeSettingsPage import FlightModeSettingsPage
@@ -38,12 +32,17 @@ from RcInputPage import RcInputPage
 
 
 class ReceiverPage(QtGui.QWidget):
-    def __init__(self):
+    def __init__(self, controller):
         super(ReceiverPage, self).__init__()
 
-        self.createUI()
+        if controller is None:
+            raise Exception
 
-    def createUI(self):
+        self.controllerManager = controller
+
+        self._createUI()
+
+    def _createUI(self):
     	mainLayout = QtGui.QVBoxLayout()
     	mainLayout.setMargin(0)
     	#mainLayout.addSpacing(5)
@@ -53,7 +52,7 @@ class ReceiverPage(QtGui.QWidget):
         tabWidget.setTabShape(QtGui.QTabWidget.Rounded)
         mainLayout.addWidget(tabWidget)
 
-        page = ReceiverStatusPage()
+        page = ReceiverStatusPage(self.controllerManager)
         tabWidget.addTab(page, "Status")
 
         page = RcInputPage(self)

@@ -21,7 +21,6 @@ __author__ = 'Sebastian Ruml'
 
 import time
 import threading
-import binascii
 
 from PyQt4.QtCore import QObject, pyqtSignal
 
@@ -67,11 +66,6 @@ class ControllerManager(QObject):
 		self.statusReaderIsAlive = False
 		self.statusReaderUpdateInterval = 0.5 # Update interval in seconds
 
-        # Status queries
-		self.status_queries = [
-								{"command": CommandTypes.GET_ALL_SERVO_POS, "args": []}
-							  ]
-
 		# Indicates if new data from the board was received
 		#self.hasNewData = False
 
@@ -86,10 +80,11 @@ class ControllerManager(QObject):
 
 	def disconnect(self):
 		"""Disconnects from the flight controller"""
-		self.serial.disconnect()
-
-		# Stop reading the board status
+		# Stop the status reader
 		self._stopStatusReader()
+
+		# Disconnects
+		self.serial.disconnect()
 
 	def set_serial_port(self, port):
 		self.serial.set_port(port)
@@ -121,7 +116,8 @@ class ControllerManager(QObject):
 		if not self.statusReaderIsAlive:
 			return
 
-		self.statusReaderAlive = False
+		self.statusReaderIsAlive = False
+		#time.sleep(self.statusReaderUpdateInterval)
 		self.statusReaderThread.join()
 
 	def _statusReader(self):
@@ -142,7 +138,7 @@ class ControllerManager(QObject):
 		"""
 		messages = list(get_all_from_queue(self.serial.messageQueue))
 		if len(messages) > 0:
-			self._logger.debug("New status response received")
+			#self._logger.debug("New status response received")
 			for message in messages:
 				self._updateStatus(message[0], message[1])
 
@@ -151,7 +147,7 @@ class ControllerManager(QObject):
 		Updates the BoardStatus object with the received data from the serial
 		connection.
 		"""
-		self.boardStatus.updateDataFromMessage(message, timestamp)
+		self.boardStatus.updateFromMessage(message, timestamp)
 		#self.boardStatus.printStatus()
 
 		# Emit signal

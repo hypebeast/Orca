@@ -20,7 +20,7 @@ __author__ = 'Sebastian Ruml'
 
 
 try:
-    from PyQt4 import QtGui, QtCore
+    from PyQt4 import QtGui
 except ImportError:
     print "No PyQt found!"
     import sys
@@ -42,45 +42,148 @@ class ScopePage(QtGui.QWidget):
         if boardController is None:
             raise "Error!"
 
-        self.boardController = boardController
-        self.scopes = list()
-        self.app_defs = defs.AppDefs()
+        self._boardController = boardController
+        self._scopes = list()
+        self._app_defs = defs.AppDefs()
         self._logger = Logger()
+        self._isRunning = False
+
+        # Available data fields
+        self.dataObjects = list()
+        self.dataObjects.append({'groupName': "Input Channels",
+                                'fields': ("inputChannel1", "inputChannel2", "inputChannel3", "inputChannel4", "inputChannel5", "inputChannel6", "inputChannel7"),
+                                'fieldNames': ("Input Channel 1", "Input Channel 2", "Input Channel 3", "Input Channel 4", "Input Channel 5", "Input Channel 6", "Input Channel 7")})
+        self.dataObjects.append({'groupName': "Output Channels",
+                                'fields': ("outputChannel1", "outputChannel2", "outputChannel3", "outputChannel4", "outputChannel5", "outputChannel6"),
+                                'fieldNames': ("Output Channel 1", "Output Channel 2", "Output Channel 3", "Output Channel 4", "Output Channel 5", "Output Channel 6")})
+        self.dataObjects.append({'groupName': "Gyro X, Y, Z",
+                                'fields': ("gyroX", "gyroY", "gyroZ"),
+                                'fieldNames': ("Gyro X", "Gyro Y", "Gyro Z")})
+        self.dataObjects.append({'groupName': "Acceleration X, Y, Z",
+                                'fields': ("accelerationX", "accelerationY", "accelerationZ"),
+                                'fieldNames': ("Acceleration X", "Acceleration Y", "Acceleration Z")})
+                          # "Roll Angle: Kalman Filter",
+                          # "Roll Angle: Setpoint",
+                          # "PID"]
+
+        # Create the UI
         self._createUi()
 
     def _createUi(self):
         """Initializes the UI."""
-        self.mainLayout = QtGui.QVBoxLayout()
-        self._addScopes()
+        mainLayout = QtGui.QVBoxLayout()
+        
+        # Palette for the headers
+        palette =  QtGui.QPalette()
+        palette.setColor(QtGui.QPalette.Background, QtGui.QColor(91, 91, 91))
+        palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor(255, 0, 0))
 
+        # Label for the headers
+        label1 = QtGui.QLabel("Data Fields")
+        label1.setStyleSheet("QLabel { font: bold; color: #FFFFFF; }")
+        label2 = QtGui.QLabel("Data Fields")
+        label2.setStyleSheet("QLabel { font: bold; color: #FFFFFF; }")
+
+        # Header 1
+        header = QtGui.QFrame()
+        header.setPalette(palette)
+        header.setMinimumHeight(40)
+        header.setAutoFillBackground(True)
+        header.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Raised)
+        header.setLineWidth(2)
+        layout = QtGui.QHBoxLayout()
+        header.setLayout(layout)
+        layout.addWidget(label1)
+        self.cbdataObjects1 = QtGui.QComboBox()
+        for item in self.dataObjects:
+            self.cbdataObjects1.addItem(item['groupName'])
+        self.cbdataObjects1.setCurrentIndex(0)
+        layout.addWidget(self.cbdataObjects1)
+        layout.addStretch()
+        mainLayout.addWidget(header)
+
+        # Scope 1
+        self.scope1 = ScopeWidget(self._boardController, self.dataObjects[0])
+        mainLayout.addWidget(self.scope1)
+        self._scopes.append(self.scope1)
+
+         # Header 2
+        header = QtGui.QFrame()
+        header.setPalette(palette)
+        header.setMinimumHeight(40)
+        header.setAutoFillBackground(True)
+        header.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Raised)
+        header.setLineWidth(2)
+        layout = QtGui.QHBoxLayout()
+        header.setLayout(layout)
+        layout.addWidget(label2)
+        self.cbdataObjects2 = QtGui.QComboBox()
+        for item in self.dataObjects:
+            self.cbdataObjects2.addItem(item['groupName'])
+        self.cbdataObjects2.setCurrentIndex(0)
+        layout.addWidget(self.cbdataObjects2)
+        layout.addStretch()
+        mainLayout.addWidget(header)
+        
+        # Scope 2
+        self.scope2 = ScopeWidget(self._boardController, self.dataObjects[0])
+        mainLayout.addWidget(self.scope2)
+        self._scopes.append(self.scope2)
+
+        # Control box
         groupBox = QtGui.QGroupBox("Scope Control")
-        groupBox.setMaximumHeight(90)
         groupBox.setMinimumHeight(90)
         layout = QtGui.QHBoxLayout()
         groupBox.setLayout(layout)
         self.startButton = QtGui.QPushButton("Start")
+        self.startButton.clicked.connect(self._startClicked)
         layout.addWidget(self.startButton)
         self.stopButton = QtGui.QPushButton("Stop")
+        self.stopButton.setEnabled(False)
+        self.stopButton.clicked.connect(self._stopClicked)
         layout.addWidget(self.stopButton)
         layout.addStretch()
-        self.mainLayout.addWidget(groupBox)
+        mainLayout.addWidget(groupBox)
 
-        self.setLayout(self.mainLayout)
+        self.cbdataObjects1.currentIndexChanged.connect(self._cbdataObjects1IndexChanged)
+        self.cbdataObjects2.currentIndexChanged.connect(self._cbdataObjects2IndexChanged)
 
-    def _addScopes(self):
-        """Adds all scopes to the GUI."""
-        self.scope1 = ScopeWidget(self.boardController, ['test1', 'test2'])
-        self.mainLayout.addWidget(self.scope1)
-        self.scopes.append(self.scope1)
-
-        self.scope2 = ScopeWidget(self.boardController, ['test3', 'test4'])
-        self.mainLayout.addWidget(self.scope2)
-        self.scopes.append(self.scope2)
+        self.setLayout(mainLayout)
 
     def start(self):
         """Starts scoping."""
-        pass
+        if self._isRunning:
+            return
+
+        self.scope1.start()
+        self.scope2.start()
+        self.startButton.setEnabled(False)
+        self.stopButton.setEnabled(True)
+        self.cbdataObjects1.setEnabled(False)
+        self.cbdataObjects2.setEnabled(False)
+        self._isRunning = True
 
     def stop(self):
         """Stops scoping."""
-        pass
+        if not self._isRunning:
+            return
+
+        self.scope1.stop()
+        self.scope2.stop()
+        self.startButton.setEnabled(True)
+        self.stopButton.setEnabled(False)
+        self.cbdataObjects1.setEnabled(True)
+        self.cbdataObjects2.setEnabled(True)
+        self._isRunning = False
+
+    def _startClicked(self):
+        self.start()
+
+    def _stopClicked(self):
+        self.stop()
+
+    def _cbdataObjects1IndexChanged(self):
+        self.scope1.setDataFields(self.dataObjects[self.cbdataObjects1.currentIndex()])
+
+    def _cbdataObjects2IndexChanged(self):
+        self.scope2.setDataFields(self.dataObjects[self.cbdataObjects2.currentIndex()])

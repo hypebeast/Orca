@@ -70,8 +70,6 @@ int main (void)
 		
 		// Flight controller
 		flight_controller_task(&flightController);
-		
-
 	}
 	
 	return 0;
