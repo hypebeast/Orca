@@ -63,9 +63,7 @@ class PlotData:
 		self.curve.setStyle(Qwt.QwtPlotCurve.Lines)
 		self.curve.attach(self.plot)
 
-		# Append some test data
-		#for data in PlotTestData().getData():
-		#	self.appendData(data)
+		self._enabled = True
 		
 	def drawCurve(self):
 		"""Sets new data to the curve"""

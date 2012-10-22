@@ -18,12 +18,12 @@
 
 
 import time
+import sys
 
 try:
     from PyQt4 import QtCore, Qt
 except ImportError:
     print "No PyQt found!"
-    import sys
     sys.exit(2)
 
 try:
@@ -70,10 +70,11 @@ class ScopeWidget(Qwt.QwtPlot):
 		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (seconds)')
 		self.setAxisScale(Qwt.QwtPlot.xBottom, 0, self._scopeLength+5, 1)
 		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Values')
-		self.setAxisScale(Qwt.QwtPlot.yLeft, 0, 250, 40)
+		self.setAxisScale(Qwt.QwtPlot.yLeft, 0, 250, 50)
 		
-		# Insert legend
-		self.insertLegend(Qwt.QwtLegend(), Qwt.QwtPlot.BottomLegend)
+		# Insert legend		
+		self._legend = Qwt.QwtLegend()
+		self.insertLegend(self._legend, Qwt.QwtPlot.BottomLegend)
 
 		# Grid
 		grid = Qwt.QwtPlotGrid()
@@ -137,6 +138,13 @@ class ScopeWidget(Qwt.QwtPlot):
 			if colorIndex >= len(colors):
 				colorIndex = 0
 
+		# Legend
+		for curve in self.plotCurves:
+			self._legend.find(curve.curve).setItemMode(Qwt.QwtLegend.ClickableItem)
+			self._legend.find(curve.curve).setChecked(True)
+
+		self.legendChecked.connect(self._onLegendChecked)
+
 	def _on_timer(self):
 		"""
 		Called by the timer.
@@ -146,9 +154,28 @@ class ScopeWidget(Qwt.QwtPlot):
 
 	def _update_scope(self):
 		"""Updates every scope curve and replots everything."""
-		# Set scale for the x-Axis
-		self.setAxisScale(Qwt.QwtPlot.xBottom, self.plotCurves[0].xData[0],
-			max(self._scopeLength, self.plotCurves[0].xData[-1]), 1)
+		# Set scale for the x-Axis and y-Axis
+		if len(self.plotCurves) > 0:
+			# Find max y-value of all curves
+			max_yVal = -sys.maxint - 1
+			for curve in self.plotCurves:
+				val = max(curve.yData)
+				if val > max_yVal:
+					max_yVal = val
+
+			# Find min y-value of all curves
+			min_yVal = sys.maxint
+			for curve in self.plotCurves:
+				val = min(curve.yData)
+				if val < min_yVal:
+					min_yVal = val
+
+			# X-Axis
+			self.setAxisScale(Qwt.QwtPlot.xBottom, self.plotCurves[0].xData[0],
+				max(self._scopeLength, self.plotCurves[0].xData[-1]), 1)
+			# Y-Axis
+			self.setAxisScale(Qwt.QwtPlot.yLeft, min_yVal,
+				max_yVal, int((max_yVal - min_yVal) / 20))
 
 		# Draw every curve
 		for curve in self.plotCurves:
@@ -163,3 +190,6 @@ class ScopeWidget(Qwt.QwtPlot):
 			timestamp = time.clock() - self._startTime
 			for curve in self.plotCurves:
 				curve.updateData(self.boardStatus, timestamp)
+
+	def _onLegendChecked(self, plotItem, on):
+		print on

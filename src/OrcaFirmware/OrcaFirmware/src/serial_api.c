@@ -12,6 +12,7 @@
 #include "serial_api.h"
 #include "crc8.h"
 #include "servo_in.h"
+#include "MPU6000.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -160,7 +161,8 @@ static void command_get_all_servo_pos(void)
 **************************************************************************/
 static void command_get_board_status(void)
 {
-	uint8_t data[43];
+	uint8_t packet_length = 57;
+	uint8_t data[packet_length];
 	int index = 0;
 	
 	// Get all status values
@@ -177,12 +179,12 @@ static void command_get_board_status(void)
 	uint16_t inChannel5 = servo_in_get_current_value(5);
 	uint16_t inChannel6 = servo_in_get_current_value(6);
 	uint16_t inChannel7 = servo_in_get_current_value(7);
-	uint16_t accX = 0;
-	uint16_t accY = 0;
-	uint16_t accZ = 0;
-	uint16_t gyroX = 0;
-	uint16_t gyroY = 0;
-	uint16_t gyroZ = 0;
+	float accX = mpu_6000_get_x_acc();
+	float accY = mpu_6000_get_y_acc();
+	float accZ = mpu_6000_get_z_acc();
+	float gyroX = mpu_6000_get_x_gyr();
+	float gyroY = mpu_6000_get_y_gyr();
+	float gyroZ = mpu_6000_get_z_gyr();
 		
 	// Start byte
 	data[index++] = PACKET_START_BYTE;
@@ -234,23 +236,23 @@ static void command_get_board_status(void)
 	memcpy(data + index, &inChannel7, 2);
 	index += 2;
 	// Acceleration X
-	memcpy(data + index, &accX, 2);
-	index += 2;
+	memcpy(data + index, &accX, 4);
+	index += 4;
 	// Acceleration Y
-	memcpy(data + index, &accY, 2);
-	index += 2;
+	memcpy(data + index, &accY, 4);
+	index += 4;
 	// Acceleration Z
-	memcpy(data + index, &accZ, 2);
-	index += 2;
+	memcpy(data + index, &accZ, 4);
+	index += 4;
 	// Gyro X
-	memcpy(data + index, &gyroX, 2);
-	index += 2;
+	memcpy(data + index, &gyroX, 4);
+	index += 4;
 	// Gyro Y
-	memcpy(data + index, &gyroY, 2);
-	index += 2;
+	memcpy(data + index, &gyroY, 4);
+	index += 4;
 	// Gyro Z
-	memcpy(data + index, &gyroZ, 2);
-	index += 2;
+	memcpy(data + index, &gyroZ, 4);
+	index += 4;
 	// CRC
 	data[index++] = 0x88;
 	// Stop byte
