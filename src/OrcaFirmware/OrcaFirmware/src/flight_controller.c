@@ -41,7 +41,7 @@
 
 pidData_t rollPid;
 FILTER_DATA_t *actualSensorData;
-int16_t actuatingRoll = 0;
+float actuatingRoll = 0;
 float rollSetValue = 0;
 
 /**************************************************************************

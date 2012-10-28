@@ -19,6 +19,18 @@
 __author__ = 'Sebastian Ruml'
 
 
-class BoardSettings():
+from logger import Logger
+
+# Global firmware settings object
+boardSettings = None
+
+
+class _BoardSettings():
 	def __init__(self):
 		pass
+
+def BoardSettings():
+	global boardSettings
+	if not boardSettings:
+		boardSettings = _BoardSettings()
+	return boardSettings
