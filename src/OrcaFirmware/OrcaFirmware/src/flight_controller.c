@@ -67,7 +67,7 @@ void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settin
 	}		
 	
 	/* Roll PID Init */
-	pid_Init(settings->pid_roll_p_factor, settings->pid_roll_i_factor, settings->pid_roll_d_factor, &rollPid);	
+	pid_Init(settings->pid_roll_p_factor, settings->pid_roll_i_factor, settings->pid_roll_d_factor, settings->pid_roll_i_limit , &rollPid);	
 }	
 
 /**************************************************************************
@@ -222,12 +222,13 @@ int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 * \param p_factor P factor tuning constant
 * \param i_factor I factor tuning constant
 * \param d_factor D factor tuning constant
+* \param i_limit I maximum value
 *
 * \return  status code
 ***************************************************************************/
-void flight_controller_update_pid_controller(int16_t p_factor, int16_t i_factor, int16_t d_factor)
+void flight_controller_update_pid_controller(float p_factor, float i_factor, float d_factor, float i_limit)
 {
-	pid_update_tuning_constants(p_factor, i_factor, d_factor, &rollPid);
+	pid_update_tuning_constants(p_factor, i_factor, d_factor, i_limit, &rollPid);
 }
 
 /**************************************************************************
@@ -294,8 +295,7 @@ int flight_controller_task(FLIGHT_CONTROLLER_t *flightController)
 		{
 			pid_Reset_Integrator(&rollPid);			
 		}
-		
-				
+			
 		flight_controller_calc_left_edf(flightController);
 		flight_controller_calc_right_edf(flightController);
 		flight_controller_calc_left_servo(flightController);

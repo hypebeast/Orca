@@ -21,7 +21,7 @@ unsigned long pidLastMicros = 0;
  */ 
 
 // Set up PID controller parameters    
-void pid_Init(float p_factor, float i_factor, float d_factor, struct PID_DATA *pid)   
+void pid_Init(float p_factor, float i_factor, float d_factor, float i_limit, struct PID_DATA *pid)   
 {   
   // Start values for PID controller   
   pid->sumError = 0;   
@@ -29,7 +29,8 @@ void pid_Init(float p_factor, float i_factor, float d_factor, struct PID_DATA *p
   // Tuning constants for PID loop   
   pid->P_Factor = p_factor /** PID_SCALING_FACTOR*/;   
   pid->I_Factor = i_factor /** PID_SCALING_FACTOR*/;   
-  pid->D_Factor = d_factor /** PID_SCALING_FACTOR*/;   
+  pid->D_Factor = d_factor /** PID_SCALING_FACTOR*/;  
+   
   // Limits to avoid overflow   
   pid->maxError = MAX_INT / (pid->P_Factor + 1);   
   pid->maxSumError = MAX_I_TERM / (pid->I_Factor + 1);   
@@ -58,19 +59,20 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
 		
   error = (setPoint - processValue);   
    
-  // Calculate Pterm and limit error overflow   
+  /* Calculate Pterm and limit error overflow */   
   if (error > pid_st->maxError){   
     p_term = MAX_INT;   
   }   
   else if (error < -pid_st->maxError){   
     p_term = -MAX_INT;   
-  }   
+  }  
   else{   
     p_term = pid_st->P_Factor * error;   
   }   
    
-  // Calculate Iterm and limit integral runaway   
-  temp = (pid_st->sumError + error);   
+  /* Calculate Iterm and limit integral runaway */   
+  temp = (pid_st->sumError + error); 
+    
   if(temp > pid_st->maxSumError){   
     i_term = MAX_I_TERM;   
     pid_st->sumError = pid_st->maxSumError;   
@@ -82,9 +84,15 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
   else{   
     pid_st->sumError = temp;   
     i_term = (pid_st->I_Factor) * (pid_st->sumError) * ta;   
-  }   
+  } 
+  
+  /* Limit the i value */
+  if(i_term > pid_st->I_Limit)
+	i_term = pid_st->I_Limit;
+  else if(i_term < -pid_st->I_Limit)
+	i_term = -pid_st->I_Limit;  
    
-  // Calculate Dterm   
+  /* Calculate D term */   
   d_term = pid_st->D_Factor * (processValue - (pid_st->lastProcessValue)) / ta;   
    
   pid_st->lastProcessValue = processValue;   
@@ -122,12 +130,13 @@ void pid_Reset_Integrator(pidData_t *pid_st)
 *
 * \return  status code
 ***************************************************************************/
-void pid_update_tuning_constants(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_DATA *pid)
+void pid_update_tuning_constants(float p_factor, float i_factor, float d_factor, float i_limit, struct PID_DATA *pid)
 {
-	pid->P_Factor = p_factor * PID_SCALING_FACTOR;
-	pid->I_Factor = i_factor * PID_SCALING_FACTOR;
-	pid->D_Factor = d_factor * PID_SCALING_FACTOR;
+	pid->P_Factor = p_factor;
+	pid->I_Factor = i_factor;
+	pid->D_Factor = d_factor;
 	
+	pid->I_Limit = i_limit;
 	pid->maxError = MAX_INT / (pid->P_Factor + 1);
 	pid->maxSumError = MAX_I_TERM / (pid->I_Factor + 1);
 }   

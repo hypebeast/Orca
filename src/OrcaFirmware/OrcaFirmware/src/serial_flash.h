@@ -36,6 +36,7 @@ typedef struct ORCA_FLASH_SETTINGS
 	float pid_roll_p_factor;	/*!< brief Startup p factor for the roll PID controller. */
 	float pid_roll_i_factor;	/*!< brief Startup i factor for the roll PID controller. */
 	float pid_roll_d_factor;	/*!< brief Startup d factor for the roll PID controller. */
+	float pid_roll_i_limit;		/*!< brief Startup i limit value for the roll PID controller. */
 } ORCA_FLASH_SETTINGS_t;
 
 

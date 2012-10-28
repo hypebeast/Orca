@@ -14,6 +14,7 @@ In the top of the two boxes make an entry for "libm.a" */
 
 FILTER_DATA_t *filterdata;
 float dt = 0;
+float accRoll = 0;
 unsigned long lastMicros = 0;
 
 static float filter_ars_update(const float angle_m);
@@ -118,7 +119,7 @@ static float filter_ars_update(const float angle_m)
 
 static float filter_predict_accG_roll(void)
 {
-	return -(atan2(-(filterdata->zAcc), filterdata->yAcc)-(PI/2.0));
+	accRoll = -(atan2(-(filterdata->zAcc), filterdata->yAcc)-(PI/2.0));
 }
 
 static float filter_conv_degrees_to_rad(float degrees)
@@ -131,6 +132,11 @@ static float filter_conv_rad_to_degrees(float degrees)
 	return degrees*180/PI;
 }
 
+float filter_get_acc_roll(void)
+{
+	return filter_conv_rad_to_degrees(accRoll);
+}
+
 void filter_task(unsigned long time)
 {
 	/* Calculate time elapsed since last call (dt) */
@@ -139,11 +145,10 @@ void filter_task(unsigned long time)
 	lastMicros = time;						
 	
 	/* Execute kalman filter */
-	float tmp = filter_predict_accG_roll();
+	filter_predict_accG_roll();
 	filter_ars_predict();		// Kalman predict
-	filter_ars_update(tmp);    // Kalman update + result (angle)
+	filter_ars_update(accRoll);    // Kalman update + result (angle)
 	
-	filterdata->test = filter_conv_rad_to_degrees(tmp); //Test stuff
 	filterdata->roll = filter_conv_rad_to_degrees(filterdata->x_angle);
 	
 }
