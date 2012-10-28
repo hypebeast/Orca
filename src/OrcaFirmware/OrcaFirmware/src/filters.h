@@ -22,7 +22,6 @@
 
 /*! Filter struct */
 typedef struct FILTER_DATA{	
-	float test;
 	float xAcc;				/*!< brief Actual acceleration x-axis in g (should be towards the nose of the plane). */
 	float yAcc;				/*!< brief Actual acceleration y-axis in g (should be towards the right wingtip). */
 	float zAcc;				/*!< brief Actual acceleration z-axis in g (should be towards the ground).*/
@@ -66,5 +65,6 @@ typedef struct FILTER_DATA{
 void filter_init(FILTER_DATA_t *filter, float Q_angle, float Q_gyro, float R_angle);
 void filter_update_constants(float Q_angle, float Q_gyro, float R_angle);
 void filter_task(unsigned long time);
+float filter_get_acc_roll(void);
 
 #endif /* FILTERS_H_ */

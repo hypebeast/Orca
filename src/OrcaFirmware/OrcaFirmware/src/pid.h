@@ -28,6 +28,8 @@ typedef struct PID_DATA{
   float I_Factor; 
   //! The Derivative tuning constant, multiplied with SCALING_FACTOR 
   float D_Factor; 
+   //! Maximum allowed I value
+  float I_Limit;
   //! Maximum allowed error, avoid overflow 
   float maxError; 
   //! Maximum allowed sumerror, avoid overflow 
@@ -47,9 +49,9 @@ typedef struct PID_DATA{
 #define FALSE           0 
 #define TRUE            1 
 
-void pid_Init(float p_factor, float i_factor, float d_factor, struct PID_DATA *pid); 
+void pid_Init(float p_factor, float i_factor, float d_factor, float i_limit, struct PID_DATA *pid)  ; 
 int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  time, struct PID_DATA *pid_st);
 void pid_Reset_Integrator(pidData_t *pid_st); 
-void pid_update_tuning_constants(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_DATA *pid); 
+void pid_update_tuning_constants(float p_factor, float i_factor, float d_factor, float i_limit, struct PID_DATA *pid);
 
 #endif /* PID_H_ */

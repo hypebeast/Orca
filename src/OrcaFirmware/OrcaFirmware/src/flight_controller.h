@@ -26,6 +26,7 @@
 #define PID_ROLL_P_FACTOR_CONF			0.04f	/*!< brief Default p factor for the roll PID controller. */
 #define PID_ROLL_I_FACTOR_CONF			0.0008f		/*!< brief Default p factor for the roll PID controller. */
 #define PID_ROLL_D_FACTOR_CONF			0.002f		/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_I_LIMIT_CONF			300.0f		/*!< brief Default I limit value. */
 
 //---------------------------------------------------------------------
 //	General Servo Definitions
@@ -81,7 +82,7 @@ int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_task(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController);
-void flight_controller_update_pid_controller(int16_t p_factor, int16_t i_factor, int16_t d_factor);
+void flight_controller_update_pid_controller(float p_factor, float i_factor, float d_factor, float i_limit);
 float flight_controller_get_actuating_roll_angle(void);
 float flight_controller_get_set_roll_angle(void);
 float flight_controller_get_sensor_roll_angle(void);

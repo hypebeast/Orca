@@ -187,7 +187,8 @@ uint16_t serial_flash_init(void)
 	settings->pid_roll_p_factor = PID_ROLL_P_FACTOR_CONF;   
 	settings->pid_roll_i_factor = PID_ROLL_I_FACTOR_CONF; 
 	settings->pid_roll_d_factor = PID_ROLL_D_FACTOR_CONF;
-	 
+	settings->pid_roll_i_limit = PID_ROLL_I_LIMIT_CONF; 
+	
 	/* Write to serial flash */
 	serial_flash_save_settings();
 	
