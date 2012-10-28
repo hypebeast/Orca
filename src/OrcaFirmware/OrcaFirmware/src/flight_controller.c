@@ -85,7 +85,7 @@ int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 					(float)(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
 	
 	/*  */
-	actuatingRoll = pid_Controller((int16_t)(rollSetValue * 10), (int16_t)(actualSensorData->roll * 10), 10000, &rollPid) / 10;	
+	actuatingRoll = pid_Controller((int16_t)(rollSetValue * 10), (int16_t)(actualSensorData->roll * 10), 10000, &rollPid)/10;	
 }
 
 /**************************************************************************
@@ -287,7 +287,15 @@ int flight_controller_task(FLIGHT_CONTROLLER_t *flightController)
 	if(flightController->mode && FLIGHT_CONTROLLER_MODE_RC)
 	{
 		//Note: Do not change the call sequence!
-		flight_controller_calc_roll(flightController);		
+		flight_controller_calc_roll(flightController);
+		
+		/* Reset PID Controller if we get no input signal */
+		if(flightController->rcServoIn->servo3 <= 1200)
+		{
+			pid_Reset_Integrator(&rollPid);			
+		}
+		
+				
 		flight_controller_calc_left_edf(flightController);
 		flight_controller_calc_right_edf(flightController);
 		flight_controller_calc_left_servo(flightController);

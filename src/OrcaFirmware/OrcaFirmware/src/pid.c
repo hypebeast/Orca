@@ -21,7 +21,7 @@ unsigned long pidLastMicros = 0;
  */ 
 
 // Set up PID controller parameters    
-void pid_Init(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_DATA *pid)   
+void pid_Init(float p_factor, float i_factor, float d_factor, struct PID_DATA *pid)   
 {   
   // Start values for PID controller   
   pid->sumError = 0;   
@@ -46,8 +46,8 @@ void pid_Init(int16_t p_factor, int16_t i_factor, int16_t d_factor, struct PID_D
  */   
 int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  time, struct PID_DATA *pid_st)   
 {   
-  int16_t error, p_term, d_term;   
-  int32_t i_term, ret, temp;   
+  float error, p_term, d_term;   
+  float i_term, ret, temp;   
    
    	/* Calculate time elapsed since last call (dt) */
 	/*please note that overflows are ok, since for example 0x0001 - 0x00FE will be equal to 2 */
@@ -56,7 +56,7 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
 	//ta = (float)(time - pidLastMicros) / 1000000;
 	//pidLastMicros = time;
 		
-  error = setPoint - processValue;   
+  error = (setPoint - processValue);   
    
   // Calculate Pterm and limit error overflow   
   if (error > pid_st->maxError){   
@@ -70,7 +70,7 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
   }   
    
   // Calculate Iterm and limit integral runaway   
-  temp = pid_st->sumError + error;   
+  temp = (pid_st->sumError + error);   
   if(temp > pid_st->maxSumError){   
     i_term = MAX_I_TERM;   
     pid_st->sumError = pid_st->maxSumError;   
@@ -81,15 +81,15 @@ int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  ti
   }   
   else{   
     pid_st->sumError = temp;   
-    i_term = (int32_t)((float)(pid_st->I_Factor) * (float)(pid_st->sumError) * ta);   
+    i_term = (pid_st->I_Factor) * (pid_st->sumError) * ta;   
   }   
    
   // Calculate Dterm   
-  d_term = (int32_t)((float)(pid_st->D_Factor) * ((float)processValue - (float)(pid_st->lastProcessValue)) / ta);   
+  d_term = pid_st->D_Factor * (processValue - (pid_st->lastProcessValue)) / ta;   
    
   pid_st->lastProcessValue = processValue;   
    
-  ret = (p_term + i_term + d_term) / PID_SCALING_FACTOR;   
+  ret = (p_term + i_term + d_term);   
   if(ret > MAX_INT){   
     ret = MAX_INT;   
   }   
