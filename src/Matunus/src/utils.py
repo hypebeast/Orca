@@ -73,10 +73,13 @@ def enumerate_serial_ports():
         existing on this computer.
     """
     path = 'HARDWARE\\DEVICEMAP\\SERIALCOMM'
+
     try:
         key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
     except WindowsError:
-        raise Exception
+        #raise Exception
+        # Key not found; just return
+        return
 
     for i in itertools.count():
         try:

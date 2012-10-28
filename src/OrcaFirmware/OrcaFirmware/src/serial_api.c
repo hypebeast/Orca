@@ -13,6 +13,7 @@
 #include "crc8.h"
 #include "servo_in.h"
 #include "MPU6000.h"
+#include "flight_controller.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -161,7 +162,7 @@ static void command_get_all_servo_pos(void)
 **************************************************************************/
 static void command_get_board_status(void)
 {
-	uint8_t packet_length = 57;
+	uint8_t packet_length = 73;
 	uint8_t data[packet_length];
 	int index = 0;
 	
@@ -185,6 +186,10 @@ static void command_get_board_status(void)
 	float gyroX = mpu_6000_get_x_gyr();
 	float gyroY = mpu_6000_get_y_gyr();
 	float gyroZ = mpu_6000_get_z_gyr();
+	float kalmanOutputRoll = flight_controller_get_sensor_roll_angle();
+	float kalmanReferenceValueRoll = ;
+	float setValueRollAngle = flight_controller_get_set_roll_angle();
+	float actuatingVariablePidRoll = flight_controller_get_actuating_roll_angle();
 		
 	// Start byte
 	data[index++] = PACKET_START_BYTE;
@@ -252,6 +257,18 @@ static void command_get_board_status(void)
 	index += 4;
 	// Gyro Z
 	memcpy(data + index, &gyroZ, 4);
+	index += 4;
+	// Kalman Output Roll
+	memcpy(data + index, &kalmanOutputRoll, 4);
+	index += 4;
+	// Kalman Reference Value Roll
+	memcpy(data + index, &kalmanReferenceValueRoll, 4);
+	index += 4;
+	// Set value Roll Angle
+	memcpy(data + index, &setValueRollAngle, 4);
+	index += 4;
+	// Actuating Variable PID Roll
+	memcpy(data + index, &actuatingVariablePidRoll, 4);
 	index += 4;
 	// CRC
 	data[index++] = 0x88;

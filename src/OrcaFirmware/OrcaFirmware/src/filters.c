@@ -145,6 +145,5 @@ void filter_task(unsigned long time)
 	
 	filterdata->test = filter_conv_rad_to_degrees(tmp); //Test stuff
 	filterdata->roll = filter_conv_rad_to_degrees(filterdata->x_angle);
-	
 }
 

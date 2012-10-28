@@ -238,6 +238,10 @@ class GetBoardStatusMessage(BaseMessage):
         self.gyroX = 0
         self.gyroY = 0
         self.gyroZ = 0
+        self.kalmanOutputRoll = 0
+        self.kalmanReferenceValueRoll = 0
+        self.setValueRollAngle = 0
+        self.actuatingVariablePidRoll = 0
 
     def getPacket(self):
         return self._encodePackage([])
@@ -295,6 +299,14 @@ class GetBoardStatusMessage(BaseMessage):
             message.gyroY = struct.unpack_from("f", package, offset)[0]
             offset += 4
             message.gyroZ = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanOutputRoll = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanReferenceValueRoll = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.setValueRollAngle = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.actuatingVariablePidRoll = struct.unpack_from("f", package, offset)[0]
         except:
             pass
 
