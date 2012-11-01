@@ -45,7 +45,7 @@ void pid_Init(float p_factor, float i_factor, float d_factor, float i_limit, str
  *   param time Abtastzeit (us) 
  *  \param pid_st  PID status struct.  
  */   
-int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  time, struct PID_DATA *pid_st)   
+float pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  time, struct PID_DATA *pid_st)   
 {   
   float error, p_term, d_term;   
   float i_term, ret, temp;   

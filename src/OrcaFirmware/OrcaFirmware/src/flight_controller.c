@@ -41,7 +41,7 @@
 
 pidData_t rollPid;
 FILTER_DATA_t *actualSensorData;
-int16_t actuatingRoll = 0;
+float actuatingRoll = 0;
 float rollSetValue = 0;
 
 /**************************************************************************
@@ -202,13 +202,11 @@ int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController)
 ***************************************************************************/
 int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 {
+	flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_EDF_REAR_OFFSET;
 
 	if(flightController->rcServoIn->servo3 >= FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET)
-		flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_EDF_REAR_OFFSET+ flightController->rcServoIn->servo3;
-
-	else
-		flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH;	
-		
+		flightController->rearEdfSetPoint = flightController->rcServoIn->servo3;
+	
 	return SYSTEM_INFO_TRUE;	
 }
 
@@ -301,7 +299,6 @@ int flight_controller_task(FLIGHT_CONTROLLER_t *flightController)
 		flight_controller_calc_left_servo(flightController);
 		flight_controller_calc_right_servo(flightController);
 		flight_controller_calc_rear_edf(flightController);
-		
 		
 		//TODO: Servo Out
 		servo_set_pos_ticks(1,flightController->leftEdfSetPoint);

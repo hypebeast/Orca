@@ -50,7 +50,7 @@ typedef struct PID_DATA{
 #define TRUE            1 
 
 void pid_Init(float p_factor, float i_factor, float d_factor, float i_limit, struct PID_DATA *pid)  ; 
-int16_t pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  time, struct PID_DATA *pid_st);
+float pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  time, struct PID_DATA *pid_st);
 void pid_Reset_Integrator(pidData_t *pid_st); 
 void pid_update_tuning_constants(float p_factor, float i_factor, float d_factor, float i_limit, struct PID_DATA *pid);
 

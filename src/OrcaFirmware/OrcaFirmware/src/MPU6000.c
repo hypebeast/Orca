@@ -113,6 +113,15 @@ uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit)
 	return SYSTEM_INFO_TRUE;
 }
 
+/**************************************************************************
+* \brief MPU 6000 write
+* Writes in a MPU 6000 register via the I2C Bus.
+*
+* \param addr the register address to be read
+* \param value written to the specified register
+*
+* \return  status code
+***************************************************************************/
 uint16_t mpu_6000_write(uint8_t addr, uint8_t value)
 {
 	twi_package_t package;
@@ -134,6 +143,16 @@ uint16_t mpu_6000_write(uint8_t addr, uint8_t value)
 	return SYSTEM_INFO_TRUE;
 }
 
+/**************************************************************************
+* \brief MPU 6000 Read
+*	Reads a MPU 6000 register via the I2C Bus. 
+*
+* \param addr the register address to be read
+* \param number number how many bytes should be read
+* \param *datarec data will be stored in this array
+*
+* \return  status code
+***************************************************************************/
 uint16_t mpu_6000_read(uint8_t addr, uint8_t number, uint8_t *datarec)
 {
 
@@ -153,13 +172,13 @@ uint16_t mpu_6000_read(uint8_t addr, uint8_t number, uint8_t *datarec)
 }	
 
 /**************************************************************************
-* \\brief MPU 6000 Read Accelerometer Measurements
+* \brief MPU 6000 Read Accelerometer Measurements
 *	Reads the accelerometer measurements (x,y and z-axis). /n
 *	The values are saved in the MPU data structure. /n
 *
-* \\param *mpu MPU data structure
+* \param *mpu MPU data structure
 *
-* \\return  status code
+* \return  status code
 ***************************************************************************/
 uint16_t mpu_6000_read_accelerometer_measurements(void)
 {

@@ -45,7 +45,7 @@
 //---------------------------------------------------------------------
 //	Rear EDF Definitions
 //---------------------------------------------------------------------
-#define FLIGHT_CONTROLLER_EDF_REAR_OFFSET				000		/*!< brief Additions-Offset für rear EDF */
+#define FLIGHT_CONTROLLER_EDF_REAR_OFFSET				FLIGHT_CONTROLLER_SERVO_LOWER_PULSE_WIDTH		/*!< brief Additions-Offset für rear EDF */
 #define FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET			1260
 
 //---------------------------------------------------------------------
