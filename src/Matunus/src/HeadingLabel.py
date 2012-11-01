@@ -68,6 +68,9 @@ class HeadingLabel(QtGui.QFrame):
     def setSize(self, width, height):
         self.setGeometry(0, 0, width, height)
 
+    def setTextAlign(self):
+        pass
+
    	def paintEvent(self, e):
 		qp = QtGui.QPainter()
 		qp.begin(self)

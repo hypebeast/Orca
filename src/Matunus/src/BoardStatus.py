@@ -21,7 +21,6 @@ __author__ = 'Sebastian Ruml'
 
 from ApiCommands import CommandTypes
 from logger import Logger
-from FirmwareSettings import FirmwareSettings
 
 
 class BoardStatus(object):
@@ -34,9 +33,6 @@ class BoardStatus(object):
 
 		# Logger
 		self._logger = Logger()
-
-		# Firmware Settings
-		self._firmwareSettings = FirmwareSettings()
 
 		# Add all fields
 		self._addFields()

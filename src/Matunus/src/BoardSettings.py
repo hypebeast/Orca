@@ -20,14 +20,73 @@ __author__ = 'Sebastian Ruml'
 
 
 from logger import Logger
+from ApiCommands import CommandTypes
 
 # Global firmware settings object
 boardSettings = None
 
-
 class _BoardSettings():
 	def __init__(self):
-		pass
+		self._logger = Logger()
+
+		self.pidRollPFactor = 0
+		self.pidRollIFactor = 0
+		self.pidRollDFactor = 0
+		self.pidPitchPFactor = 0
+		self.pidPitchIFactor = 0
+		self.pidPitchDFactor = 0
+		self.pidYawPFactor = 0
+		self.pidYawIFactor = 0
+		self.pidYawDFactor = 0
+		self.kalmanRollQAngle = 0
+		self.kalmanRollQGyro = 0
+		self.kalmanRollRAngle = 0
+		self.kalmanPitchQAngle = 0
+		self.kalmanPitchQGyro = 0
+		self.kalmanPitchRAngle = 0
+		self.kalmanYawQAngle = 0
+		self.kalmanYawQGyro = 0
+		self.kalmanYawRAngle = 0
+
+		self._lastUpdate = 0
+
+	def updateFromMessage(self, message, timestamp):
+		if message is None:
+			raise Exception
+
+		if message.commandType is not CommandTypes.GET_BOARD_SETTINGS:
+			return
+
+		self._lastUpdate = timestamp
+
+		self.pidRollPFactor = message.pidRollPFactor
+		self.pidRollIFactor = message.pidRollIFactor
+		self.pidRollDFactor = message.pidRollDFactor
+		self.pidPitchPFactor = message.pidPitchPFactor
+		self.pidPitchIFactor = message.pidPitchIFactor
+		self.pidPitchDFactor = message.pidPitchDFactor
+		self.pidYawPFactor = message.pidYawPFactor
+		self.pidYawIFactor = message.pidYawIFactor
+		self.pidYawDFactor = message.pidYawDFactor
+		self.kalmanRollQAngle = message.kalmanRollQAngle
+		self.kalmanRollQGyro = message.kalmanRollQGyro
+		self.kalmanRollRAngle = message.kalmanRollRAngle
+		self.kalmanPitchQAngle = message.kalmanPitchQAngle
+		self.kalmanPitchQGyro = message.kalmanPitchQGyro
+		self.kalmanPitchRAngle = message.kalmanPitchRAngle
+		self.kalmanYawQAngle = message.kalmanYawQAngle
+		self.kalmanYawQGyro = message.kalmanYawQGyro
+		self.kalmanYawRAngle = message.kalmanYawRAngle
+
+	@property
+	def outputChannelsLowerOffset(self):
+		"""In microseconds"""
+		return 490
+
+	@property
+	def inputChannelsOffset():
+		"""In microseconds"""
+		return 500
 
 def BoardSettings():
 	global boardSettings

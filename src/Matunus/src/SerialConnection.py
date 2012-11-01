@@ -237,7 +237,7 @@ class SerialConnection(QObject):
 
                 # Wait for some time
                 #time.sleep(self.reader_interval)
-        except serial.SerialException, e:
+        except serial.SerialException:
             self.reader_alive = False
 
     def processReceivedMessage(self, buffer):
@@ -247,6 +247,7 @@ class SerialConnection(QObject):
         """
         message = MessageFactory.getMessage(buffer)
 
+        # Put the received message with a timestamp in the message queue
         timestamp = time.clock()
         self.messageQueue.put((message, timestamp))
 

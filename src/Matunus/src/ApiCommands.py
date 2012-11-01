@@ -34,6 +34,14 @@ class CommandTypes:
     GET_SERVO_POS = 0x0002
     GET_ALL_SERVO_POS = 0x0003
     GET_BOARD_STATUS = 0x0010
+    GET_BOARD_SETTINGS = 0x0020
+    WRITE_BOARD_SETTINGS = 0x0021
+    SET_ROLL_PID_COEFFICIENTS = 0x0022
+    SET_PITCH_PID_COEFFICIENTS = 0x0023
+    SET_YAW_PID_COEFFICIENTS = 0x0024
+    SET_KALMAN_ROLL_CONSTANTS = 0x0025
+    SET_KALMAN_PITCH_CONSTANTS = 0x0026
+    SET_KALMAN_YAW_CONSTANTS = 0x0027
 
 
 class MessageTypes:
@@ -67,6 +75,8 @@ class MessageFactory:
             pass
         elif command_type == CommandTypes.GET_BOARD_STATUS:
             message = GetBoardStatusMessage().fromPacket(data)
+        elif command_type == CommandTypes.GET_BOARD_SETTINGS:
+            message = GetBoardSettingsMessage().fromPacket(data)
 
         return message
 
@@ -311,3 +321,104 @@ class GetBoardStatusMessage(BaseMessage):
             pass
 
         return message
+
+
+class GetBoardSettingsMessage(BaseMessage):
+    """
+    This message type requests the board settings (Command Type: 0x0020)
+    """
+    def __init__(self):
+        BaseMessage.__init__(self, CommandTypes.GET_BOARD_SETTINGS)
+        self.messageType = MessageTypes.COMMAND_MESSAGE
+
+        self.pidRollPFactor = 0
+        self.pidRollIFactor = 0
+        self.pidRollDFactor = 0
+        self.pidPitchPFactor = 0
+        self.pidPitchIFactor = 0
+        self.pidPitchDFactor = 0
+        self.pidYawPFactor = 0
+        self.pidYawIFactor = 0
+        self.pidYawDFactor = 0
+        self.kalmanRollQAngle = 0
+        self.kalmanRollQGyro = 0
+        self.kalmanRollRAngle = 0
+        self.kalmanPitchQAngle = 0
+        self.kalmanPitchQGyro = 0
+        self.kalmanPitchRAngle = 0
+        self.kalmanYawQAngle = 0
+        self.kalmanYawQGyro = 0
+        self.kalmanYawRAngle = 0
+
+    def getPacket(self):
+        return self._encodePackage([])
+
+    @staticmethod
+    def fromPacket(package):
+         # Check for the right command type
+        command_type = struct.unpack_from("H", package, 2)
+        if command_type[0] is not CommandTypes.GET_BOARD_STATUS:
+            return None
+
+        message = GetBoardStatusMessage()
+        message.messageType = MessageTypes.RESPONSE_MESSAGE
+
+        # Parse the data
+        offset = 5
+        try:
+            message.pidRollPFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidRollIFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidRollDFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidPitchPFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidPitchIFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidPitchDFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidYawPFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidYawIFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidYawDFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanRollQAngle = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanRollQGyro = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanRollRAngle = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanPitchQAngle = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanPitchQGyro = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanPitchRAngle = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanYawQAngle = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanYawQGyro = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.kalmanYawRAngle = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+        except:
+            pass
+
+        return message
+
+
+class SaveSettingsMessage(BaseMessage):
+    """
+    Saves the board settings to the flash (Command Type: 0x0021)
+    """
+    def __init__(self):
+        BaseMessage.__init__(self, CommandTypes.WRITE_BOARD_SETTINGS)
+        self.messageType = MessageTypes.COMMAND_MESSAGE
+
+    def getPacket(self):
+        return self._encodePackage([])
+
+    @staticmethod
+    def fromPacket(package):
+        raise NotImplementedError

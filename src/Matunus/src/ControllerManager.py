@@ -22,18 +22,17 @@ __author__ = 'Sebastian Ruml'
 import time
 import threading
 
-from PyQt4.QtCore import QObject, pyqtSignal
-
-#try:
-#    from PyQt4 import pyqtSignal
-#except ImportError:
-#    print "No PyQt found!"
-#    import sys
-#    sys.exit(2)
+try:
+    from PyQt4 import pyqtSignal
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
 from SerialConnection import SerialConnection
-from ApiCommands import CommandTypes, ServoPositionMessage, GetBoardStatusMessage
+from ApiCommands import CommandTypes, ServoPositionMessage, GetBoardStatusMessage, GetBoardSettingsMessage
 from BoardStatus import BoardStatus
+from BoardSettings import BoardSettings
 from logger import Logger
 from utils import get_all_from_queue 
 
@@ -50,6 +49,9 @@ class ControllerManager(QObject):
 	# This signals is emitted when the board status was updated
 	board_status_updated = pyqtSignal()
 
+	# This signal is emitted when the board settings are updated
+	board_settings_updated = pyqtSignal()
+
 	def __init__(self):
 		QObject.__init__(self)
 
@@ -60,6 +62,9 @@ class ControllerManager(QObject):
 
         # Board status object
 		self.boardStatus = BoardStatus()
+
+		# Board settings object
+		self.boardSettings = BoardSettings()
 
         # Status reader
 		self.statusReaderThread = None
@@ -77,6 +82,9 @@ class ControllerManager(QObject):
 
 		# Start reading the board status
 		self._startStatusReader()
+
+		# Read once the board settings
+		self.updateBoardSettings()
 
 	def disconnect(self):
 		"""Disconnects from the flight controller"""
@@ -140,7 +148,10 @@ class ControllerManager(QObject):
 		if len(messages) > 0:
 			#self._logger.debug("New status response received")
 			for message in messages:
-				self._updateStatus(message[0], message[1])
+				if message.commandType == CommandTypes.GET_BOARD_STATUS:
+					self._updateStatus(message[0], message[1])
+				elif message.commandType == CommandTypes.GET_BOARD_SETTINGS:
+					self._updateBoardSettings(message[0], message[1])
 
 	def _updateStatus(self, message, timestamp):
 		"""
@@ -153,6 +164,12 @@ class ControllerManager(QObject):
 		# Emit signal
 		self.board_status_updated.emit()
 
+	def _updateBoardSettings(self, message, timestamp):
+		self.boardSettings.updateFromMessage(message, timestamp)
+
+		# Emit signal
+		self.board_settings_updated.emit()
+
 	###########################################
 	## Output channels (servo, engine) methods
 	###########################################
@@ -163,4 +180,21 @@ class ControllerManager(QObject):
 		self.serial.writeMessage(message)
 
 	def getServoPos(self, servo_nr=1):
+		pass
+
+	###########################################
+	## Board settings methods
+	###########################################	
+	
+	def updateBoardSettings(self):
+		message = GetBoardSettingsMessage()
+		self.serial.writeMessage(message)
+
+	def saveBoardSettings(self):
+		pass
+
+	def setRollPIDCoefficients(self, p_fac, i_fac, d_fac):
+		pass
+
+	def setRollKalmandConstants(self, q_angle, q_gyro, r_angle):
 		pass

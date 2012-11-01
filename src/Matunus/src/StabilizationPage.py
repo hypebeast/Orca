@@ -26,10 +26,20 @@ except ImportError:
 	sys.exit(2)
 
 from HeadingLabel import HeadingLabel
+from BoardSettings import BoardSettings
+
 
 class StabilizationPage(QtGui.QWidget):
-	def __init__(self):
+	def __init__(self, controllerManager=None):
 		super(StabilizationPage, self).__init__()
+
+		if controllerManager is None:
+			raise Exception
+
+		self.boardController = controllerManager
+		self.boardController.board_settings_updated.connect(self._onBoardStatusUpdated)
+
+		self._boardSettings = BoardSettings()
 
 		self._createUi()
 
@@ -73,16 +83,16 @@ class StabilizationPage(QtGui.QWidget):
 		label = QtGui.QLabel("Roll")
 		hLayout.addWidget(label)
 		hLayout.addSpacing(150)
-		self.spbRollKp = QtGui.QSpinBox()
+		self.spbRollKp = QtGui.QDoubleSpinBox()
 		self.spbRollKp.setMinimumWidth(150)
 		hLayout.addWidget(self.spbRollKp)
-		self.spbRollKi = QtGui.QSpinBox()
+		self.spbRollKi = QtGui.QDoubleSpinBox()
 		self.spbRollKi.setMinimumWidth(150)
 		hLayout.addWidget(self.spbRollKi)
-		self.spbRollKd = QtGui.QSpinBox()
+		self.spbRollKd = QtGui.QDoubleSpinBox()
 		self.spbRollKd.setMinimumWidth(150)
 		hLayout.addWidget(self.spbRollKd)
-		self.spbILimitRoll = QtGui.QSpinBox()
+		self.spbILimitRoll = QtGui.QDoubleSpinBox()
 		self.spbILimitRoll.setMinimumWidth(150)
 		hLayout.addWidget(self.spbILimitRoll)
 		hLayout.addStretch()
@@ -94,16 +104,16 @@ class StabilizationPage(QtGui.QWidget):
 		label = QtGui.QLabel("Pitch")
 		hLayout.addWidget(label)
 		hLayout.addSpacing(145)
-		self.spbPitchKp = QtGui.QSpinBox()
+		self.spbPitchKp = QtGui.QDoubleSpinBox()
 		self.spbPitchKp.setMinimumWidth(150)
 		hLayout.addWidget(self.spbPitchKp)
-		self.spbPitchKi = QtGui.QSpinBox()
+		self.spbPitchKi = QtGui.QDoubleSpinBox()
 		self.spbPitchKi.setMinimumWidth(150)
 		hLayout.addWidget(self.spbPitchKi)
-		self.spbPitchKd = QtGui.QSpinBox()
+		self.spbPitchKd = QtGui.QDoubleSpinBox()
 		self.spbPitchKd.setMinimumWidth(150)
 		hLayout.addWidget(self.spbPitchKd)
-		self.spbILimitPitch = QtGui.QSpinBox()
+		self.spbILimitPitch = QtGui.QDoubleSpinBox()
 		self.spbILimitPitch.setMinimumWidth(150)
 		hLayout.addWidget(self.spbILimitPitch)
 		hLayout.addStretch()
@@ -115,16 +125,16 @@ class StabilizationPage(QtGui.QWidget):
 		label = QtGui.QLabel("Yaw")
 		hLayout.addWidget(label)
 		hLayout.addSpacing(148)
-		self.spbYawKp = QtGui.QSpinBox()
+		self.spbYawKp = QtGui.QDoubleSpinBox()
 		self.spbYawKp.setMinimumWidth(150)
 		hLayout.addWidget(self.spbYawKp)
-		self.spbYawKi = QtGui.QSpinBox()
+		self.spbYawKi = QtGui.QDoubleSpinBox()
 		self.spbYawKi.setMinimumWidth(150)
 		hLayout.addWidget(self.spbYawKi)
-		self.spbYawKd = QtGui.QSpinBox()
+		self.spbYawKd = QtGui.QDoubleSpinBox()
 		self.spbYawKd.setMinimumWidth(150)
 		hLayout.addWidget(self.spbYawKd)
-		self.spbILimitYaw = QtGui.QSpinBox()
+		self.spbILimitYaw = QtGui.QDoubleSpinBox()
 		self.spbILimitYaw.setMinimumWidth(150)
 		hLayout.addWidget(self.spbILimitYaw)
 		hLayout.addStretch()
@@ -166,13 +176,13 @@ class StabilizationPage(QtGui.QWidget):
 		label = QtGui.QLabel("Roll")
 		hLayout.addWidget(label)
 		hLayout.addSpacing(150)
-		self.spbRollQAngle = QtGui.QSpinBox()
+		self.spbRollQAngle = QtGui.QDoubleSpinBox()
 		self.spbRollQAngle.setMinimumWidth(150)
 		hLayout.addWidget(self.spbRollQAngle)
-		self.spbRollQGyro = QtGui.QSpinBox()
+		self.spbRollQGyro = QtGui.QDoubleSpinBox()
 		self.spbRollQGyro.setMinimumWidth(150)
 		hLayout.addWidget(self.spbRollQGyro)
-		self.spbRollRAngle = QtGui.QSpinBox()
+		self.spbRollRAngle = QtGui.QDoubleSpinBox()
 		self.spbRollRAngle.setMinimumWidth(150)
 		hLayout.addWidget(self.spbRollRAngle)
 		hLayout.addStretch()
@@ -184,13 +194,13 @@ class StabilizationPage(QtGui.QWidget):
 		label = QtGui.QLabel("Pitch")
 		hLayout.addWidget(label)
 		hLayout.addSpacing(145)
-		self.spbPitchQAngle = QtGui.QSpinBox()
+		self.spbPitchQAngle = QtGui.QDoubleSpinBox()
 		self.spbPitchQAngle.setMinimumWidth(150)
 		hLayout.addWidget(self.spbPitchQAngle)
-		self.spbPitchQGyro = QtGui.QSpinBox()
+		self.spbPitchQGyro = QtGui.QDoubleSpinBox()
 		self.spbPitchQGyro.setMinimumWidth(150)
 		hLayout.addWidget(self.spbPitchQGyro)
-		self.spbPitchRAngle = QtGui.QSpinBox()
+		self.spbPitchRAngle = QtGui.QDoubleSpinBox()
 		self.spbPitchRAngle.setMinimumWidth(150)
 		hLayout.addWidget(self.spbPitchRAngle)
 		hLayout.addStretch()
@@ -202,13 +212,13 @@ class StabilizationPage(QtGui.QWidget):
 		label = QtGui.QLabel("Yaw")
 		hLayout.addWidget(label)
 		hLayout.addSpacing(150)
-		self.spbYawQAngle = QtGui.QSpinBox()
+		self.spbYawQAngle = QtGui.QDoubleSpinBox()
 		self.spbYawQAngle.setMinimumWidth(150)
 		hLayout.addWidget(self.spbYawQAngle)
-		self.spbYawQGyro = QtGui.QSpinBox()
+		self.spbYawQGyro = QtGui.QDoubleSpinBox()
 		self.spbYawQGyro.setMinimumWidth(150)
 		hLayout.addWidget(self.spbYawQGyro)
-		self.spbYawRAngle = QtGui.QSpinBox()
+		self.spbYawRAngle = QtGui.QDoubleSpinBox()
 		self.spbYawRAngle.setMinimumWidth(150)
 		hLayout.addWidget(self.spbYawRAngle)
 		hLayout.addStretch()
@@ -248,13 +258,13 @@ class StabilizationPage(QtGui.QWidget):
 		label = QtGui.QLabel("Full Stick Angle (deg)")
 		hLayout.addWidget(label)
 		hLayout.addSpacing(120)
-		self.spbStickAngleRoll = QtGui.QSpinBox()
+		self.spbStickAngleRoll = QtGui.QDoubleSpinBox()
 		self.spbStickAngleRoll.setMinimumWidth(150)
 		hLayout.addWidget(self.spbStickAngleRoll)
-		self.spbStickAnglePitch = QtGui.QSpinBox()
+		self.spbStickAnglePitch = QtGui.QDoubleSpinBox()
 		self.spbStickAnglePitch.setMinimumWidth(150)
 		hLayout.addWidget(self.spbStickAnglePitch)
-		self.spbStickAngleYaw = QtGui.QSpinBox()
+		self.spbStickAngleYaw = QtGui.QDoubleSpinBox()
 		self.spbStickAngleYaw.setMinimumWidth(150)
 		hLayout.addWidget(self.spbStickAngleYaw)
 		hLayout.addStretch()
@@ -266,13 +276,13 @@ class StabilizationPage(QtGui.QWidget):
 		label = QtGui.QLabel("Full Stick Rate (deg/s)")
 		hLayout.addWidget(label)
 		hLayout.addSpacing(115)
-		self.spbStickRateRoll = QtGui.QSpinBox()
+		self.spbStickRateRoll = QtGui.QDoubleSpinBox()
 		self.spbStickRateRoll.setMinimumWidth(150)
 		hLayout.addWidget(self.spbStickRateRoll)
-		self.spbStickRatePitch = QtGui.QSpinBox()
+		self.spbStickRatePitch = QtGui.QDoubleSpinBox()
 		self.spbStickRatePitch.setMinimumWidth(150)
 		hLayout.addWidget(self.spbStickRatePitch)
-		self.spbStickRateYaw = QtGui.QSpinBox()
+		self.spbStickRateYaw = QtGui.QDoubleSpinBox()
 		self.spbStickRateYaw.setMinimumWidth(150)
 		hLayout.addWidget(self.spbStickRateYaw)
 		hLayout.addStretch()
@@ -284,13 +294,13 @@ class StabilizationPage(QtGui.QWidget):
 		label = QtGui.QLabel("Maximum Rate in Attitude Mode (deg/s)")
 		hLayout.addWidget(label)
 		hLayout.addSpacing(30)
-		self.spbStickMaxRateAttRoll = QtGui.QSpinBox()
+		self.spbStickMaxRateAttRoll = QtGui.QDoubleSpinBox()
 		self.spbStickMaxRateAttRoll.setMinimumWidth(150)
 		hLayout.addWidget(self.spbStickMaxRateAttRoll)
-		self.spbStickMaxRateAttPitch = QtGui.QSpinBox()
+		self.spbStickMaxRateAttPitch = QtGui.QDoubleSpinBox()
 		self.spbStickMaxRateAttPitch.setMinimumWidth(150)
 		hLayout.addWidget(self.spbStickMaxRateAttPitch)
-		self.spbStickMaxRateAttYaw = QtGui.QSpinBox()
+		self.spbStickMaxRateAttYaw = QtGui.QDoubleSpinBox()
 		self.spbStickMaxRateAttYaw.setMinimumWidth(150)
 		hLayout.addWidget(self.spbStickMaxRateAttYaw)
 		hLayout.addStretch()
@@ -306,13 +316,26 @@ class StabilizationPage(QtGui.QWidget):
 		hLayout.addWidget(self.cbLiveUpdate)
 		hLayout.addStretch()
 		self.saveButton = QtGui.QPushButton("Save")
+		self.saveButton.clicked.connect(self._onSaveButtonClicked)
 		hLayout.addWidget(self.saveButton)
 		self.applyButton = QtGui.QPushButton("Apply")
+		self.apllyButton.clicked.connect(self._onApplyButtonClicked)
 		hLayout.addWidget(self.applyButton)
 		
-
 		mainLayout.addLayout(hLayout)
 
 		# Set main layout
 		self.setLayout(mainLayout)
 
+	def _onApplyButtonClicked(self):
+		pass
+
+	def _onSaveButtonClicked(self):
+		# TODO: Write all settings to the controller
+		pass
+
+	def _onBoardStatusUpdated(self):
+		pass
+
+	def _updateValues(self):
+		self.spbRollKp.setValue()
