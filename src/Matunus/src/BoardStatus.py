@@ -64,6 +64,10 @@ class BoardStatus(object):
 		self.dataFields.append({'name': "gyroX", 'value': 0})
 		self.dataFields.append({'name': "gyroY", 'value': 0})
 		self.dataFields.append({'name': "gyroZ", 'value': 0})
+		self.dataFields.append({'name': "kalmanOutputRoll", 'value': 0})
+		self.dataFields.append({'name': "kalmanReferenceValueRoll", 'value': 0})
+		self.dataFields.append({'name': "setValueRollAngle", 'value': 0})
+		self.dataFields.append({'name': "actuatingVariablePidRoll", 'value': 0})
 
 	def setField(self, name, value):
 		"""Updates the specified field with the given value."""
@@ -127,6 +131,14 @@ class BoardStatus(object):
 					field['value'] = message.gyroY
 				elif field['name'] == "gyroZ":
 					field['value'] = message.gyroZ
+				elif field['name'] == "kalmanOutputRoll":
+					field['value'] = message.kalmanOutputRoll
+				elif field['name'] == "kalmanReferenceValueRoll":
+					field['value'] = message.kalmanReferenceValueRoll
+				elif field['name'] == "setValueRollAngle":
+					field['value'] = message.setValueRollAngle
+				elif field['name'] == "actuatingVariablePidRoll":
+					field['value'] = message.actuatingVariablePidRoll
 		else:
 			return
 
@@ -205,6 +217,22 @@ class BoardStatus(object):
 	@property
 	def gyroZ(self):
 		return self.getValue('gyroZ')
+
+	@property
+	def kalmanOutputRoll(self):
+		return self.getValue('kalmanOutputRoll')
+
+	@property
+	def kalmanReferenceValueRoll(self):
+		return self.getValue('kalmanReferenceValueRoll')
+
+	@property
+	def setValueRollAngle(self):
+		return self.getValue('setValueRollAngle')
+
+	@property
+	def actuatingVariablePidRoll(self):
+		return self.getValue('actuatingVariablePidRoll')
 
 	@property
 	def lastUpdate(self):

@@ -13,6 +13,8 @@
 #include "crc8.h"
 #include "servo_in.h"
 #include "MPU6000.h"
+#include "flight_controller.h"
+#include "filters.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -81,13 +83,60 @@ static void command_get_all_servo_pos(void);
 **************************************************************************/
 static void command_get_board_status(void);
 
+/**************************************************************************
+* \brief Returns the board settings.
+**************************************************************************/
+static void command_get_board_settings(void);
+
+/**************************************************************************
+* \brief Saves the board settings to the flash memory.
+**************************************************************************/
+static void command_save_board_settings(void);
+
+/**************************************************************************
+* \brief Sets the roll PID coefficients.
+**************************************************************************/
+static void command_set_roll_pid_coefficients(void);
+
+/**************************************************************************
+* \brief Sets the pitch PID coefficients.
+**************************************************************************/
+static void command_set_pitch_pid_coefficients(void);
+
+/**************************************************************************
+* \brief Sets the yaw PID coefficients.
+**************************************************************************/
+static void command_set_yaw_pid_coefficients(void);
+
+/**************************************************************************
+* \brief Sets the Kalman roll constants.
+**************************************************************************/
+static void command_set_kalman_roll_constants(void);
+
+/**************************************************************************
+* \brief Sets the Kalman pitch constants.
+**************************************************************************/
+static void command_set_kalman_pitch_constants(void);
+
+/**************************************************************************
+* \brief Sets the Kalman yaw constants.
+**************************************************************************/
+static void command_set_kalman_yaw_constants(void);
 
 /* Enabled API commands */
 struct api_command commands[] = {
 	{ 0x0001, command_set_servo_pos},
 	{ 0x0002, command_get_servo_pos},
 	{ 0x0003, command_get_all_servo_pos},
-	{ 0x0010, command_get_board_status}
+	{ 0x0010, command_get_board_status},
+	{ 0x0020, command_get_board_settings},
+	{ 0x0021, command_save_board_settings},
+	{ 0x0022, command_set_roll_pid_coefficients},
+	{ 0x0023, command_set_pitch_pid_coefficients},
+	{ 0x0024, command_set_yaw_pid_coefficients},
+	{ 0x0025, command_set_kalman_roll_constants},
+	{ 0x0026, command_set_kalman_pitch_constants},
+	{ 0x0027, command_set_kalman_yaw_constants}
 };
 
 
@@ -161,7 +210,7 @@ static void command_get_all_servo_pos(void)
 **************************************************************************/
 static void command_get_board_status(void)
 {
-	uint8_t packet_length = 57;
+	uint8_t packet_length = 73;
 	uint8_t data[packet_length];
 	int index = 0;
 	
@@ -185,6 +234,10 @@ static void command_get_board_status(void)
 	float gyroX = mpu_6000_get_x_gyr();
 	float gyroY = mpu_6000_get_y_gyr();
 	float gyroZ = mpu_6000_get_z_gyr();
+	float kalmanOutputRoll = flight_controller_get_sensor_roll_angle();
+	float kalmanReferenceValueRoll = filter_get_acc_roll();
+	float setValueRollAngle = flight_controller_get_set_roll_angle();
+	float actuatingVariablePidRoll = flight_controller_get_actuating_roll_angle();
 		
 	// Start byte
 	data[index++] = PACKET_START_BYTE;
@@ -253,12 +306,88 @@ static void command_get_board_status(void)
 	// Gyro Z
 	memcpy(data + index, &gyroZ, 4);
 	index += 4;
+	// Kalman Output Roll
+	memcpy(data + index, &kalmanOutputRoll, 4);
+	index += 4;
+	// Kalman Reference Value Roll
+	memcpy(data + index, &kalmanReferenceValueRoll, 4);
+	index += 4;
+	// Set value Roll Angle
+	memcpy(data + index, &setValueRollAngle, 4);
+	index += 4;
+	// Actuating Variable PID Roll
+	memcpy(data + index, &actuatingVariablePidRoll, 4);
+	index += 4;
 	// CRC
 	data[index++] = 0x88;
 	// Stop byte
 	data[index] = PACKET_STOP_BYTE;
 		
 	write_packet(data, index+1);
+}
+
+/**************************************************************************
+* \brief Returns the board settings.
+**************************************************************************/
+static void command_get_board_settings(void)
+{
+	
+}
+
+/**************************************************************************
+* \brief Saves the board settings to the flash memory.
+**************************************************************************/
+static void command_save_board_settings(void)
+{
+	
+}
+
+/**************************************************************************
+* \brief Sets the roll PID coefficients.
+**************************************************************************/
+static void command_set_roll_pid_coefficients(void)
+{
+	
+}
+
+/**************************************************************************
+* \brief Sets the pitch PID coefficients.
+**************************************************************************/
+static void command_set_pitch_pid_coefficients(void)
+{
+	
+}
+
+/**************************************************************************
+* \brief Sets the yaw PID coefficients.
+**************************************************************************/
+static void command_set_yaw_pid_coefficients(void)
+{
+	
+}
+
+/**************************************************************************
+* \brief Sets the Kalman roll constants.
+**************************************************************************/
+static void command_set_kalman_roll_constants(void)
+{
+	
+}
+
+/**************************************************************************
+* \brief Sets the Kalman pitch constants.
+**************************************************************************/
+static void command_set_kalman_pitch_constants(void)
+{
+	
+}
+
+/**************************************************************************
+* \brief Sets the Kalman yaw constants.
+**************************************************************************/
+static void command_set_kalman_yaw_constants(void)
+{
+	
 }
 
 /**************************************************************************

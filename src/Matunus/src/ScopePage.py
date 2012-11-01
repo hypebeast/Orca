@@ -19,6 +19,8 @@
 __author__ = 'Sebastian Ruml'
 
 
+import sys
+
 try:
     from PyQt4 import QtGui
 except ImportError:
@@ -30,6 +32,7 @@ except ImportError:
 import defs
 from ScopeWidget import ScopeWidget
 from logger import Logger
+from ScopeExportDialog import ScopeExportDialog
 
 
 class ScopePage(QtGui.QWidget):
@@ -62,9 +65,15 @@ class ScopePage(QtGui.QWidget):
         self.dataObjects.append({'groupName': "Acceleration X, Y, Z",
                                 'fields': ("accelerationX", "accelerationY", "accelerationZ"),
                                 'fieldNames': ("Acceleration X", "Acceleration Y", "Acceleration Z")})
-                          # "Roll Angle: Kalman Filter",
-                          # "Roll Angle: Setpoint",
-                          # "PID"]
+        self.dataObjects.append({'groupName': "Kalman Reference/Output Value",
+                                'fields': ("kalmanOutputRoll", "kalmanReferenceValueRoll"),
+                                'fieldNames': ("Output Roll", "Reference Roll")})
+        self.dataObjects.append({'groupName': "Set Value Angle",
+                                'fields': ("setValueRollAngle",),
+                                'fieldNames': ("Roll",)})
+        self.dataObjects.append({'groupName': "Actuating Variable PID",
+                                'fields': ("actuatingVariablePidRoll",),
+                                'fieldNames': ("Roll",)})
 
         # Create the UI
         self._createUi()
@@ -87,7 +96,7 @@ class ScopePage(QtGui.QWidget):
         # Header 1
         header = QtGui.QFrame()
         header.setPalette(palette)
-        header.setMinimumHeight(40)
+        header.setMinimumHeight(30)
         header.setAutoFillBackground(True)
         header.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Raised)
         header.setLineWidth(2)
@@ -110,7 +119,7 @@ class ScopePage(QtGui.QWidget):
          # Header 2
         header = QtGui.QFrame()
         header.setPalette(palette)
-        header.setMinimumHeight(40)
+        header.setMinimumHeight(30)
         header.setAutoFillBackground(True)
         header.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Raised)
         header.setLineWidth(2)
@@ -132,7 +141,7 @@ class ScopePage(QtGui.QWidget):
 
         # Control box
         groupBox = QtGui.QGroupBox("Scope Control")
-        groupBox.setMinimumHeight(90)
+        groupBox.setMinimumHeight(40)
         layout = QtGui.QHBoxLayout()
         groupBox.setLayout(layout)
         self.startButton = QtGui.QPushButton("Start")
@@ -143,6 +152,10 @@ class ScopePage(QtGui.QWidget):
         self.stopButton.clicked.connect(self._stopClicked)
         layout.addWidget(self.stopButton)
         layout.addStretch()
+        self.exportButton = QtGui.QPushButton("Export...")
+        self.exportButton.setEnabled(False)
+        self.exportButton.clicked.connect(self._onExportButtonClicked)
+        layout.addWidget(self.exportButton)
         mainLayout.addWidget(groupBox)
 
         self.cbdataObjects1.currentIndexChanged.connect(self._cbdataObjects1IndexChanged)
@@ -159,6 +172,7 @@ class ScopePage(QtGui.QWidget):
         self.scope2.start()
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
+        self.exportButton.setEnabled(False)
         self.cbdataObjects1.setEnabled(False)
         self.cbdataObjects2.setEnabled(False)
         self._isRunning = True
@@ -172,9 +186,43 @@ class ScopePage(QtGui.QWidget):
         self.scope2.stop()
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
+        self.exportButton.setEnabled(True)
         self.cbdataObjects1.setEnabled(True)
         self.cbdataObjects2.setEnabled(True)
         self._isRunning = False
+
+    def _exportToCSV(self, scope, fileName):
+        """Exports the current scope values to a CSV file."""
+        if fileName is None or scope is None:
+            return
+
+        f = open(fileName, 'w')
+
+        with f:
+            dataFields = None
+            curves = None
+            if scope == 1:
+                dataFields = self.scope1.dataFields
+                curves = self.scope1.plotCurves
+            else:
+                dataFields = self.scope2.dataFields
+                curves = self.scope2.plotCurves
+
+            dataNames = "Timestamp,"
+            dataNames += ','.join(dataFields['fieldNames'])
+            f.write(dataNames+'\n')
+            dataLength = len(curves[0].xData)
+            for i in range(0, dataLength):
+                line = str(curves[0].xData[i])
+                line += ','
+                for curve in curves:
+                    line += str(curve.yData[i])
+                    line += ','
+                line = line[:-1]
+                line += '\n'
+                f.write(line)
+
+            f.close()
 
     def _startClicked(self):
         self.start()
@@ -187,3 +235,9 @@ class ScopePage(QtGui.QWidget):
 
     def _cbdataObjects2IndexChanged(self):
         self.scope2.setDataFields(self.dataObjects[self.cbdataObjects2.currentIndex()])
+
+    def _onExportButtonClicked(self):
+        dialog = ScopeExportDialog(self)
+        res = dialog.exec_()
+        if res == QtGui.QDialog.Accepted:
+            self._exportToCSV(dialog.selectedScope, dialog.fileName)

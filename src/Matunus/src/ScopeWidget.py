@@ -87,8 +87,46 @@ class ScopeWidget(Qwt.QwtPlot):
 		# Assign data fields
 		self.dataFields = dataFields
 
+		# Init zoom
+		self._initZoomer()
+
 		# Init all plot curves
 		self._init_plots()
+
+	def _initZoomer(self):
+		"""Initialize zooming
+        """
+		self.zoomer = Qwt.QwtPlotZoomer(Qwt.QwtPlot.xBottom,
+                                        Qwt.QwtPlot.yLeft,
+                                        Qwt.QwtPicker.DragSelection,
+                                        Qwt.QwtPicker.AlwaysOff,
+                                        self.canvas())
+		self.zoomer.setRubberBandPen(Qt.QPen(Qt.Qt.white))
+
+	def setZoomerMousePattern(self, index):
+		"""Set the mouse zoomer pattern.
+		"""
+
+		if index == 0:
+			pattern = [
+                Qwt.QwtEventPattern.MousePattern(Qt.Qt.LeftButton,
+                                                 Qt.Qt.NoModifier),
+                Qwt.QwtEventPattern.MousePattern(Qt.Qt.MidButton,
+                                                 Qt.Qt.NoModifier),
+                Qwt.QwtEventPattern.MousePattern(Qt.Qt.RightButton,
+                                                 Qt.Qt.NoModifier),
+                Qwt.QwtEventPattern.MousePattern(Qt.Qt.LeftButton,
+                                                 Qt.Qt.ShiftModifier),
+                Qwt.QwtEventPattern.MousePattern(Qt.Qt.MidButton,
+                                                 Qt.Qt.ShiftModifier),
+                Qwt.QwtEventPattern.MousePattern(Qt.Qt.RightButton,
+                                                 Qt.Qt.ShiftModifier),
+                ]
+			self.zoomer.setMousePattern(pattern)
+		elif index in (1, 2, 3):
+			self.zoomer.initMousePattern(index)
+		else:
+			raise ValueError, 'index must be in (0, 1, 2, 3)'
 
 	def start(self):
 		"""
@@ -140,7 +178,7 @@ class ScopeWidget(Qwt.QwtPlot):
 
 		# Legend
 		for curve in self.plotCurves:
-			self._legend.find(curve.curve).setItemMode(Qwt.QwtLegend.ClickableItem)
+			self._legend.find(curve.curve).setItemMode(Qwt.QwtLegend.CheckableItem)
 			self._legend.find(curve.curve).setChecked(True)
 
 		self.legendChecked.connect(self._onLegendChecked)
@@ -192,4 +230,5 @@ class ScopeWidget(Qwt.QwtPlot):
 				curve.updateData(self.boardStatus, timestamp)
 
 	def _onLegendChecked(self, plotItem, on):
-		print on
+		if on: plotItem.show()
+		else: plotItem.hide()

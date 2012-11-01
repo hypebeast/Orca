@@ -150,6 +150,5 @@ void filter_task(unsigned long time)
 	filter_ars_update(accRoll);    // Kalman update + result (angle)
 	
 	filterdata->roll = filter_conv_rad_to_degrees(filterdata->x_angle);
-	
 }
 
