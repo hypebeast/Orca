@@ -55,7 +55,7 @@ int main (void)
 	user_interface_stat_led_pattern(USER_INTERFACE_LED_BLINKING);
 	
 	/* Uncomment this method to restore the factory settings on the next startup */
-	//serial_flash_write_factory_settings();
+	serial_flash_write_factory_settings();
 	
 	/* Calibrate the accelerometer and the gyroscopes */
 	mpu_6000_calibrate();
@@ -135,7 +135,7 @@ void orca_init(void)
 	voltage_sens_init(&voltageSensor, 0x02);
 	
 	/* Initialize the gyro/acc sensor*/
-	mpu_6000_init(&motionProcessingUnit);
+	mpu_6000_init(&motionProcessingUnit, false, false);
 	
 	/* Initialize the filter module */
 	filter_init(&orcafilter, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
@@ -189,6 +189,8 @@ void system_timer(uint32_t time)
 	ulVsTickCounter++;
 	ulUiTickCounter++;
 	
+	//ioport_set_pin_high(BOARD_SPARE_PIN_2_GPIO);
+
 	/* Call the flight Controller every 10 ms */
 	if(ulFcTickCounter >= 1)
 	{
@@ -203,6 +205,7 @@ void system_timer(uint32_t time)
 			filter_task(motionProcessingUnit.time);
 		}
 		ulFcTickCounter = 0;
+
 	}
 			
 	/* Call the voltage sensor every 500 */
@@ -218,7 +221,7 @@ void system_timer(uint32_t time)
 		user_interface_update_LEDs();
 		ulUiTickCounter = 0;
 	}
-	
+	//ioport_set_pin_low(BOARD_SPARE_PIN_2_GPIO);
 	rtc_set_alarm(1);
 	rtc_set_time(0);
 }

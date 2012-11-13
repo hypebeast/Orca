@@ -36,6 +36,8 @@ float mpuYGyrOffs = 0;	/*!< brief y-gyroscope offset */
 float mpuZGyrOffs = 0;	/*!< brief z-gyroscope offset */
 float accDiv = 0;
 float gyrDiv = 0;
+bool enableFifo = false;
+bool enableexternalMag = false;
 
 /**************************************************************************
 * \\brief MPU 6000 initialization
@@ -44,8 +46,10 @@ float gyrDiv = 0;
 *
 * \\return  status code
 ***************************************************************************/
-uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit)
+uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit, bool useFifo, bool externalMag)
 {
+	uint8_t fifoConf = 0;
+	
 	mpu = mProcessingUnit;
 	
 	mpu->state = MPU_6000_STATE_INIT;
@@ -109,6 +113,29 @@ uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit)
 	/* Configure the gyroscope sensor */
 	mpu_6000_write(MPU_6000_GYRO_CONFIG_ADDR, (MPU_6000_GYRO_FS_CONF)<<MPU_6000_GYRO_FS_SEL_bp);
 	delay_ms(1);
+	
+	/* Enable the use of the FIFO. Acceleration, rotation and temperature will be stored in the FIFO. 
+		If external magnetometer is used, it will be also stored in the FIFO. */
+	if(useFifo == true)
+	{
+		enableFifo = true;	
+		fifoConf = ((MPU_6000_FIFO_ACCEL_ENABLE)<<MPU_6000_FIFO_ACCEL_EN_bp)|((MPU_6000_FIFO_GYR_Z_ENABLE)<<MPU_6000_FIFO_GYR_Z_EN_bp)|
+					((MPU_6000_FIFO_GYR_Y_ENABLE)<<MPU_6000_FIFO_GYR_Y_EN_bp)|((MPU_6000_FIFO_GYR_X_ENABLE)<<MPU_6000_FIFO_GYR_X_EN_bp)|
+					((MPU_6000_FIFO_TEMP_ENABLE)<<MPU_6000_FIFO_TEMP_EN_bp);
+					
+		if(externalMag == true)
+		{
+			enableexternalMag = true;
+			fifoConf += ((MPU_6000_FIFO_SLV0_ENABLE)<<MPU_6000_FIFO_SLV0_EN_bp);
+		}
+		
+		/* Write FIFO settings*/
+		mpu_6000_write(MPU_6000_FIFO_ENABLE_ADDR, fifoConf);
+		delay_ms(1);
+		
+		/* Enable FIFO use */
+		mpu_6000_write(MPU_6000_USER_CTRL_ADDR, ((MPU_6000_USER_CTRL_FIFO_ENABLE)<<MPU_6000_USER_CTRL_FIFO_bp));		
+	}
 		
 	return SYSTEM_INFO_TRUE;
 }
@@ -214,11 +241,79 @@ uint16_t mpu_6000_read_gyroscope_measurements(void)
 		return SYSTEM_INFO_MPU_SENSOR_GYRO_READ_ERR;
 	
 	/* Built the 16-bit 2’s complement value */
-	mpuXGyr = gyroReceived[1] + (gyroReceived[0]<<8);
-	mpuYGyr = gyroReceived[3] + (gyroReceived[2]<<8);
-	mpuZGyr = gyroReceived[5] + (gyroReceived[4]<<8);
+	mpuXGyr = (int16_t)(gyroReceived[0]<<8) + gyroReceived[1];
+	mpuYGyr = (int16_t)(gyroReceived[2]<<8) + gyroReceived[3];
+	mpuZGyr = (int16_t)(gyroReceived[4]<<8) + gyroReceived[5];
 	
 	return SYSTEM_INFO_TRUE;
+}
+
+/**************************************************************************
+* \brief MPU 6000 Burst Read All Measurements
+*	Reads the acceleration (x,y and z-axis), gyroscope (x,y and z-axis) and 
+*	temperature measurements in one single (burst) read. /n
+*	The values are saved in the MPU data structure. /n
+*
+* \param *mpu MPU data structure
+*
+* \return  status code
+***************************************************************************/
+uint16_t mpu_6000_burst_read_all_measurements(void)
+{
+		uint8_t mpuReceived[14];
+		
+		/* Burst Read all measurements. The value of each axis is read as a 16-bit 2’s complement value. */
+		if(mpu_6000_read(MPU_6000_ACCEL_XOUT_H, 14, mpuReceived) != SYSTEM_INFO_TRUE)
+			return SYSTEM_INFO_MPU_SENSOR_ALL_READ_ERR;
+			
+		/* Built the 16-bit 2’s complement value */
+		mpuXAcc = (int16_t)(mpuReceived[0]<<8) + mpuReceived[1];
+		mpuYAcc = (int16_t)(mpuReceived[2]<<8) + mpuReceived[3];
+		mpuZAcc = (int16_t)(mpuReceived[4]<<8) + mpuReceived[5];
+		mpu->temp = (float)((int16_t)(mpuReceived[6]<<8) + mpuReceived[7])/340 + 35;
+		mpuXGyr = (int16_t)(mpuReceived[8]<<8) + mpuReceived[9];
+		mpuYGyr = (int16_t)(mpuReceived[10]<<8) + mpuReceived[11];
+		mpuZGyr = (int16_t)(mpuReceived[12]<<8) + mpuReceived[13];
+}
+	
+/**************************************************************************
+* \brief MPU 6000 Read FIFO Measurements
+*	Reads the acceleration (x,y and z-axis), gyroscope (x,y and z-axis) and 
+*	temperature measurements from the FIFO buffer. /n
+*	The values are saved in the MPU data structure. /n
+*
+* \note This is currently not working!
+*
+* \param *mpu MPU data structure
+*
+* \return  status code
+***************************************************************************/
+uint16_t mpu_6000_read_fifo_measurements(void)
+{
+	uint8_t mpuReceived[14];
+	uint16_t fifoCounter = 0;
+	
+	/* Read the number of measurements stored in the FIFO. */
+	if(mpu_6000_read(MPU_6000_FIFO_COUNT_H_ADDR, 2, mpuReceived) != SYSTEM_INFO_TRUE)
+		return SYSTEM_INFO_MPU_SENSOR_ACC_READ_ERR;
+		
+	fifoCounter = (int16_t)(mpuReceived[0]<<8) + mpuReceived[1];
+	
+	if(fifoCounter >= 1)
+	{
+		/* Read all 3 acceleration axis. The value of each axis is read as a 16-bit 2’s complement value. */
+		if(mpu_6000_read(MPU_6000_FIFO_READ_WRITE_ADDR, 14, mpuReceived) != SYSTEM_INFO_TRUE)
+			return SYSTEM_INFO_MPU_SENSOR_ALL_READ_ERR;
+			
+		/* Built the 16-bit 2’s complement value */
+		mpuXAcc = (int16_t)(mpuReceived[0]<<8) + mpuReceived[1];
+		mpuYAcc = (int16_t)(mpuReceived[2]<<8) + mpuReceived[3];
+		mpuZAcc = (int16_t)(mpuReceived[4]<<8) + mpuReceived[5];
+		mpu->temp = (float)((int16_t)(mpuReceived[6]<<8) + mpuReceived[7])/340 + 35;
+		mpuXGyr = (int16_t)(mpuReceived[8]<<8) + mpuReceived[9];
+		mpuYGyr = (int16_t)(mpuReceived[10]<<8) + mpuReceived[11];
+		mpuZGyr = (int16_t)(mpuReceived[12]<<8) + mpuReceived[13];
+	}			
 }
 
 /**************************************************************************
@@ -300,19 +395,32 @@ uint16_t mpu_6000_reset(void)
 }
 
 /**************************************************************************
-* \\brief MPU 6000 get new data
+* \brief MPU 6000 get new data
 *	Get the acceleration and rate of rotation measurements from the mpu,
-*   convert and save the new value in the mpu struct . /n
+*   convert and save the new value in the mpu struct. /n
+*   If FIFO use is enabled, the data will be read from the MPU FIFO. /n
 *
-* \\param *mpu MPU data structure
+* \param *mpu MPU data structure
 *
-* \\return  product id
+* \return  product id
 ***************************************************************************/
 uint8_t mpu_6000_get_new_data(void)
 {
 	/* Read all Acc and Gyro axis */
-	mpu_6000_read_accelerometer_measurements();
-	mpu_6000_read_gyroscope_measurements();
+	if(enableFifo == true)
+	{
+		mpu_6000_read_fifo_measurements();
+	}
+	else
+	{
+		#ifdef MPU_6000_BURST_READ_ENABLE
+			mpu_6000_burst_read_all_measurements();
+		#endif
+		#ifndef MPU_6000_BURST_READ_ENABLE	
+			mpu_6000_read_accelerometer_measurements();
+			mpu_6000_read_gyroscope_measurements();
+		#endif
+	}		
 	
 	/* Scaling and save all measurements */
 	mpu->xAcc = ((float)mpuXAcc / accDiv) - mpuXAccOffs; //Save the X-Acceleration in g
@@ -321,7 +429,7 @@ uint8_t mpu_6000_get_new_data(void)
 	mpu->xGyr = ((float)mpuXGyr / gyrDiv) - mpuXGyrOffs; //Save the X-rate of rotation in deg/s
 	mpu->yGyr = ((float)mpuYGyr / gyrDiv) - mpuYGyrOffs; //Save the Y-rate of rotation in deg/s
 	mpu->zGyr = ((float)mpuZGyr / gyrDiv) - mpuZGyrOffs; //Save the Z-rate of rotation in deg/s
-	
+
 	return true;
 }
 

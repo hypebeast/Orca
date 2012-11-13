@@ -23,10 +23,10 @@
 //	Roll Filter Startup Settings
 //  Edit this settings for different configurations
 //---------------------------------------------------------------------
-#define PID_ROLL_P_FACTOR_CONF			0.04f	/*!< brief Default p factor for the roll PID controller. */
-#define PID_ROLL_I_FACTOR_CONF			0.0008f		/*!< brief Default p factor for the roll PID controller. */
-#define PID_ROLL_D_FACTOR_CONF			0.002f		/*!< brief Default p factor for the roll PID controller. */
-#define PID_ROLL_I_LIMIT_CONF			300.0f		/*!< brief Default I limit value. */
+#define PID_ROLL_P_FACTOR_CONF			0.05f	/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_I_LIMIT_CONF			5.0f		/*!< brief Default I limit value. */
 
 //---------------------------------------------------------------------
 //	General Servo Definitions

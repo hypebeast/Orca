@@ -85,7 +85,7 @@ int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 					(float)(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
 	
 	/*  */
-	actuatingRoll = pid_Controller((int16_t)(rollSetValue * 10), (int16_t)(actualSensorData->roll * 10), 10000, &rollPid)/10;	
+	actuatingRoll = pid_Controller(rollSetValue, actualSensorData->roll, 10000, &rollPid);	
 }
 
 /**************************************************************************
@@ -241,6 +241,11 @@ void flight_controller_update_pid_controller(float p_factor, float i_factor, flo
 ***************************************************************************/
 float flight_controller_get_actuating_roll_angle(void)
 {
+	if(actuatingRoll == 0)
+	{
+		nop();
+		return 0;
+	}
 	return actuatingRoll;
 }
 
