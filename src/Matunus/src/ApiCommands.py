@@ -35,7 +35,7 @@ class CommandTypes:
     GET_ALL_SERVO_POS = 0x0003
     GET_BOARD_STATUS = 0x0010
     GET_BOARD_SETTINGS = 0x0020
-    WRITE_BOARD_SETTINGS = 0x0021
+    SAVE_BOARD_SETTINGS = 0x0021
     SET_ROLL_PID_COEFFICIENTS = 0x0022
     SET_PITCH_PID_COEFFICIENTS = 0x0023
     SET_YAW_PID_COEFFICIENTS = 0x0024
@@ -334,12 +334,15 @@ class GetBoardSettingsMessage(BaseMessage):
         self.pidRollPFactor = 0
         self.pidRollIFactor = 0
         self.pidRollDFactor = 0
+        self.pidRollILimit = 0
         self.pidPitchPFactor = 0
         self.pidPitchIFactor = 0
         self.pidPitchDFactor = 0
+        self.pidPitchILimit = 0
         self.pidYawPFactor = 0
         self.pidYawIFactor = 0
         self.pidYawDFactor = 0
+        self.pidYawILimit = 0
         self.kalmanRollQAngle = 0
         self.kalmanRollQGyro = 0
         self.kalmanRollRAngle = 0
@@ -355,12 +358,12 @@ class GetBoardSettingsMessage(BaseMessage):
 
     @staticmethod
     def fromPacket(package):
-         # Check for the right command type
+         # Check if we received a message with ID 0x0020
         command_type = struct.unpack_from("H", package, 2)
-        if command_type[0] is not CommandTypes.GET_BOARD_STATUS:
+        if command_type[0] is not CommandTypes.GET_BOARD_SETTINGS:
             return None
 
-        message = GetBoardStatusMessage()
+        message = GetBoardSettingsMessage()
         message.messageType = MessageTypes.RESPONSE_MESSAGE
 
         # Parse the data
@@ -372,17 +375,23 @@ class GetBoardSettingsMessage(BaseMessage):
             offset += 4
             message.pidRollDFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
+            message.pidRollIFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
             message.pidPitchPFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
             message.pidPitchIFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
             message.pidPitchDFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
+            message.pidPitchILimit = struct.unpack_from("f", package, offset)[0]
+            offset += 4
             message.pidYawPFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
             message.pidYawIFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
             message.pidYawDFactor = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidYawILimit = struct.unpack_from("f", package, offset)[0]
             offset += 4
             message.kalmanRollQAngle = struct.unpack_from("f", package, offset)[0]
             offset += 4
@@ -413,11 +422,167 @@ class SaveSettingsMessage(BaseMessage):
     Saves the board settings to the flash (Command Type: 0x0021)
     """
     def __init__(self):
-        BaseMessage.__init__(self, CommandTypes.WRITE_BOARD_SETTINGS)
+        BaseMessage.__init__(self, CommandTypes.SAVE_BOARD_SETTINGS)
         self.messageType = MessageTypes.COMMAND_MESSAGE
 
     def getPacket(self):
         return self._encodePackage([])
+
+    @staticmethod
+    def fromPacket(package):
+        raise NotImplementedError
+
+
+class SetRollPIDCoefficientsMessage(BaseMessage):
+    """
+    Sets the PID coeficients for the roll axis (Command Type: 0x0022)
+    """
+    def __init__(self, p_factor, i_factor, d_factor, i_limit):
+        BaseMessage.__init__(self, CommandTypes.SET_KALMAN_ROLL_CONSTANTS)
+        self.messageType = MessageTypes.COMMAND_MESSAGE
+
+        self.pFactor = p_factor
+        self.iFactor = i_factor
+        self.dFactor = d_factor
+        self.iLimit = i_limit
+
+    def getPacket(self):
+        data = []
+        data.append({"value": self.pFactor, "format": "f"})
+        data.append({"value": self.iFactor, "format": "f"})
+        data.append({"value": self.dFactor, "format": "f"})
+        data.append({"value": self.iLimit, "format": "f"})
+
+        return self._encodePackage(data)
+
+    @staticmethod
+    def fromPacket(package):
+        raise NotImplementedError
+
+
+class SetPitchPIDCoefficientsMessage(BaseMessage):
+    """
+    Sets the PID coeficients for the pitch axis (Command Type: 0x0023)
+    """
+    def __init__(self, p_factor, i_factor, d_factor, i_limit):
+        BaseMessage.__init__(self, CommandTypes.SET_KALMAN_PITCH_CONSTANTS)
+        self.messageType = MessageTypes.COMMAND_MESSAGE
+
+        self.pFactor = p_factor
+        self.iFactor = i_factor
+        self.dFactor = d_factor
+        self.iLimit = i_limit
+
+    def getPacket(self):
+        data = []
+        data.append({"value": self.pFactor, "format": "f"})
+        data.append({"value": self.iFactor, "format": "f"})
+        data.append({"value": self.dFactor, "format": "f"})
+        data.append({"value": self.iLimit, "format": "f"})
+
+        return self._encodePackage(data)
+
+    @staticmethod
+    def fromPacket(package):
+        raise NotImplementedError
+
+
+class SetYawPIDCoefficientsMessage(BaseMessage):
+    """
+    Sets the PID coeficients for the yaw axis (Command Type: 0x0024)
+    """
+    def __init__(self, p_factor, i_factor, d_factor, i_limit):
+        BaseMessage.__init__(self, CommandTypes.SET_KALMAN_YAW_CONSTANTS)
+        self.messageType = MessageTypes.COMMAND_MESSAGE
+
+        self.pFactor = p_factor
+        self.iFactor = i_factor
+        self.dFactor = d_factor
+        self.iLimit = i_limit
+
+    def getPacket(self):
+        data = []
+        data.append({"value": self.pFactor, "format": "f"})
+        data.append({"value": self.iFactor, "format": "f"})
+        data.append({"value": self.dFactor, "format": "f"})
+        data.append({"value": self.iLimit, "format": "f"})
+
+        return self._encodePackage(data)
+
+    @staticmethod
+    def fromPacket(package):
+        raise NotImplementedError
+
+
+class SetRollKalmanConstantsMessage(BaseMessage):
+    """
+    Sets the Kalman constants for the roll axis (Command Type: 0x0025)
+    """
+    def __init__(self, q_angle, q_gyro, r_angle):
+        BaseMessage.__init__(self, CommandTypes.SET_KALMAN_ROLL_CONSTANTS)
+        self.messageType = MessageTypes.COMMAND_MESSAGE
+
+        self.qAngle = q_angle
+        self.qGyro = q_gyro
+        self.rAngle = r_angle
+
+    def getPacket(self):
+        data = []
+        data.append({"value": self.qAngle, "format": "f"})
+        data.append({"value": self.qGyro, "format": "f"})
+        data.append({"value": self.rAngle, "format": "f"})
+
+        return self._encodePackage(data)
+
+    @staticmethod
+    def fromPacket(package):
+        raise NotImplementedError
+
+
+class SetPitchKalmanConstantsMessage(BaseMessage):
+    """
+    Sets the Kalman constants for the pitch axis (Command Type: 0x0026)
+    """
+    def __init__(self, q_angle, q_gyro, r_angle):
+        BaseMessage.__init__(self, CommandTypes.SET_KALMAN_PITCH_CONSTANTS)
+        self.messageType = MessageTypes.COMMAND_MESSAGE
+
+        self.qAngle = q_angle
+        self.qGyro = q_gyro
+        self.rAngle = r_angle
+
+    def getPacket(self):
+        data = []
+        data.append({"value": self.qAngle, "format": "f"})
+        data.append({"value": self.qGyro, "format": "f"})
+        data.append({"value": self.rAngle, "format": "f"})
+
+        return self._encodePackage(data)
+
+    @staticmethod
+    def fromPacket(package):
+        raise NotImplementedError
+
+
+class SetYawKalmanConstantsMessage(BaseMessage):
+    """
+    Sets the Kalman constants for the pitch axis (Command Type: 0x0027)
+    """
+    def __init__(self, q_angle, q_gyro, r_angle):
+        BaseMessage.__init__(self, CommandTypes.SET_KALMAN_YAW_CONSTANTS)
+        self.messageType = MessageTypes.COMMAND_MESSAGE
+
+        self.qAngle = q_angle
+        self.qGyro = q_gyro
+        self.rAngle = r_angle
+
+    def getPacket(self):
+        data = []
+        data.append({"value": self.qAngle, "format": "f"})
+        data.append({"value": self.qGyro, "format": "f"})
+        data.append({"value": self.rAngle, "format": "f"})
+
+        return self._encodePackage(data)
 
     @staticmethod
     def fromPacket(package):

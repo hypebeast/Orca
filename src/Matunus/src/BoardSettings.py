@@ -22,6 +22,7 @@ __author__ = 'Sebastian Ruml'
 from logger import Logger
 from ApiCommands import CommandTypes
 
+
 # Global firmware settings object
 boardSettings = None
 
@@ -32,12 +33,15 @@ class _BoardSettings():
 		self.pidRollPFactor = 0
 		self.pidRollIFactor = 0
 		self.pidRollDFactor = 0
+		self.pidRollILimit = 0
 		self.pidPitchPFactor = 0
 		self.pidPitchIFactor = 0
 		self.pidPitchDFactor = 0
+		self.pidPitchILimit = 0
 		self.pidYawPFactor = 0
 		self.pidYawIFactor = 0
 		self.pidYawDFactor = 0
+		self.pidYawILimit = 0
 		self.kalmanRollQAngle = 0
 		self.kalmanRollQGyro = 0
 		self.kalmanRollRAngle = 0
@@ -62,12 +66,15 @@ class _BoardSettings():
 		self.pidRollPFactor = message.pidRollPFactor
 		self.pidRollIFactor = message.pidRollIFactor
 		self.pidRollDFactor = message.pidRollDFactor
+		self.pidRollILimit = message.pidRollILimit
 		self.pidPitchPFactor = message.pidPitchPFactor
 		self.pidPitchIFactor = message.pidPitchIFactor
 		self.pidPitchDFactor = message.pidPitchDFactor
+		self.pidPitchILimit = message.pidPitchILimit
 		self.pidYawPFactor = message.pidYawPFactor
 		self.pidYawIFactor = message.pidYawIFactor
 		self.pidYawDFactor = message.pidYawDFactor
+		self.pidYawILimit = message.pidYawILimit
 		self.kalmanRollQAngle = message.kalmanRollQAngle
 		self.kalmanRollQGyro = message.kalmanRollQGyro
 		self.kalmanRollRAngle = message.kalmanRollRAngle
@@ -89,6 +96,7 @@ class _BoardSettings():
 		return 500
 
 def BoardSettings():
+	"""Singleton instance for the board settings"""
 	global boardSettings
 	if not boardSettings:
 		boardSettings = _BoardSettings()

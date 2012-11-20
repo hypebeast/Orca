@@ -18,3 +18,7 @@
 
 __author__ = 'Sebastian Ruml'
 
+
+class AircraftSettingsPage:
+	def __init__(self):
+		pass

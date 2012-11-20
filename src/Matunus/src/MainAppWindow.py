@@ -30,7 +30,7 @@ except ImportError:
 import os
 import sys
 
-from MainPage import MainPage
+from WelcomePage import WelcomePage
 from InfoPanel import InfoPanel
 from ConfigurationPage import ConfigurationPage
 from ScopePage import ScopePage
@@ -135,12 +135,13 @@ class MainAppWindow(QtGui.QMainWindow):
         self.controllerManager = ControllerManager()
 
         # Create UI
-        self.createUi()
-        self.createActions()
-        self.createMenus()
-        self.connectToSignals()
+        self._createUi()
+        self._createActions()
+        self._createMenus()
+        self._connectToSignals()
 
         self.resize(1200, 850)
+        self._center()
         self.setWindowTitle("Matunus")
         self.statusBar().showMessage("Ready", 3000)
 
@@ -148,7 +149,10 @@ class MainAppWindow(QtGui.QMainWindow):
 
         self._logger.info("Startup done!")
 
-    def createUi(self):
+    def _createUi(self):
+        # Set app icon
+        self.setWindowIcon(QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "app.png")))
+
         # Main layout
         self.mainLayout = QtGui.QHBoxLayout()
 
@@ -171,11 +175,11 @@ class MainAppWindow(QtGui.QMainWindow):
         self.mainContainer.setTabPosition(QtGui.QTabWidget.South)
         self.mainContainer.setTabShape(QtGui.QTabWidget.Rounded)
 
-        # Home page
-        self.mainPage = MainPage()
-        self.pages.append(self.mainPage)
+        # Welcome page
+        self.welcomePage = WelcomePage()
+        self.pages.append(self.welcomePage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "config.png"))
-        self.mainContainer.addTab(self.mainPage, icon, "Home")
+        self.mainContainer.addTab(self.welcomePage, icon, "Home")
 
         # Flight display page
         self.flightDisplay = FlightDisplay()
@@ -207,14 +211,20 @@ class MainAppWindow(QtGui.QMainWindow):
         widget.setLayout(self.mainLayout)
         self.setCentralWidget(widget)
 
-    def createMenus(self):
+    def _center(self):
+        qr = self.frameGeometry()
+        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
+    def _createMenus(self):
         self.fileMenu = self.menuBar().addMenu("&File")
         self.settingsMenu = self.menuBar().addMenu("&Settings")
         self.helpMenu = self.menuBar().addMenu("&Help")
         self.fileMenu.addAction(self.exitAction)
         self.settingsMenu.addAction(self.settingsAction)
 
-    def createActions(self):
+    def _createActions(self):
         self.exitAction = QtGui.QAction("&Exit", self)
         self.exitAction.setShortcut('Ctrl+Q')
         self.exitAction.setStatusTip("Exit application")
@@ -224,7 +234,7 @@ class MainAppWindow(QtGui.QMainWindow):
         self.settingsAction.setStatusTip("Settings")
         self.settingsAction.triggered.connect(self.showSettingsDialog)
 
-    def connectToSignals(self):
+    def _connectToSignals(self):
         pass
 
     def updateUi(self):

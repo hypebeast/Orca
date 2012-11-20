@@ -37,7 +37,7 @@ class StabilizationPage(QtGui.QWidget):
 			raise Exception
 
 		self.boardController = controllerManager
-		self.boardController.board_settings_updated.connect(self._onBoardStatusUpdated)
+		self.boardController.board_settings_updated.connect(self._onBoardSettingsUpdated)
 
 		self._boardSettings = BoardSettings()
 
@@ -85,15 +85,19 @@ class StabilizationPage(QtGui.QWidget):
 		hLayout.addSpacing(150)
 		self.spbRollKp = QtGui.QDoubleSpinBox()
 		self.spbRollKp.setMinimumWidth(150)
+		self.spbRollKp.valueChanged.connect(self._onPidRollKpChanged)
 		hLayout.addWidget(self.spbRollKp)
 		self.spbRollKi = QtGui.QDoubleSpinBox()
 		self.spbRollKi.setMinimumWidth(150)
+		self.spbRollKi.valueChanged.connect(self._onPidRollKiChanged)
 		hLayout.addWidget(self.spbRollKi)
 		self.spbRollKd = QtGui.QDoubleSpinBox()
 		self.spbRollKd.setMinimumWidth(150)
+		self.spbRollKd.valueChanged.connect(self._onPidRollKdChanged)
 		hLayout.addWidget(self.spbRollKd)
 		self.spbILimitRoll = QtGui.QDoubleSpinBox()
 		self.spbILimitRoll.setMinimumWidth(150)
+		self.spbILimitRoll.valueChanged.connect(self._onPidRollILimitChanged)
 		hLayout.addWidget(self.spbILimitRoll)
 		hLayout.addStretch()
 		groupBoxLayout.addLayout(hLayout)
@@ -316,10 +320,12 @@ class StabilizationPage(QtGui.QWidget):
 		hLayout.addWidget(self.cbLiveUpdate)
 		hLayout.addStretch()
 		self.saveButton = QtGui.QPushButton("Save")
+		self.saveButton.setEnabled(False)
 		self.saveButton.clicked.connect(self._onSaveButtonClicked)
 		hLayout.addWidget(self.saveButton)
 		self.applyButton = QtGui.QPushButton("Apply")
-		self.apllyButton.clicked.connect(self._onApplyButtonClicked)
+		self.applyButton.setEnabled(False)
+		self.applyButton.clicked.connect(self._onApplyButtonClicked)
 		hLayout.addWidget(self.applyButton)
 		
 		mainLayout.addLayout(hLayout)
@@ -328,14 +334,62 @@ class StabilizationPage(QtGui.QWidget):
 		self.setLayout(mainLayout)
 
 	def _onApplyButtonClicked(self):
-		pass
+		# Send settings to the controller
+		self._applyValues()
+
+		# Disable apply button
+		self.applyButton.setEnabled(False)
+
+	def _applyValues(self):
+		"""Writes all settings values to the controller."""
+		# PID roll settings
+		self.boardController.setRollPIDCoefficients(self.spbRollKp.getValue(),
+			self.spbRollKi.getValue(), self.spbRollKd.getValue(),
+			self.spbILimitRoll.getValue())
+
+		# Kalman roll settings
+		self.boardController.setRollKalmandConstants(self.spbRollQAngle.getValue(),
+			self.spbRollQGyro.getValue(), self.spbRollRAngle.getValue())
 
 	def _onSaveButtonClicked(self):
-		# TODO: Write all settings to the controller
-		pass
+		# Send settings to the controller
+		self._applyValues()
 
-	def _onBoardStatusUpdated(self):
-		pass
+		# Save settings
+		self._saveValues()
+
+		# Disable save and apply button
+		self.saveButton.setEnabled(False)
+		self.applyButton.setEnabled(False)
+
+	def _saveValues(self):
+		"""Saves the settings on the controller."""
+		# Save settings
+		self.boardController.saveBoardSettings()
+
+	def _onBoardSettingsUpdated(self):
+		"""Called when the board settings were updated."""
+		self._updateValues()
 
 	def _updateValues(self):
-		self.spbRollKp.setValue()
+		"""Update GUI elements."""
+		self.spbRollKp.setValue(self._boardSettings.pidRollPFactor)
+		self.spbRollKi.setValue(self._boardSettings.pidRollIFactor)
+		self.spbRollKd.setValue(self._boardSettings.pidRollDFactor)
+
+	def _onPidRollKpChanged(self, value):
+		self._onSettingsChanged()
+
+	def _onPidRollKiChanged(self, value):
+		self._onSettingsChanged()
+
+	def _onPidRollKdChanged(self, value):
+		self._onSettingsChanged()
+
+	def _onPidRollILimitChanged(self, value):
+		self._onSettingsChanged()
+
+	def _onSettingsChanged(self):
+		# Settings were changed; enable save and apply buttons
+		self.saveButton.setEnabled(True)
+		self.applyButton.setEnabled(True)

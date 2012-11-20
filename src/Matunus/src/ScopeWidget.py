@@ -62,7 +62,7 @@ class ScopeWidget(Qwt.QwtPlot):
 		# This timer updates the plot curves
 		self.updateTimer = QtCore.QTimer()
 		QtCore.QObject.connect(self.updateTimer, QtCore.SIGNAL('timeout()'), self._on_timer)
-		self._updateInterval = 0.5
+		self._updateInterval = 0.25
 		self._scopeLength = 60 # Scope length in seconds
 
 		# Basic plot setup
@@ -197,6 +197,8 @@ class ScopeWidget(Qwt.QwtPlot):
 			# Find max y-value of all curves
 			max_yVal = -sys.maxint - 1
 			for curve in self.plotCurves:
+				if not curve:
+					continue
 				val = max(curve.yData)
 				if val > max_yVal:
 					max_yVal = val
@@ -217,6 +219,8 @@ class ScopeWidget(Qwt.QwtPlot):
 
 		# Draw every curve
 		for curve in self.plotCurves:
+			if not curve:
+				continue
 			curve.drawCurve()
 
 		# Replot everything

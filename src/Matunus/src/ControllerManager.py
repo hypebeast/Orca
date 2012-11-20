@@ -23,14 +23,16 @@ import time
 import threading
 
 try:
-    from PyQt4 import pyqtSignal
+    from PyQt4.QtCore import pyqtSignal, QObject
 except ImportError:
     print "No PyQt found!"
     import sys
     sys.exit(2)
 
 from SerialConnection import SerialConnection
-from ApiCommands import CommandTypes, ServoPositionMessage, GetBoardStatusMessage, GetBoardSettingsMessage
+from ApiCommands import CommandTypes, ServoPositionMessage, GetBoardStatusMessage
+from ApiCommands import GetBoardSettingsMessage, SetRollPIDCoefficientsMessage
+from ApiCommands import SetRollKalmanConstantsMessage, SaveSettingsMessage
 from BoardStatus import BoardStatus
 from BoardSettings import BoardSettings
 from logger import Logger
@@ -69,7 +71,7 @@ class ControllerManager(QObject):
         # Status reader
 		self.statusReaderThread = None
 		self.statusReaderIsAlive = False
-		self.statusReaderUpdateInterval = 0.5 # Update interval in seconds
+		self.statusReaderUpdateInterval = 0.25 # Update interval in seconds
 
 		# Indicates if new data from the board was received
 		#self.hasNewData = False
@@ -137,6 +139,8 @@ class ControllerManager(QObject):
 			message = GetBoardStatusMessage()
 			self.serial.writeMessage(message)
 
+			#self.updateBoardSettings()
+
 			time.sleep(self.statusReaderUpdateInterval)
 
 	def _onMessageReceived(self):
@@ -148,25 +152,27 @@ class ControllerManager(QObject):
 		if len(messages) > 0:
 			#self._logger.debug("New status response received")
 			for message in messages:
-				if message.commandType == CommandTypes.GET_BOARD_STATUS:
+				if message[0] is None:
+					continue
+				if message[0].commandType == CommandTypes.GET_BOARD_STATUS:
 					self._updateStatus(message[0], message[1])
-				elif message.commandType == CommandTypes.GET_BOARD_SETTINGS:
+				elif message[0].commandType == CommandTypes.GET_BOARD_SETTINGS:
 					self._updateBoardSettings(message[0], message[1])
 
 	def _updateStatus(self, message, timestamp):
 		"""
-		Updates the BoardStatus object with the received data from the serial
+		Updates the board status with the received data from the serial
 		connection.
 		"""
 		self.boardStatus.updateFromMessage(message, timestamp)
 		#self.boardStatus.printStatus()
-
 		# Emit signal
 		self.board_status_updated.emit()
 
 	def _updateBoardSettings(self, message, timestamp):
+		"""Called when an board settings (0x0020) message was received. The board
+		settings will be updated with the received message."""
 		self.boardSettings.updateFromMessage(message, timestamp)
-
 		# Emit signal
 		self.board_settings_updated.emit()
 
@@ -187,14 +193,19 @@ class ControllerManager(QObject):
 	###########################################	
 	
 	def updateBoardSettings(self):
+		"""Sends an update board settings message."""
 		message = GetBoardSettingsMessage()
 		self.serial.writeMessage(message)
 
 	def saveBoardSettings(self):
-		pass
+		"""Saves all firmware settings to the flash memory."""
+		message = SaveSettingsMessage()
+		self.serial.writeMessage(message)
 
-	def setRollPIDCoefficients(self, p_fac, i_fac, d_fac):
-		pass
+	def setRollPIDCoefficients(self, p_fac, i_fac, d_fac, i_limit):
+		message = SetRollPIDCoefficientsMessage(p_fac, i_fac, d_fac, i_limit)
+		self.serial.writeMessage(message)
 
 	def setRollKalmandConstants(self, q_angle, q_gyro, r_angle):
-		pass
+		message = SetRollKalmanConstantsMessage(q_angle, q_gyro, r_angle)
+		self.serial.writeMessage(message)

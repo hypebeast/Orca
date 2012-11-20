@@ -15,6 +15,7 @@
 #include "MPU6000.h"
 #include "flight_controller.h"
 #include "filters.h"
+#include "serial_flash.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -166,7 +167,6 @@ static void command_set_servo_pos(void)
 	
 	// Set the new position
 	servo_set_pos_degree(servo_nr, position);
-	//servo_set_pos_degree(servo_nr, 90);
 }
 
 
@@ -200,7 +200,7 @@ static void command_get_servo_pos(void)
 **************************************************************************/
 static void command_get_all_servo_pos(void)
 {
-	
+	// TODO
 }
 
 /**************************************************************************
@@ -242,13 +242,13 @@ static void command_get_board_status(void)
 	// Start byte
 	data[index++] = PACKET_START_BYTE;
 	// Message type
-	data[index++] = 0x10;
+	data[index++] = 0x20;
 	// Command type
 	uint16_t cmdtype = 0x0010;
 	memcpy(data + index, &cmdtype, 2);
 	index += 2;
 	// Data Length
-	data[index++] = 38;
+	data[index++] = 66;
 	// Output Channel 1
 	memcpy(data + index, &outChannel1, 2);
 	index += 2;
@@ -331,15 +331,119 @@ static void command_get_board_status(void)
 **************************************************************************/
 static void command_get_board_settings(void)
 {
+	uint8_t packet_length = 91;
+	uint8_t data[packet_length];
+	int index = 0;
 	
+	float pidRollKp = flight_controller_get_pid_roll_p_factor();
+	float pidRollKi = flight_controller_get_pid_roll_i_factor();
+	float pidRollKd = flight_controller_get_pid_roll_d_factor();
+	float pidRollILimit = flight_controller_get_pid_roll_i_limit();
+	float pidPitchKp = 0.0f;
+	float pidPitchKi = 0.0f;
+	float pidPitchKd = 0.0f;
+	float pidPitchILimit = 0.0f;
+	float pidYawKp = 0.0f;
+	float pidYawKi = 0.0f;
+	float pidYawKd = 0.0f;
+	float pidYawILimit = 0.0f;
+	float kalmanRollQAngle = 0.0f;
+	float kalmanRollQGyro = 0.0f;
+	float kalmanRollRAngle = 0.0f;
+	float kalmanPitchQAngle = 0.0f;
+	float kalmanPitchQGyro = 0.0f;
+	float kalmanPitchRAngle = 0.0f;
+	float kalmanYawQAngle = 0.0f;
+	float kalmanYawQGyro = 0.0f;
+	float kalmanYawRAngle = 0.0f;
+	
+	// Start byte
+	data[index++] = PACKET_START_BYTE;
+	// Message type
+	data[index++] = 0x20;
+	// Command type
+	uint16_t cmdtype = 0x0020;
+	memcpy(data + index, &cmdtype, 2);
+	index += 2;
+	// Data Length
+	data[index++] = 84;
+	// PID Roll P-Factor
+	memcpy(data + index, &pidRollKp, 4);
+	index += 4;
+	// PID Roll I-Factor
+	memcpy(data + index, &pidRollKi, 4);
+	index += 4;
+	// PID Roll D-Factor
+	memcpy(data + index, &pidRollKd, 4);
+	index += 4;
+	// PID Roll I-Limit
+	memcpy(data + index, &pidRollILimit, 4);
+	index += 4;
+	// PID Pitch P-Factor
+	memcpy(data + index, &pidPitchKp, 4);
+	index += 4;
+	// PID Pitch I-Factor
+	memcpy(data + index, &pidPitchKi, 4);
+	index += 4;
+	// PID Pitch D-Factor
+	memcpy(data + index, &pidPitchKd, 4);
+	index += 4;
+	// PID Pitch I-Limit
+	memcpy(data + index, &pidPitchILimit, 4);
+	index += 4;
+	// PID Yaw P-Factor
+	memcpy(data + index, &pidYawKp, 4);
+	index += 4;
+	// PID Yaw I-Factor
+	memcpy(data + index, &pidYawKi, 4);
+	index += 4;
+	// PID Yaw D-Factor
+	memcpy(data + index, &pidYawKd, 4);
+	index += 4;
+	// PID Yaw I-Limit
+	memcpy(data + index, &pidYawILimit, 4);
+	index += 4;
+	// Kalman Roll Q-Angle
+	memcpy(data + index, &kalmanRollQAngle, 4);
+	index += 4;
+	// Kalman Roll Q-Gyro
+	memcpy(data + index, &kalmanRollQGyro, 4);
+	index += 4;
+	// Kalman Roll R-Angle
+	memcpy(data + index, &kalmanRollRAngle, 4);
+	index += 4;
+	// Kalman Pitch Q-Angle
+	memcpy(data + index, &kalmanPitchQAngle, 4);
+	index += 4;
+	// Kalman Pitch Q-Gyro
+	memcpy(data + index, &kalmanPitchQGyro, 4);
+	index += 4;
+	// Kalman Pitch R-Angle
+	memcpy(data + index, &kalmanPitchRAngle, 4);
+	index += 4;
+	// Kalman Yaw Q-Angle
+	memcpy(data + index, &kalmanYawQAngle, 4);
+	index += 4;
+	// Kalman Yaw Q-Gyro
+	memcpy(data + index, &kalmanYawQGyro, 4);
+	index += 4;
+	// Kalman Yaw R-Angle
+	memcpy(data + index, &kalmanYawRAngle, 4);
+	index += 4;
+	// CRC
+	data[index++] = 0x88;
+	// Stop byte
+	data[index] = PACKET_STOP_BYTE;
+	
+	write_packet(data, index+1);
 }
 
 /**************************************************************************
-* \brief Saves the board settings to the flash memory.
+* \brief Saves the board settings to the external flash memory.
 **************************************************************************/
 static void command_save_board_settings(void)
 {
-	
+	serial_flash_save_settings();
 }
 
 /**************************************************************************
@@ -347,7 +451,22 @@ static void command_save_board_settings(void)
 **************************************************************************/
 static void command_set_roll_pid_coefficients(void)
 {
+	float p_factor;
+	float i_factor;
+	float d_factor;
+	float i_limit;
+	uint8_t index = 0;
 	
+	memcpy(&p_factor, rx_command_packet.data + index, sizeof(p_factor));
+	index += 4;
+	memcpy(&i_factor, rx_command_packet.data + index, sizeof(i_factor));
+	index += 4;
+	memcpy(&d_factor, rx_command_packet.data + index, sizeof(d_factor));
+	index += 4;
+	memcpy(&i_limit, rx_command_packet.data + index, sizeof(i_limit));
+	
+	// Update the PID controller
+	flight_controller_update_pid_roll_coefficients(p_factor, i_factor, d_factor, i_limit);
 }
 
 /**************************************************************************
@@ -355,7 +474,21 @@ static void command_set_roll_pid_coefficients(void)
 **************************************************************************/
 static void command_set_pitch_pid_coefficients(void)
 {
+	float p_factor;
+	float i_factor;
+	float d_factor;
+	float i_limit;
+	uint8_t index = 0;
 	
+	memcpy(&p_factor, rx_command_packet.data + index, sizeof(p_factor));
+	index += 4;
+	memcpy(&i_factor, rx_command_packet.data + index, sizeof(i_factor));
+	index += 4;
+	memcpy(&d_factor, rx_command_packet.data + index, sizeof(d_factor));
+	index += 4;
+	memcpy(&i_limit, rx_command_packet.data + index, sizeof(i_limit));
+	
+	// TODO
 }
 
 /**************************************************************************
@@ -363,7 +496,21 @@ static void command_set_pitch_pid_coefficients(void)
 **************************************************************************/
 static void command_set_yaw_pid_coefficients(void)
 {
+	float p_factor;
+	float i_factor;
+	float d_factor;
+	float i_limit;
+	uint8_t index = 0;
 	
+	memcpy(&p_factor, rx_command_packet.data + index, sizeof(p_factor));
+	index += 4;
+	memcpy(&i_factor, rx_command_packet.data + index, sizeof(i_factor));
+	index += 4;
+	memcpy(&d_factor, rx_command_packet.data + index, sizeof(d_factor));
+	index += 4;
+	memcpy(&i_limit, rx_command_packet.data + index, sizeof(i_limit));
+	
+	// TODO
 }
 
 /**************************************************************************
@@ -371,7 +518,19 @@ static void command_set_yaw_pid_coefficients(void)
 **************************************************************************/
 static void command_set_kalman_roll_constants(void)
 {
+	float q_angle;
+	float q_gyro;
+	float r_angle;
+	uint8_t index = 0;
 	
+	memcpy(&q_angle, rx_command_packet.data + index, sizeof(q_angle));
+	index += 4;
+	memcpy(&q_gyro, rx_command_packet.data + index, sizeof(q_gyro));
+	index += 4;
+	memcpy(&r_angle, rx_command_packet.data + index, sizeof(r_angle));
+	index += 4;
+	
+	filter_update_constants(q_angle, q_gyro, r_angle);
 }
 
 /**************************************************************************
@@ -379,7 +538,19 @@ static void command_set_kalman_roll_constants(void)
 **************************************************************************/
 static void command_set_kalman_pitch_constants(void)
 {
+	float q_angle;
+	float q_gyro;
+	float r_angle;
+	uint8_t index = 0;
 	
+	memcpy(&q_angle, rx_command_packet.data + index, sizeof(q_angle));
+	index += 4;
+	memcpy(&q_gyro, rx_command_packet.data + index, sizeof(q_gyro));
+	index += 4;
+	memcpy(&r_angle, rx_command_packet.data + index, sizeof(r_angle));
+	index += 4;
+	
+	// TODO
 }
 
 /**************************************************************************
@@ -387,7 +558,19 @@ static void command_set_kalman_pitch_constants(void)
 **************************************************************************/
 static void command_set_kalman_yaw_constants(void)
 {
+	float q_angle;
+	float q_gyro;
+	float r_angle;
+	uint8_t index = 0;
 	
+	memcpy(&q_angle, rx_command_packet.data + index, sizeof(q_angle));
+	index += 4;
+	memcpy(&q_gyro, rx_command_packet.data + index, sizeof(q_gyro));
+	index += 4;
+	memcpy(&r_angle, rx_command_packet.data + index, sizeof(r_angle));
+	index += 4;
+	
+	// TODO
 }
 
 /**************************************************************************
@@ -425,7 +608,7 @@ void write_packet(uint8_t *data, uint16_t length)
 **************************************************************************/
 static void execute_command(void)
 {
-	unsigned int i;
+	uint8_t i;
 	
 	for (i = 0; i < ARRAY_SIZE(commands); i++) {
 		if (commands[i].command_type == rx_command_packet.command &&
@@ -713,7 +896,6 @@ bool USART_RXBufferData_Available(USART_data_t * usart_data)
 	/* There are data left in the buffer unless Head and Tail are equal. */
 	return (tempHead != tempTail);
 }
-
 
 
 /*! \brief Get received data (5-8 bit character).

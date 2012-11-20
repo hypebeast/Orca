@@ -69,6 +69,8 @@ def main():
         print __appName__ + " v" + __version__
         sys.exit(2)
 
+    # Set new AppUserModelID
+    # TODO: Only required for Windows
     myappid = 'sr.orca.matunus.002' # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 

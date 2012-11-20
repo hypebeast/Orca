@@ -21,18 +21,15 @@ __author__ = 'Sebastian Ruml'
 
 try:
  	from PyQt4 import QtCore, QtXml
-	from PyQt4.Qt import Qt
 except ImportError:
  	print "No PyQt found!"
 	import sys
 	sys.exit(2)
 
-import defs
-
 
 class SvgDocument:
  	"""
-	Helper class for working with SVG XML documents.
+	Helper class for working with SVG documents.
 	"""
 	def __init__(self, fileName):
 		if fileName == None:

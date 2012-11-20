@@ -23,6 +23,7 @@ import os
 
 try:
     from PyQt4 import QtGui, QtSvg
+    #from PyQt4.QtCore import QUrl
 except ImportError:
     print "No PyQt found!"
     import sys
@@ -30,59 +31,52 @@ except ImportError:
 
 import defs
 
-class MainPage(QtGui.QWidget):
+class WelcomePage(QtGui.QWidget):
     def __init__(self):
-        super(MainPage, self).__init__()
+        super(WelcomePage, self).__init__()
 
+        self.app_defs = defs.AppDefs()
         self._createUi()
 
     def _createUi(self):
+        #self.view = QtGui.QGraphicsView()
+        #self.scene = QtGui.QGraphicsScene()
+        #self.scene.setSceneRect(self.rect())
+        #self.view.setScene(self.scene)
+
         mainLayout = QtGui.QVBoxLayout()
+        #mainLayout.addWidget(self.view)
+
+        #image_file = os.path.join(self.app_defs.ArtworkPath, "welcome_background.png")
+        #self.backgroundImage = QtGui.QGraphicsPixmapItem(QtGui.QPixmap(image_file), None, self.scene)
 
         label = QtGui.QLabel("<b><font size=\"8\" color='black'>Matunus</font></b>")
         mainLayout.addWidget(label)
         label = QtGui.QLabel("<font size=\"5\" color='black'>Orca Ground Control Station</font>")
         mainLayout.addWidget(label)
 
-        self.app_defs = defs.AppDefs()
-        self.background = os.path.join(self.app_defs.ArtworkPath, "welcome_background.svg")
+        #self.background = os.path.join(self.app_defs.ArtworkPath, "welcome_background.svg")
 
-        # Status group box
-        #groupBoxStatus = QtGui.QGroupBox("Status")
-        #vLayout = QtGui.QVBoxLayout()
-        #systemStatusLayout = QtGui.QHBoxLayout()
-        #lSystemStatus = QtGui.QLabel("System.Status:")
-        #systemStatusLayout.addWidget(lSystemStatus)
-        #systemStatusLayout.insertSpacing(1, 10)
-        #self.systemStatus = StatusLabel()
-        #self.systemStatus.setText("Disconnected")
-        #self.systemStatus.setMaximumHeight(40)
-        #self.systemStatus.setMinimumWidth(100)
-        #systemStatusLayout.addWidget(self.systemStatus)
-        #systemStatusLayout.insertSpacing(3, 30)
-        #lSystemMessage = QtGui.QLabel("System.Message:")
-        #systemStatusLayout.addWidget(lSystemMessage)
-        #systemStatusLayout.insertSpacing(5, 20)
-        #self.systemMessage = StatusLabel()
-        #self.systemMessage.setText("None")
-        #self.systemMessage.setMaximumHeight(40)
-        #self.systemMessage.setMinimumWidth(500)
-        #systemStatusLayout.addWidget(self.systemMessage)
-        #systemStatusLayout.addStretch()
-        #vLayout.addItem(systemStatusLayout)
+        # QML stuff
+        #self.mainViewFile = os.path.join(self.app_defs.QmlPath, "welcomepage", "welcomepage.qml")
+        #self.mainView = QtDeclarative.QDeclarativeView()
+        #self.mainView.setSource(QUrl(self.mainViewFile))
+        #self.mainView.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)
+        #mainLayout.addWidget(self.mainView)
 
-        #vLayout.addStretch()
-        #groupBoxStatus.setLayout(vLayout)
-
-        #mainLayout.addWidget(groupBoxStatus)
         mainLayout.addStretch()
         self.setLayout(mainLayout)
 
-    def paintEvent(self, e):
-        qp = QtGui.QPainter()
-        qp.begin(self)
-        #self._drawWidget(qp)
-        qp.end()
+    #def paintEvent(self, e):
+    #    qp = QtGui.QPainter()
+    #    qp.begin(self)
+    #    #self._drawWidget(qp)
+    #    qp.end()
+
+    #def resizeEvent(self, event):
+    #    self.scene.setSceneRect(0, 0, event.size().width(), event.size().height())
+    #    super(WelcomePage, self).resizeEvent(event)
+
 
     def _drawWidget(self, qp):
         svgRenderer = QtSvg.QSvgRenderer()
