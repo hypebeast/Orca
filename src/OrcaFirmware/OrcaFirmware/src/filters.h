@@ -13,9 +13,9 @@
 //	Roll Filter Startup Settings
 //  Edit this settings for different configurations
 //---------------------------------------------------------------------
-#define FILTER_R_ANGLE_CONF			0.69f		/*!< brief Startup covariance, our observation noise from the accelerometer. */
-#define FILTER_Q_ANGLE_CONF			0.0001f		/*!< brief Startup prozess covariance. In this case, it indicates how much we trust the accelerometer relative to the gyros. */
-#define FILTER_Q_GYRO_CONF			0.0003f		/*!< brief Startup prozess covariance. In this case, it indicates how much we trust the accelerometer relative to the gyros. */
+#define FILTER_R_ANGLE_CONF			0.2		/*!< brief 0.69Startup covariance, our observation noise from the accelerometer. */
+#define FILTER_Q_ANGLE_CONF			0.0001f		/*!< brief 0.0001 Startup prozess covariance. In this case, it indicates how much we trust the accelerometer relative to the gyros. */
+#define FILTER_Q_GYRO_CONF			0.01f		/*!< brief 0.0003 Startup prozess covariance. In this case, it indicates how much we trust the accelerometer relative to the gyros. */
 
 #define PI 3.14159265358979f
 

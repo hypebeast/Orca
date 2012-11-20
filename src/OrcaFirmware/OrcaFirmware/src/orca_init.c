@@ -90,4 +90,7 @@ void orca_board_init(BOARD_CONFIG_t *board)
 	ioport_configure_pin(BOARD_SERIAL_DATA_FLASH_MASTER_MISO, IOPORT_DIR_INPUT);
 	ioport_configure_pin(BOARD_SERIAL_DATA_FLASH_CS, IOPORT_DIR_OUTPUT | IOPORT_INIT_HIGH);
 	
+	//for testing
+	ioport_configure_pin(BOARD_SPARE_PIN_2_GPIO, IOPORT_DIR_OUTPUT | IOPORT_INIT_LOW);
+	
 }

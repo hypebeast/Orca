@@ -30,6 +30,7 @@ void pid_Init(float p_factor, float i_factor, float d_factor, float i_limit, str
   pid->P_Factor = p_factor /** PID_SCALING_FACTOR*/;   
   pid->I_Factor = i_factor /** PID_SCALING_FACTOR*/;   
   pid->D_Factor = d_factor /** PID_SCALING_FACTOR*/;  
+  pid->I_Limit = i_limit;
    
   // Limits to avoid overflow   
   pid->maxError = MAX_INT / (pid->P_Factor + 1);   
@@ -45,7 +46,7 @@ void pid_Init(float p_factor, float i_factor, float d_factor, float i_limit, str
  *   param time Abtastzeit (us) 
  *  \param pid_st  PID status struct.  
  */   
-float pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  time, struct PID_DATA *pid_st)   
+float pid_Controller(float setPoint, float processValue, unsigned long  time, struct PID_DATA *pid_st)   
 {   
   float error, p_term, d_term;   
   float i_term, ret, temp;   
@@ -105,7 +106,7 @@ float pid_Controller(int16_t setPoint, int16_t processValue, unsigned long  time
     ret = -MAX_INT;   
   }   
    
-  return((int16_t)ret);   
+  return(ret);   
 }   
    
 /*! \brief Resets the integrator.  

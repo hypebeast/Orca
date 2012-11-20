@@ -32,7 +32,7 @@
 /* \brief  Receive buffer size: 2,4,8,16,32,64,128 or 256 bytes. */
 #define USART_RX_BUFFER_SIZE 256
 /* \brief Transmit buffer size: 2,4,8,16,32,64,128 or 256 bytes */
-#define USART_TX_BUFFER_SIZE 256
+#define USART_TX_BUFFER_SIZE 512
 /* \brief Receive buffer mask. */
 #define USART_RX_BUFFER_MASK ( USART_RX_BUFFER_SIZE - 1 )
 /* \brief Transmit buffer mask. */

@@ -21,6 +21,8 @@
 #define MPU_6000_SMPRT_DIV_CONF			0x04						/*!< brief Used sample rate divider */
 #define MPU_6000_ISR_LVL				PORT_INT0LVL_HI_gc			/*!< brief Servo Input ISR Level */	
 #define MPU_6000_CAL_CYCLE				50
+#define MPU_6000_BURST_READ_ENABLE									/*!< brief Use burst read of all sensor measurements, if FIFO read is disabled. */
+
 //---------------------------------------------------------------------
 //	General
 //---------------------------------------------------------------------
@@ -150,8 +152,68 @@
 //---------------------------------------------------------------------
 #define MPU_6000_WHO_AM_I_ADDR		0x75		/*!< brief MPU Register is used to verify the identity of the device */
 
+//---------------------------------------------------------------------
+//	Register 35 – FIFO Enable, Page 16
+//---------------------------------------------------------------------
+#define MPU_6000_FIFO_ENABLE_ADDR				0x23		/*!< brief This register determines which sensor measurements are loaded into the FIFO buffer. */
+#define MPU_6000_FIFO_SLV0_EN_bp				0x00		/*!< brief EXT_SENS_DATA Slave 0 registers bit position. */
+#define MPU_6000_FIFO_SLV0_ENABLE				0x01		/*!< brief This bit enables EXT_SENS_DATA Slave 0 registers. */
+#define MPU_6000_FIFO_SLV0_DISABLE				0x00		/*!< brief This bit disables EXT_SENS_DATA Slave 0 registers. */
+#define MPU_6000_FIFO_SLV1_EN_bp				0x01		/*!< brief EXT_SENS_DATA Slave 1 registers bit position. */
+#define MPU_6000_FIFO_SLV1_ENABLE				0x01		/*!< brief This bit enables EXT_SENS_DATA Slave 1 registers. */
+#define MPU_6000_FIFO_SLV1_DISABLE				0x00		/*!< brief This bit disables EXT_SENS_DATA Slave 1 registers. */
+#define MPU_6000_FIFO_SLV2_EN_bp				0x02		/*!< brief EXT_SENS_DATA Slave 2 registers bit position. */
+#define MPU_6000_FIFO_SLV2_ENABLE				0x01		/*!< brief This bit enables EXT_SENS_DATA Slave 2 registers. */
+#define MPU_6000_FIFO_SLV2_DISABLE				0x00		/*!< brief This bit disables EXT_SENS_DATA Slave 2 registers. */
+#define MPU_6000_FIFO_ACCEL_EN_bp				0x03		/*!< brief Acceleration FIFO registers bit position. */
+#define MPU_6000_FIFO_ACCEL_ENABLE				0x01		/*!< brief This bit enables Acceleration to be written into the FIFO. */
+#define MPU_6000_FIFO_ACCEL_DISABLE				0x00		/*!< brief This bit disables Acceleration to be written into the FIFO. */
+#define MPU_6000_FIFO_GYR_Z_EN_bp				0x04		/*!< brief Gyroscope z-axis FIFO registers bit position. */
+#define MPU_6000_FIFO_GYR_Z_ENABLE				0x01		/*!< brief This bit enables Gyroscope z-axis to be written into the FIFO. */
+#define MPU_6000_FIFO_GYR_Z_DISABLE				0x00		/*!< brief This bit disables Gyroscope z-axis to be written into the FIFO. */
+#define MPU_6000_FIFO_GYR_Y_EN_bp				0x05		/*!< brief Gyroscope y-axis FIFO registers bit position. */
+#define MPU_6000_FIFO_GYR_Y_ENABLE				0x01		/*!< brief This bit enables Gyroscope y-axis to be written into the FIFO. */
+#define MPU_6000_FIFO_GYR_Y_DISABLE				0x00		/*!< brief This bit disables Gyroscope y-axis to be written into the FIFO. */
+#define MPU_6000_FIFO_GYR_X_EN_bp				0x06		/*!< brief Gyroscope x-axis FIFO registers bit position. */
+#define MPU_6000_FIFO_GYR_X_ENABLE				0x01		/*!< brief This bit enables Gyroscope x-axis to be written into the FIFO. */
+#define MPU_6000_FIFO_GYR_X_DISABLE				0x00		/*!< brief This bit disables Gyroscope x-axis to be written into the FIFO. */
+#define MPU_6000_FIFO_TEMP_EN_bp				0x07		/*!< brief Temperature FIFO registers bit position. */
+#define MPU_6000_FIFO_TEMP_ENABLE				0x01		/*!< brief This bit enables Temperature to be written into the FIFO. */
+#define MPU_6000_FIFO_TEMP_DISABLE				0x00		/*!< brief This bit disables Temperature to be written into the FIFO. */
 
+//---------------------------------------------------------------------
+//	MPU Register 72 & 73 – FIFO Count Registers, Page 44
+//---------------------------------------------------------------------
+#define MPU_6000_FIFO_COUNT_H_ADDR			0x72		/*!< brief MPU Register is used to keep track of the number of samples currently in the FIFO (higher bits). */
+#define MPU_6000_FIFO_COUNT_L_ADDR			0x73		/*!< brief MPU Register is used to keep track of the number of samples currently in the FIFO (lower bits). */
 
+//---------------------------------------------------------------------
+//	MPU Register 116 – FIFO Read Write, Page 45
+//---------------------------------------------------------------------
+#define MPU_6000_FIFO_READ_WRITE_ADDR		0x74		/*!< brief MPU Register is used to read and write data from the FIFO buffer. */
+
+//---------------------------------------------------------------------
+//	Register 106 – User Control, Page 39
+//---------------------------------------------------------------------
+#define MPU_6000_USER_CTRL_ADDR						0x6A		/*!< brief This register allows the user to enable and disable the FIFO buffer, I2C Master Mode, and primary I2C interface. */
+#define MPU_6000_USER_CTRL_SIG_COND_RESET_bp		0x00		/*!< brief Resets the signal paths for all sensors bit position. */
+#define MPU_6000_USER_CTRL_SIG_COND_RESET_ENABLE	0x01		/*!< brief This bit enables reset the signal paths for all sensors. */
+#define MPU_6000_USER_CTRL_SIG_COND_RESET_DISABLE	0x00		/*!< brief This bit disables reset the signal paths for all sensors. */
+#define MPU_6000_USER_CTRL_I2C_MST_RESET_bp			0x01		/*!< brief Resets the I2C Master bit position. */
+#define MPU_6000_USER_CTRL_I2C_MST_RESET_ENABLE		0x01		/*!< brief This bit enables resets the I2C Master. */
+#define MPU_6000_USER_CTRL_I2C_MST_RESET_DISABLE	0x00		/*!< brief This bit disables resets the I2C Master. */
+#define MPU_6000_USER_CTRL_FIFO_RESET_bp			0x02		/*!< brief Resets the FIFO buffer bit position. */
+#define MPU_6000_USER_CTRL_FIFO_RESET_ENABLE		0x01		/*!< brief This bit enables resets the FIFO buffer. */
+#define MPU_6000_USER_CTRL_FIFO_RESET_DISABLE		0x00		/*!< brief This bit disables resets the FIFO buffer. */
+#define MPU_6000_USER_CTRL_I2C_IF_bp				0x04		/*!< brief Resets primary I2C interface buffer bit position. */
+#define MPU_6000_USER_CTRL_I2C_IF_ENABLE			0x01		/*!< brief This bit enables primary I2C interface reset. */
+#define MPU_6000_USER_CTRL_I2C_IF_DISABLE			0x00		/*!< brief This bit disables primary I2C interface reset. */
+#define MPU_6000_USER_CTRL_I2C_MST_bp				0x05		/*!< brief Enable I2C Master Mode bit position. */
+#define MPU_6000_USER_CTRL_I2C_MST_ENABLE			0x01		/*!< brief This bit enables I2C Master Mode. */
+#define MPU_6000_USER_CTRL_I2C_MST_DISABLE			0x00		/*!< brief This bit disables I2C Master Mode. */
+#define MPU_6000_USER_CTRL_FIFO_bp					0x06		/*!< brief Enable FIFO operations bit position. */
+#define MPU_6000_USER_CTRL_FIFO_ENABLE				0x01		/*!< brief This bit enables FIFO operations. */
+#define MPU_6000_USER_CTRL_FIFO_DISABLE				0x00		/*!< brief This bit disables FIFO operations. */
 
 
 /************************************************************ Not listed in the datasheet ******************************************************************/
@@ -192,9 +254,10 @@ typedef struct MOTION_PROCESSING_UNIT{
 	float xGyr;								/*!< brief X-rate of rotation in deg/s */
 	float yGyr;								/*!< brief Y-rate of rotation in deg/s */
 	float zGyr;								/*!< brief Z-rate of rotation in deg/s */
+	float temp;								/*!< brief Temperature in degress */
 }MOTION_PROCESSING_UNIT_t;
 
-uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit);
+uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit, bool useFifo, bool externalMag);
 uint16_t mpu_6000_is_available(void);
 int16_t mpu_6000_get_z_acc_offset(void);
 uint8_t mpu_6000_get_product_id(void);
@@ -210,5 +273,7 @@ float mpu_6000_get_z_acc(void);
 float mpu_6000_get_x_gyr(void);
 float mpu_6000_get_y_gyr(void);
 float mpu_6000_get_z_gyr(void);
+uint16_t mpu_6000_read_fifo_measurements(void);
+uint16_t mpu_6000_burst_read_all_measurements(void);
 
 #endif /* MPU6000_H_ */

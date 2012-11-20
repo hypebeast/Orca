@@ -85,7 +85,7 @@ int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 					(float)(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
 	
 	/*  */
-	actuatingRoll = pid_Controller((int16_t)(rollSetValue * 10), (int16_t)(actualSensorData->roll * 10), 10000, &rollPidConf)/10;	
+	actuatingRoll = pid_Controller(rollSetValue, actualSensorData->roll, 10000, &rollPid);	
 }
 
 /**************************************************************************
@@ -210,13 +210,11 @@ int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController)
 ***************************************************************************/
 int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 {
+	flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_EDF_REAR_OFFSET;
 
 	if(flightController->rcServoIn->servo3 >= FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET)
-		flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_EDF_REAR_OFFSET+ flightController->rcServoIn->servo3;
-
-	else
-		flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH;	
-		
+		flightController->rearEdfSetPoint = flightController->rcServoIn->servo3;
+	
 	return SYSTEM_INFO_TRUE;	
 }
 
@@ -277,6 +275,11 @@ void flight_controller_update_pid_yaw_coefficients(float p_factor, float i_facto
 ***************************************************************************/
 float flight_controller_get_actuating_roll_angle(void)
 {
+	if(actuatingRoll == 0)
+	{
+		nop();
+		return 0;
+	}
 	return actuatingRoll;
 }
 
@@ -375,7 +378,6 @@ int flight_controller_task(FLIGHT_CONTROLLER_t *flightController)
 		flight_controller_calc_left_servo(flightController);
 		flight_controller_calc_right_servo(flightController);
 		flight_controller_calc_rear_edf(flightController);
-		
 		
 		//TODO: Servo Out
 		servo_set_pos_ticks(1,flightController->leftEdfSetPoint);
