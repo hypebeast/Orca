@@ -347,9 +347,9 @@ static void command_get_board_settings(void)
 	float pidYawKi = 0.0f;
 	float pidYawKd = 0.0f;
 	float pidYawILimit = 0.0f;
-	float kalmanRollQAngle = 0.0f;
-	float kalmanRollQGyro = 0.0f;
-	float kalmanRollRAngle = 0.0f;
+	float kalmanRollQAngle = filter_get_roll_qangle();
+	float kalmanRollQGyro = filter_get_roll_qgyro();
+	float kalmanRollRAngle = filter_get_roll_rangle();
 	float kalmanPitchQAngle = 0.0f;
 	float kalmanPitchQGyro = 0.0f;
 	float kalmanPitchRAngle = 0.0f;
@@ -635,7 +635,6 @@ static void parse_command_packet(void)
 	
 	// Byte four and five contains the command type	
 	rx_command_packet.command = (uint16_t)(((command_buff.buff[index+1]) << 8)|command_buff.buff[index]);
-	
 	index += 2;
 	
 	// Byte six contains the data length

@@ -66,5 +66,8 @@ void filter_init(FILTER_DATA_t *filter, float Q_angle, float Q_gyro, float R_ang
 void filter_update_constants(float Q_angle, float Q_gyro, float R_angle);
 void filter_task(unsigned long time);
 float filter_get_acc_roll(void);
+float filter_get_roll_qangle(void);
+float filter_get_roll_qgyro(void);
+float filter_get_roll_rangle(void);
 
 #endif /* FILTERS_H_ */

@@ -84,21 +84,33 @@ class StabilizationPage(QtGui.QWidget):
 		hLayout.addWidget(label)
 		hLayout.addSpacing(150)
 		self.spbRollKp = QtGui.QDoubleSpinBox()
+		self.spbRollKp.setDecimals(5)
+		self.spbRollKp.setMinimum(0)
+		self.spbRollKp.setMaximum(50)
 		self.spbRollKp.setMinimumWidth(150)
 		self.spbRollKp.valueChanged.connect(self._onPidRollKpChanged)
 		hLayout.addWidget(self.spbRollKp)
 		self.spbRollKi = QtGui.QDoubleSpinBox()
+		self.spbRollKi.setDecimals(5)
+		self.spbRollKi.setMinimum(0)
+		self.spbRollKi.setMaximum(50)
 		self.spbRollKi.setMinimumWidth(150)
 		self.spbRollKi.valueChanged.connect(self._onPidRollKiChanged)
 		hLayout.addWidget(self.spbRollKi)
 		self.spbRollKd = QtGui.QDoubleSpinBox()
+		self.spbRollKd.setDecimals(5)
+		self.spbRollKd.setMinimum(0)
+		self.spbRollKd.setMaximum(50)
 		self.spbRollKd.setMinimumWidth(150)
 		self.spbRollKd.valueChanged.connect(self._onPidRollKdChanged)
 		hLayout.addWidget(self.spbRollKd)
-		self.spbILimitRoll = QtGui.QDoubleSpinBox()
-		self.spbILimitRoll.setMinimumWidth(150)
-		self.spbILimitRoll.valueChanged.connect(self._onPidRollILimitChanged)
-		hLayout.addWidget(self.spbILimitRoll)
+		self.spbRollILimit = QtGui.QDoubleSpinBox()
+		self.spbRollILimit.setDecimals(5)
+		self.spbRollILimit.setMinimum(0)
+		self.spbRollILimit.setMaximum(50)
+		self.spbRollILimit.setMinimumWidth(150)
+		self.spbRollILimit.valueChanged.connect(self._onPidRollILimitChanged)
+		hLayout.addWidget(self.spbRollILimit)
 		hLayout.addStretch()
 		groupBoxLayout.addLayout(hLayout)
 		
@@ -174,25 +186,37 @@ class StabilizationPage(QtGui.QWidget):
 		hLayout.addStretch()
 		groupBoxLayout.addLayout(hLayout)  
 
-		# Roll constants
+		# Kalman Roll constants
 		hLayout = QtGui.QHBoxLayout()
 		hLayout.addSpacing(50)
 		label = QtGui.QLabel("Roll")
 		hLayout.addWidget(label)
 		hLayout.addSpacing(150)
 		self.spbRollQAngle = QtGui.QDoubleSpinBox()
+		self.spbRollQAngle.setDecimals(5)
+		self.spbRollQAngle.setMinimum(0)
+		self.spbRollQAngle.setMaximum(50)
 		self.spbRollQAngle.setMinimumWidth(150)
+		self.spbRollQAngle.valueChanged.connect(self._onKalmanRollQAngleChanged)
 		hLayout.addWidget(self.spbRollQAngle)
 		self.spbRollQGyro = QtGui.QDoubleSpinBox()
+		self.spbRollQGyro.setDecimals(5)
+		self.spbRollQGyro.setMinimum(0)
+		self.spbRollQGyro.setMaximum(50)
 		self.spbRollQGyro.setMinimumWidth(150)
+		self.spbRollQGyro.valueChanged.connect(self._onKalmanRollQGyroChanged)
 		hLayout.addWidget(self.spbRollQGyro)
 		self.spbRollRAngle = QtGui.QDoubleSpinBox()
+		self.spbRollRAngle.setDecimals(5)
+		self.spbRollRAngle.setMinimum(0)
+		self.spbRollRAngle.setMaximum(50)
 		self.spbRollRAngle.setMinimumWidth(150)
+		self.spbRollRAngle.valueChanged.connect(self._onKalmanRollRAngleChanged)
 		hLayout.addWidget(self.spbRollRAngle)
 		hLayout.addStretch()
 		groupBoxLayout.addLayout(hLayout)
 
-		# Pitch constants
+		# Kalman Pitch constants
 		hLayout = QtGui.QHBoxLayout()
 		hLayout.addSpacing(50)
 		label = QtGui.QLabel("Pitch")
@@ -210,7 +234,7 @@ class StabilizationPage(QtGui.QWidget):
 		hLayout.addStretch()
 		groupBoxLayout.addLayout(hLayout)
 
-		# Yaw constants
+		# Kalman Yaw constants
 		hLayout = QtGui.QHBoxLayout()
 		hLayout.addSpacing(50)
 		label = QtGui.QLabel("Yaw")
@@ -314,10 +338,14 @@ class StabilizationPage(QtGui.QWidget):
 
 		mainLayout.addStretch()
 
-		# Save and apply button
+		# Bottom buttons
 		hLayout = QtGui.QHBoxLayout()
-		self.cbLiveUpdate = QtGui.QCheckBox("Update in real time")
-		hLayout.addWidget(self.cbLiveUpdate)
+		self.bRestoreFactory = QtGui.QPushButton("Restore Factory Settings")
+		self.bRestoreFactory.clicked.connect(self._onbRestoreFactoryClicked)
+		hLayout.addWidget(self.bRestoreFactory)
+		self.bReloadFromBoard = QtGui.QPushButton("Reload data from board")
+		self.bReloadFromBoard.clicked.connect(self._onbReloadFromBoard)
+		hLayout.addWidget(self.bReloadFromBoard)
 		hLayout.addStretch()
 		self.saveButton = QtGui.QPushButton("Save")
 		self.saveButton.setEnabled(False)
@@ -333,6 +361,27 @@ class StabilizationPage(QtGui.QWidget):
 		# Set main layout
 		self.setLayout(mainLayout)
 
+		# Connect all signals
+		self._connectSignals()
+
+	def _connectSignals(self):
+		self.spbRollKp.valueChanged.connect(self._onPidRollKpChanged)
+		self.spbRollKi.valueChanged.connect(self._onPidRollKiChanged)
+		self.spbRollKd.valueChanged.connect(self._onPidRollKdChanged)
+		self.spbRollILimit.valueChanged.connect(self._onPidRollILimitChanged)
+		self.spbRollQAngle.valueChanged.connect(self._onKalmanRollQAngleChanged)
+		self.spbRollQGyro.valueChanged.connect(self._onKalmanRollQGyroChanged)
+		self.spbRollRAngle.valueChanged.connect(self._onKalmanRollRAngleChanged)
+
+	def _disconnectSignals(self):
+		self.spbRollKp.valueChanged.disconnect(self._onPidRollKpChanged)
+		self.spbRollKi.valueChanged.disconnect(self._onPidRollKiChanged)
+		self.spbRollKd.valueChanged.disconnect(self._onPidRollKdChanged)
+		self.spbRollILimit.valueChanged.disconnect(self._onPidRollILimitChanged)
+		self.spbRollQAngle.valueChanged.disconnect(self._onKalmanRollQAngleChanged)
+		self.spbRollQGyro.valueChanged.disconnect(self._onKalmanRollQGyroChanged)
+		self.spbRollRAngle.valueChanged.disconnect(self._onKalmanRollRAngleChanged)
+
 	def _onApplyButtonClicked(self):
 		# Send settings to the controller
 		self._applyValues()
@@ -343,13 +392,16 @@ class StabilizationPage(QtGui.QWidget):
 	def _applyValues(self):
 		"""Writes all settings values to the controller."""
 		# PID roll settings
-		self.boardController.setRollPIDCoefficients(self.spbRollKp.getValue(),
-			self.spbRollKi.getValue(), self.spbRollKd.getValue(),
-			self.spbILimitRoll.getValue())
+		self.boardController.setRollPIDCoefficients(self.spbRollKp.value(),
+			self.spbRollKi.value(), self.spbRollKd.value(),
+			self.spbRollILimit.value())
 
 		# Kalman roll settings
-		self.boardController.setRollKalmandConstants(self.spbRollQAngle.getValue(),
-			self.spbRollQGyro.getValue(), self.spbRollRAngle.getValue())
+		self.boardController.setRollKalmanConstants(self.spbRollQAngle.value(),
+			self.spbRollQGyro.value(), self.spbRollRAngle.value())
+
+		# Disable apply button
+		self.applyButton.setEnabled(False)
 
 	def _onSaveButtonClicked(self):
 		# Send settings to the controller
@@ -368,28 +420,56 @@ class StabilizationPage(QtGui.QWidget):
 		self.boardController.saveBoardSettings()
 
 	def _onBoardSettingsUpdated(self):
-		"""Called when the board settings were updated."""
+		"""Called when the board settings are updated."""
 		self._updateValues()
 
 	def _updateValues(self):
 		"""Update GUI elements."""
+		# Disable events
+		self._disconnectSignals()
+		
 		self.spbRollKp.setValue(self._boardSettings.pidRollPFactor)
 		self.spbRollKi.setValue(self._boardSettings.pidRollIFactor)
 		self.spbRollKd.setValue(self._boardSettings.pidRollDFactor)
+		self.spbRollILimit.setValue(self._boardSettings.pidRollILimit)
+
+		self.spbRollQAngle.setValue(self._boardSettings.kalmanRollQAngle)
+		self.spbRollQGyro.setValue(self._boardSettings.kalmanRollQGyro)
+		self.spbRollRAngle.setValue(self._boardSettings.kalmanRollRAngle)
+
+		# Re-enable events
+		self._connectSignals()
 
 	def _onPidRollKpChanged(self, value):
-		self._onSettingsChanged()
+		self._enableButtons()
 
 	def _onPidRollKiChanged(self, value):
-		self._onSettingsChanged()
+		self._enableButtons()
 
 	def _onPidRollKdChanged(self, value):
-		self._onSettingsChanged()
+		self._enableButtons()
 
 	def _onPidRollILimitChanged(self, value):
-		self._onSettingsChanged()
+		self._enableButtons()
 
-	def _onSettingsChanged(self):
+	def _onKalmanRollQAngleChanged(self, value):
+		self._enableButtons()
+
+	def _onKalmanRollQGyroChanged(self, value):
+		self._enableButtons()
+
+	def _onKalmanRollRAngleChanged(self, value):
+		self._enableButtons()
+
+	def _enableButtons(self):
 		# Settings were changed; enable save and apply buttons
 		self.saveButton.setEnabled(True)
 		self.applyButton.setEnabled(True)
+
+	def _onbRestoreFactoryClicked(self):
+		self._boardSettings.restoreStabilizationFactorySettings()
+		self._updateValues()
+		self._enableButtons()
+
+	def _onbReloadFromBoard(self):
+		self.boardController.updateBoardSettings()

@@ -39,6 +39,21 @@ void filter_update_constants(float Q_angle, float Q_gyro, float R_angle)
 	filterdata->R_angle = R_angle;
 }
 
+float filter_get_roll_qangle(void)
+{
+	return filterdata->Q_angle;
+}
+
+float filter_get_roll_qgyro(void)
+{
+	return filterdata->Q_gyro;
+}
+
+float filter_get_roll_rangle(void)
+{
+	return filterdata->R_angle;
+}
+
 /*
  * The predict function. Updates 2 variables:
  * our model-state x and the 2x2 matrix P

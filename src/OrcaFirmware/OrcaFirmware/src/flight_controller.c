@@ -39,7 +39,7 @@
 #include "servo.h"
 #include "pid.h"
 
-pidData_t rollPidConf;
+pidData_t rollPid;
 FILTER_DATA_t *actualSensorData;
 float actuatingRoll = 0;
 float rollSetValue = 0;
@@ -67,7 +67,7 @@ void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settin
 	}		
 	
 	/* Roll PID Init */
-	pid_Init(settings->pid_roll_p_factor, settings->pid_roll_i_factor, settings->pid_roll_d_factor, settings->pid_roll_i_limit , &rollPidConf);	
+	pid_Init(settings->pid_roll_p_factor, settings->pid_roll_i_factor, settings->pid_roll_d_factor, settings->pid_roll_i_limit , &rollPid);	
 }	
 
 /**************************************************************************
@@ -230,7 +230,7 @@ int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 ***************************************************************************/
 void flight_controller_update_pid_roll_coefficients(float p_factor, float i_factor, float d_factor, float i_limit)
 {
-	pid_update_tuning_constants(p_factor, i_factor, d_factor, i_limit, &rollPidConf);
+	pid_update_tuning_constants(p_factor, i_factor, d_factor, i_limit, &rollPid);
 }
 
 /**************************************************************************
@@ -319,7 +319,7 @@ float flight_controller_get_set_roll_angle(void)
 ***************************************************************************/
 float flight_controller_get_pid_roll_p_factor(void)
 {
-	return rollPidConf.P_Factor;
+	return rollPid.P_Factor;
 }
 
 /**************************************************************************
@@ -329,7 +329,7 @@ float flight_controller_get_pid_roll_p_factor(void)
 ***************************************************************************/
 float flight_controller_get_pid_roll_i_factor(void)
 {
-	return rollPidConf.I_Factor;
+	return rollPid.I_Factor;
 }
 
 /**************************************************************************
@@ -339,7 +339,7 @@ float flight_controller_get_pid_roll_i_factor(void)
 ***************************************************************************/
 float flight_controller_get_pid_roll_d_factor(void)
 {
-	return rollPidConf.D_Factor;
+	return rollPid.D_Factor;
 }
 
 /**************************************************************************
@@ -349,7 +349,7 @@ float flight_controller_get_pid_roll_d_factor(void)
 ***************************************************************************/
 float flight_controller_get_pid_roll_i_limit(void)
 {
-	return rollPidConf.I_Limit;
+	return rollPid.I_Limit;
 }
 
 /**************************************************************************
@@ -370,7 +370,7 @@ int flight_controller_task(FLIGHT_CONTROLLER_t *flightController)
 		/* Reset PID Controller if we get no input signal */
 		if(flightController->rcServoIn->servo3 <= 1200)
 		{
-			pid_Reset_Integrator(&rollPidConf);			
+			pid_Reset_Integrator(&rollPid);			
 		}
 			
 		flight_controller_calc_left_edf(flightController);

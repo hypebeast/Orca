@@ -27,14 +27,14 @@
 #define PID_ROLL_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the roll PID controller. */
 #define PID_ROLL_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the roll PID controller. */
 #define PID_ROLL_I_LIMIT_CONF			5.0f		/*!< brief Default I limit value. */
-#define PID_PITCH_P_FACTOR_CONF			0.04f		/*!< brief Default p factor for the pitch PID controller. */
-#define PID_PITCH_I_FACTOR_CONF			0.0008f		/*!< brief Default p factor for the pitch PID controller. */
-#define PID_PITCH_D_FACTOR_CONF			0.002f		/*!< brief Default p factor for the pitch PID controller. */
-#define PID_PITCH_I_LIMIT_CONF			300.0f		/*!< brief Default I limit value. */
-#define PID_YAW_P_FACTOR_CONF			0.04f		/*!< brief Default p factor for the yaw PID controller. */
-#define PID_YAW_I_FACTOR_CONF			0.0008f		/*!< brief Default p factor for the yaw PID controller. */
-#define PID_YAW_D_FACTOR_CONF			0.002f		/*!< brief Default p factor for the yaw PID controller. */
-#define PID_YAW_I_LIMIT_CONF			300.0f		/*!< brief Default I limit value. */
+#define PID_PITCH_P_FACTOR_CONF			0.05f		/*!< brief Default p factor for the pitch PID controller. */
+#define PID_PITCH_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the pitch PID controller. */
+#define PID_PITCH_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the pitch PID controller. */
+#define PID_PITCH_I_LIMIT_CONF			5.0f		/*!< brief Default I limit value. */
+#define PID_YAW_P_FACTOR_CONF			0.05f		/*!< brief Default p factor for the yaw PID controller. */
+#define PID_YAW_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the yaw PID controller. */
+#define PID_YAW_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the yaw PID controller. */
+#define PID_YAW_I_LIMIT_CONF			5.0f		/*!< brief Default I limit value. */
 
 //---------------------------------------------------------------------
 //	General Servo Definitions

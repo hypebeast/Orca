@@ -157,7 +157,7 @@ class ControllerManager(QObject):
 				if message[0].commandType == CommandTypes.GET_BOARD_STATUS:
 					self._updateStatus(message[0], message[1])
 				elif message[0].commandType == CommandTypes.GET_BOARD_SETTINGS:
-					self._updateBoardSettings(message[0], message[1])
+					self._onBoardSettingsUpdated(message[0], message[1])
 
 	def _updateStatus(self, message, timestamp):
 		"""
@@ -169,7 +169,7 @@ class ControllerManager(QObject):
 		# Emit signal
 		self.board_status_updated.emit()
 
-	def _updateBoardSettings(self, message, timestamp):
+	def _onBoardSettingsUpdated(self, message, timestamp):
 		"""Called when an board settings (0x0020) message was received. The board
 		settings will be updated with the received message."""
 		self.boardSettings.updateFromMessage(message, timestamp)
@@ -206,6 +206,6 @@ class ControllerManager(QObject):
 		message = SetRollPIDCoefficientsMessage(p_fac, i_fac, d_fac, i_limit)
 		self.serial.writeMessage(message)
 
-	def setRollKalmandConstants(self, q_angle, q_gyro, r_angle):
+	def setRollKalmanConstants(self, q_angle, q_gyro, r_angle):
 		message = SetRollKalmanConstantsMessage(q_angle, q_gyro, r_angle)
 		self.serial.writeMessage(message)

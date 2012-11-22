@@ -91,6 +91,14 @@ class BaseMessage:
     START_BYTE = 0x8D
     STOP_BYTE = 0x7E
 
+    # Type tables used for encoding and decoding of the message data
+    SUPPORTED_TYPES = ["B", "H", "f"]
+    TYPE_SIZES = [  
+                    1, # unsigned char (B)
+                    2, # unsigned short (H)
+                    4  # float (f)
+                ]
+
     def __init__(self, commandType):
         self.commandType = commandType
         self.messageType = MessageTypes.COMMAND_MESSAGE
@@ -126,8 +134,8 @@ class BaseMessage:
         package.extend(struct.pack("B", self.messageType))
         # Command type
         package.extend(struct.pack("H", self.commandType))
-        # Data length 
-        package.extend(struct.pack("B", len(data)))
+        # Data length
+        package.extend(struct.pack("B", self._calculateDataLength(data)))
         # Encode the data
         self._packData(package, data)
         # CRC
@@ -139,6 +147,24 @@ class BaseMessage:
 
     def _decodePackage(self, data):
         pass
+
+    def _calculateDataLength(self, data):
+        """
+        This method calculates the length of the data and returns the length
+        in bytes.
+        """
+        if len(data) < 1:
+            return 0
+
+        data_length = 0
+        for argument in data:
+            try:
+                index = self.SUPPORTED_TYPES.index(argument["format"])
+                data_length = data_length + self.TYPE_SIZES[index]
+            except Exception as detail:
+                print detail
+
+        return data_length
 
     def _packData(self, package, data):
         """Encodes the data and returns the package with the encoded data."""
@@ -375,7 +401,7 @@ class GetBoardSettingsMessage(BaseMessage):
             offset += 4
             message.pidRollDFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.pidRollIFactor = struct.unpack_from("f", package, offset)[0]
+            message.pidRollILimit = struct.unpack_from("f", package, offset)[0]
             offset += 4
             message.pidPitchPFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
@@ -438,7 +464,7 @@ class SetRollPIDCoefficientsMessage(BaseMessage):
     Sets the PID coeficients for the roll axis (Command Type: 0x0022)
     """
     def __init__(self, p_factor, i_factor, d_factor, i_limit):
-        BaseMessage.__init__(self, CommandTypes.SET_KALMAN_ROLL_CONSTANTS)
+        BaseMessage.__init__(self, CommandTypes.SET_ROLL_PID_COEFFICIENTS)
         self.messageType = MessageTypes.COMMAND_MESSAGE
 
         self.pFactor = p_factor
@@ -465,7 +491,7 @@ class SetPitchPIDCoefficientsMessage(BaseMessage):
     Sets the PID coeficients for the pitch axis (Command Type: 0x0023)
     """
     def __init__(self, p_factor, i_factor, d_factor, i_limit):
-        BaseMessage.__init__(self, CommandTypes.SET_KALMAN_PITCH_CONSTANTS)
+        BaseMessage.__init__(self, CommandTypes.SET_PITCH_PID_COEFFICIENTS)
         self.messageType = MessageTypes.COMMAND_MESSAGE
 
         self.pFactor = p_factor
@@ -492,7 +518,7 @@ class SetYawPIDCoefficientsMessage(BaseMessage):
     Sets the PID coeficients for the yaw axis (Command Type: 0x0024)
     """
     def __init__(self, p_factor, i_factor, d_factor, i_limit):
-        BaseMessage.__init__(self, CommandTypes.SET_KALMAN_YAW_CONSTANTS)
+        BaseMessage.__init__(self, CommandTypes.SET_YAW_PID_COEFFICIENTS)
         self.messageType = MessageTypes.COMMAND_MESSAGE
 
         self.pFactor = p_factor

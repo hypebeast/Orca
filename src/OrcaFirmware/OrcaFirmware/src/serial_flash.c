@@ -82,7 +82,7 @@ uint16_t serial_flash_init(void)
 	 if(serial_flash_read_settings() != true)
 		return false;
 	 
-	 /* Should we execute a factory reset */
+	 /* Should we execute a factory reset? */
 	 if(settings->factoryReset != SERIAL_FLASH_DISABLE_FACTORY_RESET)
 	 {
 		 if(serial_flash_write_factory_settings() != true)
@@ -180,7 +180,7 @@ uint16_t serial_flash_init(void)
 	/* No factory reset on the next MC startup */
 	settings->factoryReset = SERIAL_FLASH_DISABLE_FACTORY_RESET; 
 	  
-	/* Set all settings to there default values */
+	/* Set all settings to the default values */
 	settings->Q_angle = FILTER_Q_ANGLE_CONF;
 	settings->R_angle = FILTER_R_ANGLE_CONF;
 	settings->Q_gyro = FILTER_Q_GYRO_CONF;
