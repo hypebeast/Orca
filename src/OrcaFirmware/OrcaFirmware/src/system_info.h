@@ -37,6 +37,8 @@ enum system_message{
 	SYSTEM_INFO_MPU_SENSOR_ALL_READ_ERR			=0x0043,	/*!< brief MPU  I2C read all measurements error. */
 	/* User Interface */
 	SYSTEM_INFO_UI_LED_PATTERN_ERR				=0x0050,	/*!< brief Wron LED pattern. */
+	/* Variometer Sensor */
+	SYSTEM_INFO_VARIOMETER_SENSOR_WRITE_ERR		=0x0060,	/*!< brief I2C Write to the pressure sensor is not possible. */
 };
 
 /*! \enum errlvl

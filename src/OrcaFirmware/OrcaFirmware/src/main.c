@@ -29,6 +29,7 @@
 #include "user_interface.h"
 #include "serial_flash.h"
 #include "filters.h"
+#include "MS5611.h"
 
 /* global variables */
 BOARD_CONFIG_t board;  								/*!< \brief board module */
@@ -38,6 +39,7 @@ VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
 MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing unit module */
 FILTER_DATA_t orcafilter;							/*!< \brief filter module */
 ORCA_FLASH_SETTINGS_t orcaSettings;					/*!< \brief orca settings module */
+VARIOMETER_MODULET_t variometer;
 
 unsigned long ulFcTickCounter = 0;			/*!< \brief Flight Controller system tick counter */
 unsigned long ulVsTickCounter = 0;			/*!< \brief Voltage sensor system tick counter */
@@ -139,6 +141,8 @@ void orca_init(void)
 	
 	/* Initialize the filter module */
 	filter_init(&orcafilter, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
+	
+
 			
 	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
 	pmic_init();
@@ -148,6 +152,8 @@ void orca_init(void)
 
 	delay_ms(100);
 	
+		MS5611_init(&variometer);
+		
 	/* Initialize and start the System Timer */
 	rtc_init();
 	rtc_set_callback(system_timer);
