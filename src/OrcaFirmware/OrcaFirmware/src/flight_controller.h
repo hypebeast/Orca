@@ -20,13 +20,21 @@
 #define FLIGHT_CONTROLLER_MODE_AUTOMATIC (0x01<<1)		/*!< brief Automatic mode */
 
 //---------------------------------------------------------------------
-//	Roll Filter Startup Settings
+//	Factory Settings for the PID Controller
 //  Edit this settings for different configurations
 //---------------------------------------------------------------------
 #define PID_ROLL_P_FACTOR_CONF			0.05f	/*!< brief Default p factor for the roll PID controller. */
 #define PID_ROLL_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the roll PID controller. */
 #define PID_ROLL_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the roll PID controller. */
 #define PID_ROLL_I_LIMIT_CONF			5.0f		/*!< brief Default I limit value. */
+#define PID_PITCH_P_FACTOR_CONF			0.05f		/*!< brief Default p factor for the pitch PID controller. */
+#define PID_PITCH_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the pitch PID controller. */
+#define PID_PITCH_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the pitch PID controller. */
+#define PID_PITCH_I_LIMIT_CONF			5.0f		/*!< brief Default I limit value. */
+#define PID_YAW_P_FACTOR_CONF			0.05f		/*!< brief Default p factor for the yaw PID controller. */
+#define PID_YAW_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the yaw PID controller. */
+#define PID_YAW_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the yaw PID controller. */
+#define PID_YAW_I_LIMIT_CONF			5.0f		/*!< brief Default I limit value. */
 
 //---------------------------------------------------------------------
 //	General Servo Definitions
@@ -82,9 +90,15 @@ int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_task(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController);
-void flight_controller_update_pid_controller(float p_factor, float i_factor, float d_factor, float i_limit);
+void flight_controller_update_pid_roll_coefficients(float p_factor, float i_factor, float d_factor, float i_limit);
+void flight_controller_update_pitch_roll_coefficients(float p_factor, float i_factor, float d_factor, float i_limit);
+void flight_controller_update_yaw_roll_coefficients(float p_factor, float i_factor, float d_factor, float i_limit);
 float flight_controller_get_actuating_roll_angle(void);
 float flight_controller_get_set_roll_angle(void);
 float flight_controller_get_sensor_roll_angle(void);
+float flight_controller_get_pid_roll_p_factor(void);
+float flight_controller_get_pid_roll_i_factor(void);
+float flight_controller_get_pid_roll_d_factor(void);
+float flight_controller_get_pid_roll_i_limit(void);
 
 #endif /* FLIGHT_CONTROLLER_H_ */

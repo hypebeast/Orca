@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -19,31 +19,9 @@
 __author__ = 'Sebastian Ruml'
 
 
-from logger import Logger
-
-# Global firmware settings object
-firmwareSettings = None
-
-class _FirmwareSettings(object):
+class AppSettings:
 	"""
-	This class handles reading and writing of the firmware settings.
+	The application settings.
 	"""
 	def __init__(self):
-		self._logger = Logger()
-
-	@property
-	def outputChannelsLowerOffset(self):
-		"""In microseconds"""
-		return 490
-
-	@property
-	def inputChannelsOffset():
-		"""In microseconds"""
-		return 500
-
-
-def FirmwareSettings():
-	global firmwareSettings
-	if not firmwareSettings:
-		firmwareSettings = _FirmwareSettings()
-	return firmwareSettings
+		pass

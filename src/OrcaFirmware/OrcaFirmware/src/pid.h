@@ -13,7 +13,7 @@
 
 #define PID_SCALING_FACTOR  1024 
  
-/*! \brief PID Status 
+/*! \brief PID status and configuration variables.
  * 
  * Setpoints and data used by the PID control algorithm 
  */ 

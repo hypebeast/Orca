@@ -45,9 +45,9 @@ class FlightDisplay(QtGui.QWidget):
 
         self.appDefs = defs.AppDefs()
 
-        self.createUi()
+        self._createUi()
 
-    def createUi(self):
+    def _createUi(self):
         self.view = QtGui.QGraphicsView()
         self.scene = QtGui.QGraphicsScene()
 

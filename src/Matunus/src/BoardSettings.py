@@ -20,16 +20,158 @@ __author__ = 'Sebastian Ruml'
 
 
 from logger import Logger
+from ApiCommands import CommandTypes
+
 
 # Global firmware settings object
 boardSettings = None
 
-
 class _BoardSettings():
+
+	# Default Settings
+	DEFAULT_PID_ROLL_PFACTOR = 0.05
+	DEFAULT_PID_ROLL_IFACTOR = 0.002
+	DEFAULT_PID_ROLL_DFACTOR = 0.00
+	DEFAULT_PID_ROLL_ILIMIT = 5.0
+	DEFAULT_KALMAN_ROLL_QAngle = 0.2
+	DEFAULT_KALMAN_ROLL_QGyro = 0.0001
+	DEFAULT_KALMAN_ROLL_RAngle = 0.01
+
 	def __init__(self):
-		pass
+		self._logger = Logger()
+
+		self.pidRollPFactor = 0
+		self.pidRollIFactor = 0
+		self.pidRollDFactor = 0
+		self.pidRollILimit = 0
+		self.pidPitchPFactor = 0
+		self.pidPitchIFactor = 0
+		self.pidPitchDFactor = 0
+		self.pidPitchILimit = 0
+		self.pidYawPFactor = 0
+		self.pidYawIFactor = 0
+		self.pidYawDFactor = 0
+		self.pidYawILimit = 0
+		self.kalmanRollQAngle = 0
+		self.kalmanRollQGyro = 0
+		self.kalmanRollRAngle = 0
+		self.kalmanPitchQAngle = 0
+		self.kalmanPitchQGyro = 0
+		self.kalmanPitchRAngle = 0
+		self.kalmanYawQAngle = 0
+		self.kalmanYawQGyro = 0
+		self.kalmanYawRAngle = 0
+
+		self._lastUpdate = 0
+
+		self._setDefaults()
+
+	def _setDefaults(self):
+		self.pidRollPFactor = self.DEFAULT_PID_ROLL_PFACTOR
+		self.pidRollIFactor = self.DEFAULT_PID_ROLL_IFACTOR
+		self.pidRollDFactor = self.DEFAULT_PID_ROLL_DFACTOR
+		self.pidRollILimit = self.DEFAULT_PID_ROLL_ILIMIT
+		self.pidPitchPFactor = 0
+		self.pidPitchIFactor = 0
+		self.pidPitchDFactor = 0
+		self.pidPitchILimit = 0
+		self.pidYawPFactor = 0
+		self.pidYawIFactor = 0
+		self.pidYawDFactor = 0
+		self.pidYawILimit = 0
+		self.kalmanRollQAngle = self.DEFAULT_KALMAN_ROLL_QAngle
+		self.kalmanRollQGyro = self.DEFAULT_KALMAN_ROLL_QGyro
+		self.kalmanRollRAngle = self.DEFAULT_KALMAN_ROLL_RAngle
+		self.kalmanPitchQAngle = 0
+		self.kalmanPitchQGyro = 0
+		self.kalmanPitchRAngle = 0
+		self.kalmanYawQAngle = 0
+		self.kalmanYawQGyro = 0
+		self.kalmanYawRAngle = 0
+
+	def restoreFactorySettings(self):
+		self._setDefaults()
+
+	def restoreStabilizationFactorySettings(self):
+		self.pidRollPFactor = self.DEFAULT_PID_ROLL_PFACTOR
+		self.pidRollIFactor = self.DEFAULT_PID_ROLL_IFACTOR
+		self.pidRollDFactor = self.DEFAULT_PID_ROLL_DFACTOR
+		self.pidRollILimit = self.DEFAULT_PID_ROLL_ILIMIT
+		self.pidPitchPFactor = 0
+		self.pidPitchIFactor = 0
+		self.pidPitchDFactor = 0
+		self.pidPitchILimit = 0
+		self.pidYawPFactor = 0
+		self.pidYawIFactor = 0
+		self.pidYawDFactor = 0
+		self.pidYawILimit = 0
+		self.kalmanRollQAngle = self.DEFAULT_KALMAN_ROLL_QAngle
+		self.kalmanRollQGyro = self.DEFAULT_KALMAN_ROLL_QGyro
+		self.kalmanRollRAngle = self.DEFAULT_KALMAN_ROLL_RAngle
+		self.kalmanPitchQAngle = 0
+		self.kalmanPitchQGyro = 0
+		self.kalmanPitchRAngle = 0
+		self.kalmanYawQAngle = 0
+		self.kalmanYawQGyro = 0
+		self.kalmanYawRAngle = 0
+
+	def updateFromMessage(self, message, timestamp):
+		if message is None:
+			raise Exception
+
+		if message.commandType is not CommandTypes.GET_BOARD_SETTINGS:
+			return
+
+		self._lastUpdate = timestamp
+
+		self.pidRollPFactor = message.pidRollPFactor
+		self.pidRollIFactor = message.pidRollIFactor
+		self.pidRollDFactor = message.pidRollDFactor
+		self.pidRollILimit = message.pidRollILimit
+		self.pidPitchPFactor = message.pidPitchPFactor
+		self.pidPitchIFactor = message.pidPitchIFactor
+		self.pidPitchDFactor = message.pidPitchDFactor
+		self.pidPitchILimit = message.pidPitchILimit
+		self.pidYawPFactor = message.pidYawPFactor
+		self.pidYawIFactor = message.pidYawIFactor
+		self.pidYawDFactor = message.pidYawDFactor
+		self.pidYawILimit = message.pidYawILimit
+		self.kalmanRollQAngle = message.kalmanRollQAngle
+		self.kalmanRollQGyro = message.kalmanRollQGyro
+		self.kalmanRollRAngle = message.kalmanRollRAngle
+		self.kalmanPitchQAngle = message.kalmanPitchQAngle
+		self.kalmanPitchQGyro = message.kalmanPitchQGyro
+		self.kalmanPitchRAngle = message.kalmanPitchRAngle
+		self.kalmanYawQAngle = message.kalmanYawQAngle
+		self.kalmanYawQGyro = message.kalmanYawQGyro
+		self.kalmanYawRAngle = message.kalmanYawRAngle
+
+		#self.printStatus()
+
+	@property
+	def outputChannelsLowerOffset(self):
+		"""In microseconds"""
+		return 490
+
+	@property
+	def inputChannelsOffset():
+		"""In microseconds"""
+		return 500
+
+	def printStatus(self):
+		self._logger.info("Board Settings")
+		self._logger.info("--------------")
+		self._logger.info("PID Roll P-Factor: %s" % self.pidRollPFactor)
+		self._logger.info("PID Roll I-Factor: %s" % self.pidRollIFactor)
+		self._logger.info("PID Roll D-Factor: %s" % self.pidRollDFactor)
+		self._logger.info("PID Roll I-Limit: %s" % self.pidRollILimit)
+		self._logger.info("Kalman Roll Q-Angle: %s" % self.kalmanRollQAngle)
+		self._logger.info("Kalman Roll Q-Gyro: %s" % self.kalmanRollQGyro)
+		self._logger.info("Kalman Roll R-Angle: %s" % self.kalmanRollRAngle)
+		self._logger.info("--------------")
 
 def BoardSettings():
+	"""Singleton instance for the board settings"""
 	global boardSettings
 	if not boardSettings:
 		boardSettings = _BoardSettings()

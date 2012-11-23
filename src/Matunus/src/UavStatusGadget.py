@@ -42,9 +42,10 @@ class UavStatusGadget(QtGui.QWidget):
         fileName = os.path.join(self.app_defs.ArtworkPath, "flight_controller_status.svg")
 
         self.svgDocument = SvgDocument(fileName)
-
         self.linkElement = self.svgDocument.elementById("linkStatus").toElement()
+        #self.linkElement = self.svgDocument.elementById("throttleValue").toElement()
 
+        # Initialize all UI elements
         self._initUI()
 
     def _initUI(self):
@@ -61,6 +62,9 @@ class UavStatusGadget(QtGui.QWidget):
         svgRenderer = QtSvg.QSvgRenderer()
         svgRenderer.load(self.svgDocument.document.toByteArray())
         svgRenderer.render(qp)
+
+    def setThrottleValue(self, value):
+        pass
 
     def setLinkStatus(self, enabled=False):
         color = "#FF0000"

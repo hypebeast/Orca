@@ -1,6 +1,6 @@
 # Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
-# This file is part of the Matunus project (part of the orcacopter project)
+# This file is part of the Matunus project (part of the Orca project).
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ __author__ = 'Sebastian Ruml'
 
 from ApiCommands import CommandTypes
 from logger import Logger
-from FirmwareSettings import FirmwareSettings
 
 
 class BoardStatus(object):
@@ -34,9 +33,6 @@ class BoardStatus(object):
 
 		# Logger
 		self._logger = Logger()
-
-		# Firmware Settings
-		self._firmwareSettings = FirmwareSettings()
 
 		# Add all fields
 		self._addFields()

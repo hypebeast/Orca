@@ -106,7 +106,7 @@ class ConfigurationPage(QtGui.QWidget):
         self.mainContainer.addWidget(page)
 
         # Stabilization
-        page = StabilizationPage()
+        page = StabilizationPage(self.controllerManager)
         self.mainContainer.addWidget(page)
 
         # GPS

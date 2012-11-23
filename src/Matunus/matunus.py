@@ -24,12 +24,13 @@ __author__ = 'Sebastian Ruml'
 import sys
 import os
 from optparse import OptionParser
+import ctypes
 
 from src import MainAppWindow
 from src import defs
 
 __appName__ = 'Matunus'
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 __author__ = 'Sebastian Ruml'
 
 # Check that at least Python 2.6 is running
@@ -51,6 +52,8 @@ def main():
     app_defs.DataPath = os.path.join(app_defs.AppPath, "data")
     app_defs.IconsPath = os.path.join(app_defs.DataPath, "icons")
     app_defs.ArtworkPath = os.path.join(app_defs.DataPath, "artwork")
+    app_defs.SrcPath = os.path.join(app_defs.AppPath, "src")
+    app_defs.QmlPath = os.path.join(app_defs.SrcPath, "qml")
 
     # Command line arguments
     parser = OptionParser()
@@ -65,6 +68,11 @@ def main():
     if options.version:
         print __appName__ + " v" + __version__
         sys.exit(2)
+
+    # Set new AppUserModelID
+    # TODO: Only required for Windows
+    myappid = 'sr.orca.matunus.002' # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # Start the application
     app = MainAppWindow.App(options, args)

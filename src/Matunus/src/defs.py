@@ -23,6 +23,8 @@ class _AppDefs:
 	DataPath = ""
 	IconsPath = ""
 	ArtworkPath = ""
+	SrcPath = ""
+	QmlPath = ""
 	
 	def __init__(self):
 		pass

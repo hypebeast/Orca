@@ -106,7 +106,8 @@ int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController)
 												//- FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_AILERON_FACTOR;
 	if(actuatingRoll>0)
 	{
-		flightController->leftEdfSetPoint -= (uint16_t)(actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		flightController->leftEdfSetPoint -= (uint16_t)(actuatingRoll *
+			(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
 	}
 	 
 	return SYSTEM_INFO_TRUE;	
@@ -130,7 +131,8 @@ int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController)
 												//- flightController->rcServoIn->servo2)*FLIGHT_CONTROLLER_AILERON_FACTOR;
 	if(actuatingRoll<0)
 	{
-		flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll *(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll *
+			(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
 	}	
 	return SYSTEM_INFO_TRUE;	
 }
@@ -149,16 +151,19 @@ int flight_controller_calc_left_servo(FLIGHT_CONTROLLER_t *flightController)
 	if(flightController->rcServoIn->servo1 >= FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
 	{	
 		flightController->leftServoSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH -
-												(flightController->rcServoIn->servo1 - FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
+												(flightController->rcServoIn->servo1 - 
+												FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH) * FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
 	}												
 	else
 	{
 		flightController->leftServoSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH +
-												(FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH - flightController->rcServoIn->servo1)*FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
+												(FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH -
+												flightController->rcServoIn->servo1) * FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
 	}
 	
 	/* Rudder Control */
-	flightController->leftServoSetPoint += (flightController->rcServoIn->servo4 - FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_RUDDER_FACTOR;
+	flightController->leftServoSetPoint += (flightController->rcServoIn->servo4 -
+		FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_RUDDER_FACTOR;
 
 	
 	return SYSTEM_INFO_TRUE;	
@@ -178,16 +183,19 @@ int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController)
 	if(flightController->rcServoIn->servo1 >= FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
 	{	
 		flightController->rightServoSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH +
-												(flightController->rcServoIn->servo1 - FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
+												(flightController->rcServoIn->servo1 -
+													FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
 	}												
 	else
 	{
 		flightController->rightServoSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH -
-												(FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH - flightController->rcServoIn->servo1)*FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
+												(FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH -
+													flightController->rcServoIn->servo1)*FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
 	}
 	
 	/* Rudder Control */
-	flightController->rightServoSetPoint += (flightController->rcServoIn->servo4 - FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_RUDDER_FACTOR;
+	flightController->rightServoSetPoint += (flightController->rcServoIn->servo4 -
+		FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_RUDDER_FACTOR;
 	
 	return SYSTEM_INFO_TRUE;	
 }
@@ -211,22 +219,48 @@ int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 }
 
 /**************************************************************************
-* \brief Flight Controller Update PID Controller
+* \brief Flight Controller Update roll PID controller
 *
-* Call this method to update the setting of the specified PID Controller.
-*
-* \TODO: Auf mehrere PID Regler erweitern!
+* Call this method to update the setting of the roll PID controller.
 *
 * \param p_factor P factor tuning constant
 * \param i_factor I factor tuning constant
 * \param d_factor D factor tuning constant
 * \param i_limit I maximum value
-*
-* \return  status code
 ***************************************************************************/
-void flight_controller_update_pid_controller(float p_factor, float i_factor, float d_factor, float i_limit)
+void flight_controller_update_pid_roll_coefficients(float p_factor, float i_factor, float d_factor, float i_limit)
 {
 	pid_update_tuning_constants(p_factor, i_factor, d_factor, i_limit, &rollPid);
+}
+
+/**************************************************************************
+* \brief Flight Controller Update pitch PID controller
+*
+* Call this method to update the setting of the pitch PID controller.
+*
+* \param p_factor P factor tuning constant
+* \param i_factor I factor tuning constant
+* \param d_factor D factor tuning constant
+* \param i_limit I maximum value
+***************************************************************************/
+void flight_controller_update_pid_pitch_coefficients(float p_factor, float i_factor, float d_factor, float i_limit)
+{
+	// TODO
+}
+
+/**************************************************************************
+* \brief Flight Controller Update yaw PID controller
+*
+* Call this method to update the setting of the yaw PID controller.
+*
+* \param p_factor P factor tuning constant
+* \param i_factor I factor tuning constant
+* \param d_factor D factor tuning constant
+* \param i_limit I maximum value
+***************************************************************************/
+void flight_controller_update_pid_yaw_coefficients(float p_factor, float i_factor, float d_factor, float i_limit)
+{
+	// TODO
 }
 
 /**************************************************************************
@@ -276,6 +310,46 @@ float flight_controller_get_sensor_roll_angle(void)
 float flight_controller_get_set_roll_angle(void)
 {
 	return rollSetValue;
+}
+
+/**************************************************************************
+* \\brief Returns the P-Factor for the roll PID controller.
+*
+* \\return The P-Factor.
+***************************************************************************/
+float flight_controller_get_pid_roll_p_factor(void)
+{
+	return rollPid.P_Factor;
+}
+
+/**************************************************************************
+* \\brief Returns the I-Factor for the roll PID controller.
+*
+* \\return The I-Factor.
+***************************************************************************/
+float flight_controller_get_pid_roll_i_factor(void)
+{
+	return rollPid.I_Factor;
+}
+
+/**************************************************************************
+* \\brief Returns the D-Factor for the roll PID controller.
+*
+* \\return The D-Factor.
+***************************************************************************/
+float flight_controller_get_pid_roll_d_factor(void)
+{
+	return rollPid.D_Factor;
+}
+
+/**************************************************************************
+* \\brief Returns the I-Limit for the roll PID controller.
+*
+* \\return The I-Limit.
+***************************************************************************/
+float flight_controller_get_pid_roll_i_limit(void)
+{
+	return rollPid.I_Limit;
 }
 
 /**************************************************************************

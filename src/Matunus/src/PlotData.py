@@ -37,15 +37,15 @@ class PlotData:
 	"""
 	This class represents one plot curve and it's data.
 	"""
-	def __init__(self, plot, field, name):
-		if not plot or not field or not name:
+	def __init__(self, plot, field, fieldName):
+		if not plot or not field or not fieldName:
 			raise Exception
 
 		self.plot = plot
 		# Data field name
 		self.dataField = field
-		# Human readable data filed name
-		self.dataName = name
+		# Human readable data field name
+		self.dataName = fieldName
 		self.data = list()
 		self.xData = list()	
 		self.yData = list()
@@ -55,7 +55,7 @@ class PlotData:
 		self.yMinimum = 0
 		self.yMaximum = 0
 		self.xAxisSize = 120 # Max number of data points
-		self.curve = Qwt.QwtPlotCurve(name)
+		self.curve = Qwt.QwtPlotCurve(fieldName)
 		self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
 		pen = QtGui.QPen(QtGui.QColor('limegreen'))
 		pen.setWidth(1)

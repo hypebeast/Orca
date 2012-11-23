@@ -229,7 +229,7 @@ class SerialConnection(QObject):
                             if value == self.STOP_BYTE:
                                 self.responseStatus = ResponseStatus.IDLE
                                 self.responseBuffer.append(byte)
-                                self.processReceivedMessage(self.responseBuffer)
+                                self._processReceivedMessage(self.responseBuffer)
                             elif value == self.START_BYTE:
                                 self.responseBuffer.append(byte)
                             else:
@@ -237,16 +237,17 @@ class SerialConnection(QObject):
 
                 # Wait for some time
                 #time.sleep(self.reader_interval)
-        except serial.SerialException, e:
+        except serial.SerialException:
             self.reader_alive = False
 
-    def processReceivedMessage(self, buffer):
+    def _processReceivedMessage(self, buffer):
         """
         Processes a received message packet. It's called when a new message
         was received.
         """
         message = MessageFactory.getMessage(buffer)
 
+        # Put the received message with a timestamp in the message queue
         timestamp = time.clock()
         self.messageQueue.put((message, timestamp))
 
