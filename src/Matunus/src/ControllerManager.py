@@ -148,16 +148,26 @@ class ControllerManager(QObject):
 		Callback method which is called when a new messages was received from
 		the serial connection.
 		"""
-		messages = list(get_all_from_queue(self.serial.messageQueue))
-		if len(messages) > 0:
-			#self._logger.debug("New status response received")
-			for message in messages:
-				if message[0] is None:
-					continue
-				if message[0].commandType == CommandTypes.GET_BOARD_STATUS:
-					self._updateStatus(message[0], message[1])
-				elif message[0].commandType == CommandTypes.GET_BOARD_SETTINGS:
-					self._onBoardSettingsUpdated(message[0], message[1])
+		try:
+			messages = list(get_all_from_queue(self.serial.messageQueue))
+			#message = self.serial.messageQueue.get(False)
+			#if message[0] is None:
+			#	return
+			#if message[0].commandType == CommandTypes.GET_BOARD_STATUS:
+			#	self._updateStatus(message[0], message[1])
+			#elif message[0].commandType == CommandTypes.GET_BOARD_SETTINGS:
+			#	self._onBoardSettingsUpdated(message[0], message[1])
+			if len(messages) > 0:
+				#self._logger.debug("New status response received")
+				for message in messages:
+					if message[0] is None:
+						continue
+					if message[0].commandType == CommandTypes.GET_BOARD_STATUS:
+						self._updateStatus(message[0], message[1])
+					elif message[0].commandType == CommandTypes.GET_BOARD_SETTINGS:
+						self._onBoardSettingsUpdated(message[0], message[1])
+		except StopIteration:
+			return
 
 	def _updateStatus(self, message, timestamp):
 		"""

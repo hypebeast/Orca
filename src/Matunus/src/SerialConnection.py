@@ -26,18 +26,15 @@ import Queue
 import time
 import array
 
-from PyQt4.QtCore import QObject, pyqtSignal
-
-#try:
-#    from PyQt4 import pyqtSignal
-#except ImportError:
-#    print "No PyQt found!"
-#    import sys
-#    sys.exit(2)
+try:
+    from PyQt4.QtCore import pyqtSignal, QObject
+except ImportError:
+    print "No PyQt found!"
+    sys.exit(2)
 
 from crc8 import crc8
 from logger import Logger
-from ApiCommands import MessageFactory
+from ApiCommands import MessageFactory, BaseMessage
 
 
 NEWLINE_CONVERISON_MAP = ('\n', '\r', '\r\n')
@@ -246,6 +243,9 @@ class SerialConnection(QObject):
         was received.
         """
         message = MessageFactory.getMessage(buffer)
+
+        if not message:
+            return
 
         # Put the received message with a timestamp in the message queue
         timestamp = time.clock()

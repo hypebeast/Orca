@@ -105,8 +105,8 @@ uint16_t serial_flash_init(void)
  ***************************************************************************/
  uint16_t serial_flash_factory_reset(void)
  {
-	 settings->factoryReset = SERIAL_FLASH_EXECUTE_FACTORY_RESET;
-		return true;
+	settings->factoryReset = SERIAL_FLASH_EXECUTE_FACTORY_RESET;
+	return true;
  }
  
  /*************************************************************************
