@@ -54,6 +54,7 @@ def main():
     app_defs.ArtworkPath = os.path.join(app_defs.DataPath, "artwork")
     app_defs.SrcPath = os.path.join(app_defs.AppPath, "src")
     app_defs.QmlPath = os.path.join(app_defs.SrcPath, "qml")
+    app_defs.StylesheetPath = os.path.join(app_defs.DataPath, "stylesheets")
 
     # Command line arguments
     parser = OptionParser()

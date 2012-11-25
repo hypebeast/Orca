@@ -294,7 +294,13 @@ class App():
         """
         Run the app.
         """
+        app_defs = defs.AppDefs()
+
         app = QtGui.QApplication(sys.argv)
+        qss = QtCore.QFile(os.path.join(app_defs.StylesheetPath, "default_windows.qss"))
+        qss.open(QtCore.QFile.ReadOnly)
+        app.setStyleSheet(QtCore.QString(qss.readAll()))
+        qss.close()
         mainWin = MainAppWindow(options, args)
         mainWin.show()
         sys.exit(app.exec_())

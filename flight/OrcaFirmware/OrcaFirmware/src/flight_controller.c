@@ -54,7 +54,10 @@ float rollSetValue = 0;
 *
 * \\return  ---
 ***************************************************************************/
-void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settings, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController)
+void flight_controller_init(BOARD_CONFIG_t *board,
+							ORCA_FLASH_SETTINGS_t *settings,
+							SERVO_IN_t *servo, FILTER_DATA_t *filter,
+							FLIGHT_CONTROLLER_t *flightController)
 {
 	//TODO: Do all init stuff here
 	
@@ -67,7 +70,9 @@ void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settin
 	}		
 	
 	/* Roll PID Init */
-	pid_Init(settings->pid_roll_p_factor, settings->pid_roll_i_factor, settings->pid_roll_d_factor, settings->pid_roll_i_limit , &rollPid);	
+	pid_Init(settings->pid_roll_p_factor, settings->pid_roll_i_factor,
+			settings->pid_roll_d_factor, settings->pid_roll_i_limit,
+			&rollPid);	
 }	
 
 /**************************************************************************
