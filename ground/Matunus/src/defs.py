@@ -25,6 +25,7 @@ class _AppDefs:
 	ArtworkPath = ""
 	SrcPath = ""
 	QmlPath = ""
+	StylesheetPath = ""
 	
 	def __init__(self):
 		pass

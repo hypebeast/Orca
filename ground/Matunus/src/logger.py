@@ -17,7 +17,6 @@
 
 import logging
 import logging.handlers
-import copy
 
 logger = None
 
@@ -83,6 +82,17 @@ class _Logger:
         """
         self._log.log(logging.DEBUG, msg)
 
+    def warn(self, msg, obj=None):
+        """
+        Log warnings.
+        """
+        self._log.log(logging.WARNING, msg)
+
+    def error(self, msg, obj=None):
+        """
+        Log error messages
+        """
+        self._log.log(logging.ERROR, msg)
 
     def debug_detailled(self, msg, obj=None):
         """

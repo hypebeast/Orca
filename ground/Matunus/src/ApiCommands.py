@@ -18,6 +18,12 @@
 
 __author__ = 'Sebastian Ruml'
 
+try:
+    from PyQt4.QtCore import QObject
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
 import binascii
 import struct
@@ -65,6 +71,9 @@ class MessageFactory:
 
             return struct.unpack_from("H", data, 2)[0]
             
+        # Logger
+        logger = Logger()
+
         # Get the command type
         command_type = getCommandType(data)
 
@@ -77,11 +86,13 @@ class MessageFactory:
             message = GetBoardStatusMessage().fromPacket(data)
         elif command_type == CommandTypes.GET_BOARD_SETTINGS:
             message = GetBoardSettingsMessage().fromPacket(data)
+        else:
+            logger.warn("Mesage type not found")    
 
         return message
 
 
-class BaseMessage:
+class BaseMessage(QObject):
     """
     Base class for an command message packet. An command message is used for
     the communication with the flight controller over a serial connection.
@@ -100,6 +111,7 @@ class BaseMessage:
                 ]
 
     def __init__(self, commandType):
+        QObject.__init__(self)
         self.commandType = commandType
         self.messageType = MessageTypes.COMMAND_MESSAGE
 
@@ -285,7 +297,7 @@ class GetBoardStatusMessage(BaseMessage):
     @staticmethod
     def fromPacket(package):
         #hexvalues = ''.join('%02x' % ord(byte) for byte in package)
-        #print "Status message: " + hexvalues
+        #print "Board status message: " + hexvalues
 
         # Check for the right command type
         command_type = struct.unpack_from("H", package, 2)
@@ -294,6 +306,12 @@ class GetBoardStatusMessage(BaseMessage):
 
         message = GetBoardStatusMessage()
         message.messageType = MessageTypes.RESPONSE_MESSAGE
+
+        #print "Message length: " + str(len(package))
+
+        # FIXME: Quick hack to filter out malformed packages
+        if len(package) != 73:
+            return None
 
         # Parse the data
         offset = 5
@@ -344,7 +362,7 @@ class GetBoardStatusMessage(BaseMessage):
             offset += 4
             message.actuatingVariablePidRoll = struct.unpack_from("f", package, offset)[0]
         except:
-            pass
+            print "Unpacking Error"
 
         return message
 

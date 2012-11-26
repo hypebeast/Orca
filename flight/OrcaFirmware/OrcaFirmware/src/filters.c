@@ -156,7 +156,7 @@ float filter_get_acc_roll(void)
 void filter_task(unsigned long time)
 {
 	/* Calculate time elapsed since last call (dt) */
-	/*please note that overflows are ok, since for example 0x0001 - 0x00FE will be equal to 2 */
+	/* Please note that overflows are ok, since for example 0x0001 - 0x00FE will be equal to 2 */
 	dt = (float)(time - lastMicros) / 1000000;	
 	lastMicros = time;						
 	
