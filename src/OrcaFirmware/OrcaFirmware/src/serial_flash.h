@@ -50,5 +50,6 @@ uint16_t serial_flash_factory_reset(void);
 uint16_t serial_flash_read_settings(void);
 uint16_t serial_flash_write_factory_settings(void);
 uint16_t serial_flash_save_settings(void);
+uint16_t serial_flash_save_settings_to_flash(void);
 
 #endif /* SERIAL_FLASH_H_ */

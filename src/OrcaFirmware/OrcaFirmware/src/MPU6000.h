@@ -259,7 +259,6 @@ typedef struct MOTION_PROCESSING_UNIT{
 
 uint16_t mpu_6000_init(MOTION_PROCESSING_UNIT_t *mProcessingUnit, bool useFifo, bool externalMag);
 uint16_t mpu_6000_is_available(void);
-int16_t mpu_6000_get_z_acc_offset(void);
 uint8_t mpu_6000_get_product_id(void);
 uint16_t mpu_6000_reset(void);
 void isr_mpu_6000_int_pin(void);
@@ -275,5 +274,11 @@ float mpu_6000_get_y_gyr(void);
 float mpu_6000_get_z_gyr(void);
 uint16_t mpu_6000_read_fifo_measurements(void);
 uint16_t mpu_6000_burst_read_all_measurements(void);
+float mpu_6000_get_x_acc_offset(void);
+float mpu_6000_get_y_acc_offset(void);
+float mpu_6000_get_z_acc_offset(void);
+float mpu_6000_get_x_gyr_offset(void);
+float mpu_6000_get_y_gyr_offset(void);
+float mpu_6000_get_z_gyr_offset(void);
 
 #endif /* MPU6000_H_ */

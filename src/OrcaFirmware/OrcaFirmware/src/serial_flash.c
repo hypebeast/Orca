@@ -147,18 +147,47 @@ uint16_t serial_flash_init(void)
  ***************************************************************************/
  uint16_t serial_flash_save_settings(void)
  {
-	 uint16_t strsize = sizeof(ORCA_FLASH_SETTINGS_t);
-	 	 
-	 if(strsize > AT45DBX_SECTOR_SIZE)
-	 	return false;
-		  
+	 /* Save actual values to settings struct */
+	 
+	 /* Filter settings roll */
+	settings->R_angle = filter_get_roll_rangle();
+	settings->Q_angle = filter_get_roll_qangle();
+	settings->Q_gyro = filter_get_roll_qgyro(); 
+	
+	/* PID controller settings roll */
+	settings->pid_roll_p_factor = flight_controller_get_pid_roll_p_factor();
+	settings->pid_roll_i_factor = flight_controller_get_pid_roll_i_factor();
+	settings->pid_roll_d_factor = flight_controller_get_pid_roll_d_factor();
+	settings->pid_roll_i_limit = flight_controller_get_pid_roll_i_limit();
+	
+	/* Store data on serial flash */ 
+	serial_flash_save_settings_to_flash();
+ }
+ 
+  /*************************************************************************
+ * \brief Serial Flash Save Settings to Flash
+ *
+ * Saves the settings to the external serial flash.\n
+ *
+ * \param --
+ *
+ * \return  true	all right
+ * \return	false	error
+ ***************************************************************************/
+ uint16_t serial_flash_save_settings_to_flash(void)
+ {
+	uint16_t strsize = sizeof(ORCA_FLASH_SETTINGS_t);
+		 
+	if(strsize > AT45DBX_SECTOR_SIZE)
+	return false;
+		 
 	/* Write to serial flash */
 	memcpy(&ram_buf[0],settings,strsize);
 	at45dbx_write_sector_open(SERIAL_FLASH_SETTINGS_SECTOR);
 	at45dbx_write_sector_from_ram(ram_buf);
 	at45dbx_write_close();
-	
-	return true;
+		 
+	return true; 
  }
 
  /*************************************************************************
@@ -190,7 +219,7 @@ uint16_t serial_flash_init(void)
 	settings->pid_roll_i_limit = PID_ROLL_I_LIMIT_CONF; 
 	
 	/* Write to serial flash */
-	serial_flash_save_settings();
+	serial_flash_save_settings_to_flash();
 	
 	return true;
   }

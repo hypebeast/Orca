@@ -340,26 +340,6 @@ uint16_t mpu_6000_is_available(void)
 }
 
 /**************************************************************************
-* \\brief MPU 6000 is available
-*	Chekcs the MPU 6000 on the I2C bus and returns true if the sensor is
-*	available . /n
-*
-* \\param *mpu MPU data structure
-*
-* \\return  true, device is accessible
-			false, device is not responding
-***************************************************************************/
-int16_t mpu_6000_get_z_acc_offset(void)
-{
-	uint8_t mpurecdata[2];
-	
-	/* Read all 3 acceleration axis. The value of each axis is read as a 16-bit 2’s complement value. */
-	mpu_6000_read(0x0A, 2, mpurecdata);
-
-	return ((int16_t)(mpurecdata[0]<<8) + mpurecdata[1]);
-}
-
-/**************************************************************************
 * \\brief MPU 6000 get product id
 *	Returns the mpu product id . /n
 *
@@ -571,6 +551,84 @@ float mpu_6000_get_y_gyr(void)
 float mpu_6000_get_z_gyr(void)
 {
 	return mpu->zGyr;
+}
+
+/**************************************************************************
+* \\brief MPU 6000 Get x accelerometer offset
+*	Returns the x-acceleration offset in g. /n
+*
+* \\param ---
+*
+* \\return  x acc offset
+***************************************************************************/
+float mpu_6000_get_x_acc_offset(void)
+{
+	return mpuXAccOffs;
+}
+
+/**************************************************************************
+* \brief MPU 6000 Get y accelerometer offset
+*	Returns the y-acceleration offset in g. /n
+*
+* \param ---
+*
+* \return  y acc offset
+***************************************************************************/
+float mpu_6000_get_y_acc_offset(void)
+{
+	return mpuYAccOffs;
+}
+
+/**************************************************************************
+* \brief MPU 6000 Get z accelerometer offset
+*	Returns the z-acceleration offset in g. /n
+*
+* \param ---
+*
+* \return  z acc offset
+***************************************************************************/
+float mpu_6000_get_z_acc_offset(void)
+{
+	return mpuZAccOffs;
+}
+
+/**************************************************************************
+* \brief MPU 6000 Get x gyroscope offset
+*	Returns the x-rate offset in deg/s. /n
+*
+* \param ---
+*
+* \return  x rate offset
+***************************************************************************/
+float mpu_6000_get_x_gyr_offset(void)
+{
+	return mpuXGyrOffs;
+}
+
+/**************************************************************************
+* \brief MPU 6000 Get y gyroscope offset
+*	Returns the y-rate offset in deg/s. /n
+*
+* \param ---
+*
+* \return  y rate offset
+***************************************************************************/
+float mpu_6000_get_y_gyr_offset(void)
+{
+	return mpuYGyrOffs;
+}
+
+/**************************************************************************
+* \brief MPU 6000 Get z gyroscope offset
+*	Returns the z-rate offset in deg/s. /n
+*
+* \param ---
+*
+* \return  z rate offset
+***************************************************************************/
+float mpu_6000_get_z_gyr_offset(void)
+{
+	return mpuZGyrOffs;
 }
 
 /**************************************************************************

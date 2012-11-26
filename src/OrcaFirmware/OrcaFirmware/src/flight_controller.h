@@ -23,10 +23,10 @@
 //	Factory Settings for the PID Controller
 //  Edit this settings for different configurations
 //---------------------------------------------------------------------
-#define PID_ROLL_P_FACTOR_CONF			0.05f	/*!< brief Default p factor for the roll PID controller. */
-#define PID_ROLL_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_P_FACTOR_CONF			0.005f	/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_I_FACTOR_CONF			0.0002f		/*!< brief Default p factor for the roll PID controller. */
 #define PID_ROLL_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the roll PID controller. */
-#define PID_ROLL_I_LIMIT_CONF			5.0f		/*!< brief Default I limit value. */
+#define PID_ROLL_I_LIMIT_CONF			1.0f		/*!< brief Default I limit value. */
 #define PID_PITCH_P_FACTOR_CONF			0.05f		/*!< brief Default p factor for the pitch PID controller. */
 #define PID_PITCH_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the pitch PID controller. */
 #define PID_PITCH_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the pitch PID controller. */

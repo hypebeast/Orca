@@ -109,6 +109,11 @@ int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController)
 		flightController->leftEdfSetPoint -= (uint16_t)(actuatingRoll *
 			(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
 	}
+	else
+	{
+		flightController->leftEdfSetPoint += (uint16_t)(-1*actuatingRoll *
+		(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+	}
 	 
 	return SYSTEM_INFO_TRUE;	
 }
@@ -133,6 +138,11 @@ int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController)
 	{
 		flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll *
 			(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+	}
+	else
+	{
+		flightController->rightEdfSetPoint += (uint16_t)(actuatingRoll *
+		(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));		
 	}	
 	return SYSTEM_INFO_TRUE;	
 }
