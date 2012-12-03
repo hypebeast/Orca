@@ -18,8 +18,9 @@
 
 __author__ = 'Sebastian Ruml'
 
-
+import FMUManager
 from ApiCommands import CommandTypes
+from DataObjectField import DataObjectField, DataFieldTypes
 from logger import Logger
 
 
@@ -28,58 +29,73 @@ class BoardStatus(object):
 	This class holds the current status of the flight controller.
 	"""
 	def __init__(self):
-		self.dataFields = None
+		self.dataFields = list()
 		self._lastUpdate = 0
+
+		# FMU Manager
+		#self._fmuManager = FMUManager.FMUManager()
+		#self._fmuManager.data_object_received.connect(self._onDataObjectReceived)
 
 		# Logger
 		self._logger = Logger()
 
-		# Add all fields
-		self._addFields()
+		# Create data fields
+		self._createDataFields()
 
-	def _addFields(self):
-		"""Creates and adds all data fields."""
-		self.dataFields = list()
+	def _createDataFields(self):
+		"""
+		Creates all data fields.
+		"""
+		self.dataFields.append(DataObjectField("outputChannel1", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("outputChannel2", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("outputChannel3", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("outputChannel4", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("outputChannel5", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("outputChannel6", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("inputChannel1", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("inputChannel2", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("inputChannel3", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("inputChannel4", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("inputChannel5", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("inputChannel6", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("inputChannel7", "ticks", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("accelerationX", "Grad/s^2", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("accelerationY", "Grad/s^2", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("accelerationZ", "Grad/s^2", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("gyroX", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("gyroY", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("gyroZ", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("kalmanOutputRoll", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("kalmanReferenceValueRoll", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("setValueRollAngle", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("actuatingVariablePidRoll", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("debugIntValue1", "", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("debugIntValue2", "", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("debugIntValue3", "", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("debugIntValue4", "", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("debugIntValue5", "", DataFieldTypes.Int))
+		self.dataFields.append(DataObjectField("debugFloatValue1", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("debugFloatValue2", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("debugFloatValue3", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("debugFloatValue4", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("debugFloatValue5", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("debugStringMessage", "", DataFieldTypes.String))
 
-		self.dataFields.append({'name': "outputChannel1", 'value': 0.0})
-		self.dataFields.append({'name': "outputChannel2", 'value': 0.0})
-		self.dataFields.append({'name': "outputChannel3", 'value': 0.0})
-		self.dataFields.append({'name': "outputChannel4", 'value': 0.0})
-		self.dataFields.append({'name': "outputChannel5", 'value': 0.0})
-		self.dataFields.append({'name': "outputChannel6", 'value': 0.0})
-		self.dataFields.append({'name': "inputChannel1", 'value': 0.0})
-		self.dataFields.append({'name': "inputChannel2", 'value': 0.0})
-		self.dataFields.append({'name': "inputChannel3", 'value': 0.0})
-		self.dataFields.append({'name': "inputChannel4", 'value': 0.0})
-		self.dataFields.append({'name': "inputChannel5", 'value': 0.0})
-		self.dataFields.append({'name': "inputChannel6", 'value': 0.0})
-		self.dataFields.append({'name': "inputChannel7", 'value': 0.0})
-		self.dataFields.append({'name': "accelerationX", 'value': 0.0})
-		self.dataFields.append({'name': "accelerationY", 'value': 0.0})
-		self.dataFields.append({'name': "accelerationZ", 'value': 0.0})
-		self.dataFields.append({'name': "gyroX", 'value': 0.0})
-		self.dataFields.append({'name': "gyroY", 'value': 0.0})
-		self.dataFields.append({'name': "gyroZ", 'value': 0.0})
-		self.dataFields.append({'name': "kalmanOutputRoll", 'value': 0.0})
-		self.dataFields.append({'name': "kalmanReferenceValueRoll", 'value': 0.0})
-		self.dataFields.append({'name': "setValueRollAngle", 'value': 0.0})
-		self.dataFields.append({'name': "actuatingVariablePidRoll", 'value': 0.0})
-
-	def setField(self, name, value):
+	def setValue(self, name, value):
 		"""Updates the specified field with the given value."""
 		pass
 
 	def getValue(self, name):
 		"""Returns the value of the specified data field."""
 		for field in self.dataFields:
-			if field['name'] == name:
-				return field['value']
+			if field.name == name:
+				return field.value
 
 		return None
 
 	def updateFromMessage(self, message, timestamp):
 		"""
-		This method takes a dictionary that contains the data values.
+		Updates all data fields from an API message.
 		"""
 		if message is None:
 			return
@@ -89,56 +105,91 @@ class BoardStatus(object):
 		elif message.commandType == CommandTypes.GET_BOARD_STATUS:
 			self._lastUpdate = timestamp
 			for field in self.dataFields:
-				if field['name'] == "outputChannel1":
-					field['value'] = message.outputChannel1
-				elif field['name'] == "outputChannel2":
-					field['value'] = message.outputChannel2
-				elif field['name'] == "outputChannel3":
-					field['value'] = message.outputChannel3
-				elif field['name'] == "outputChannel4":
-					field['value'] = message.outputChannel4
-				elif field['name'] == "outputChannel5":
-					field['value'] = message.outputChannel5
-				elif field['name'] == "outputChannel6":
-					field['value'] = message.outputChannel6
-				elif field['name'] == "inputChannel1":
-					field['value'] = message.inputChannel1
-				elif field['name'] == "inputChannel2":
-					field['value'] = message.inputChannel2
-				elif field['name'] == "inputChannel3":
-					field['value'] = message.inputChannel3
-				elif field['name'] == "inputChannel4":
-					field['value'] = message.inputChannel4
-				elif field['name'] == "inputChannel5":
-					field['value'] = message.inputChannel5
-				elif field['name'] == "inputChannel6":
-					field['value'] = message.inputChannel6
-				elif field['name'] == "inputChannel7":
-					field['value'] = message.inputChannel7
-				elif field['name'] == "accelerationX":
-					field['value'] = message.accelerationX
-				elif field['name'] == "accelerationY":
-					field['value'] = message.accelerationY
-				elif field['name'] == "accelerationZ":
-					field['value'] = message.accelerationZ
-				elif field['name'] == "gyroX":
-					field['value'] = message.gyroX
-				elif field['name'] == "gyroY":
-					field['value'] = message.gyroY
-				elif field['name'] == "gyroZ":
-					field['value'] = message.gyroZ
-				elif field['name'] == "kalmanOutputRoll":
-					field['value'] = message.kalmanOutputRoll
-				elif field['name'] == "kalmanReferenceValueRoll":
-					field['value'] = message.kalmanReferenceValueRoll
-				elif field['name'] == "setValueRollAngle":
-					field['value'] = message.setValueRollAngle
-				elif field['name'] == "actuatingVariablePidRoll":
-					field['value'] = message.actuatingVariablePidRoll
+				if field.name == "outputChannel1":
+					field.value = message.outputChannel1
+				elif field.name == "outputChannel2":
+					field.value = message.outputChannel2
+				elif field.name == "outputChannel3":
+					field.value = message.outputChannel3
+				elif field.name == "outputChannel4":
+					field.value = message.outputChannel4
+				elif field.name == "outputChannel5":
+					field.value = message.outputChannel5
+				elif field.name == "outputChannel6":
+					field.value = message.outputChannel6
+				elif field.name == "inputChannel1":
+					field.value = message.inputChannel1
+				elif field.name == "inputChannel2":
+					field.value = message.inputChannel2
+				elif field.name == "inputChannel3":
+					field.value = message.inputChannel3
+				elif field.name == "inputChannel4":
+					field.value = message.inputChannel4
+				elif field.name == "inputChannel5":
+					field.value = message.inputChannel5
+				elif field.name == "inputChannel6":
+					field.value = message.inputChannel6
+				elif field.name == "inputChannel7":
+					field.value = message.inputChannel7
+				elif field.name == "accelerationX":
+					field.value = message.accelerationX
+				elif field.name == "accelerationY":
+					field.value = message.accelerationY
+				elif field.name == "accelerationZ":
+					field.value = message.accelerationZ
+				elif field.name == "gyroX":
+					field.value = message.gyroX
+				elif field.name == "gyroY":
+					field.value = message.gyroY
+				elif field.name == "gyroZ":
+					field.value = message.gyroZ
+				elif field.name == "kalmanOutputRoll":
+					field.value = message.kalmanOutputRoll
+				elif field.name == "kalmanReferenceValueRoll":
+					field.value = message.kalmanReferenceValueRoll
+				elif field.name == "setValueRollAngle":
+					field.value = message.setValueRollAngle
+				elif field.name == "actuatingVariablePidRoll":
+					field.value = message.actuatingVariablePidRoll
+		elif message.commandType == CommandTypes.DEBUG_INT_VALUES:
+			self._lastUpdate = timestamp
+			for field in self.dataFields:
+				if field.name == "debugIntValue1":
+					field.value = message.value1
+				elif field.name == "debugIntValue2":
+					field.value = message.value2
+				elif field.name == "debugIntValue3":
+					field.value = message.value3
+				elif field.name == "debugIntValue4":
+					field.value = message.value4
+				elif field.name == "debugIntValue5":
+					field.value = message.value5
+		elif message.commandType == CommandTypes.DEBUG_FLOAT_VALUES:
+			self._lastUpdate = timestamp
+			for field in self.dataFields:
+				if field.name == "debugFloatValue1":
+					field.value = message.value1
+				elif field.name == "debugFloatValue2":
+					field.value = message.value2
+				elif field.name == "debugFloatValue3":
+					field.value = message.value3
+				elif field.name == "debugFloatValue4":
+					field.value = message.value4
+				elif field.name == "debugFloatValue5":
+					field.value = message.value5
+		elif message.commandType == CommandTypes.DEBUG_STRING_MESSAGE:
+			self._lastUpdate = timestamp
+			for field in self.dataFields:
+				if field.name == "debugStringMessage":
+					field.value = message.message
+					break
 		else:
 			return
 
 		#self.printStatus()
+
+	def _onDataObjectReceived(self):
+		pass
 
 	@property
 	def outputChannel1(self):
@@ -231,6 +282,50 @@ class BoardStatus(object):
 	@property
 	def actuatingVariablePidRoll(self):
 		return self.getValue('actuatingVariablePidRoll')
+
+	@property
+	def debugIntValue1(self):
+		return self.getValue("debugIntValue1")
+
+	@property
+	def debugIntValue2(self):
+		return self.getValue("debugIntValue2")
+
+	@property
+	def debugIntValue3(self):
+		return self.getValue("debugIntValue3")
+
+	@property
+	def debugIntValue4(self):
+		return self.getValue("debugIntValue4")
+
+	@property
+	def debugIntValue5(self):
+		return self.getValue("debugIntValue5")
+
+	@property
+	def debugFloatValue1(self):
+		return self.getValue("debugFloatValue1")
+
+	@property
+	def debugFloatValue2(self):
+		return self.getValue("debugFloatValue2")
+
+	@property
+	def debugFloatValue3(self):
+		return self.getValue("debugFloatValue3")
+
+	@property
+	def debugFloatValue4(self):
+		return self.getValue("debugFloatValue4")
+
+	@property
+	def debugFloatValue5(self):
+		return self.getValue("debugFloatValue5")
+
+	@property
+	def debugStringMessage(self):
+		return self.getValue("debugStringMessage")
 
 	@property
 	def lastUpdate(self):

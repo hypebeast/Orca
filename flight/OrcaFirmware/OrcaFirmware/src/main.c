@@ -142,8 +142,6 @@ void orca_init(void)
 	/* Initialize the filter module */
 	filter_init(&orcafilter, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
 	
-
-			
 	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
 	pmic_init();
 
@@ -152,7 +150,7 @@ void orca_init(void)
 
 	delay_ms(100);
 	
-		MS5611_init(&variometer);
+	MS5611_init(&variometer);
 		
 	/* Initialize and start the System Timer */
 	rtc_init();

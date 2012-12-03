@@ -574,6 +574,139 @@ static void command_set_kalman_yaw_constants(void)
 }
 
 /**************************************************************************
+* \brief Writes a debug message to the serial line. The debug message contains
+*        five integer (16 bit) values.
+*
+* \param val1		First value
+* \param val2		Second value
+* \param val3		Third value
+* \param val4		Fourth value
+* \param val5		Fifth value
+**************************************************************************/
+void write_debug_message_int(uint16_t val1, uint16_t val2, uint16_t val3,
+								uint16_t val4, uint16_t val5)
+{
+	uint8_t packet_length = 1 + 1 + 2 + 1 + 10 + 1 + 1;
+	uint8_t data[packet_length];
+	int index = 0;
+	
+	// Start byte
+	data[index++] = PACKET_START_BYTE;
+	// Message type
+	data[index++] = 0x20;
+	// Command type
+	uint16_t cmdtype = 0x0100;
+	memcpy(data + index, &cmdtype, 2);
+	index += 2;
+	// Data Length
+	data[index++] = 10;
+	// val1
+	memcpy(data + index, &val1, 2);
+	index += 2;
+	// val2
+	memcpy(data + index, &val2, 2);
+	index += 2;
+	// val3
+	memcpy(data + index, &val3, 2);
+	index += 2;
+	// val4
+	memcpy(data + index, &val4, 2);
+	index += 2;
+	// val5
+	memcpy(data + index, &val5, 2);
+	index += 2;
+	// CRC
+	data[index++] = 0x88;
+	// Stop byte
+	data[index] = PACKET_STOP_BYTE;
+	
+	write_packet(data, index+1);
+}
+
+/**************************************************************************
+* \brief Writes a debug message to the serial line. The debug message contains
+*        five float values.
+*
+* \param val1		First value
+* \param val2		Second value
+* \param val3		Third value
+* \param val4		Fourth value
+* \param val5		Fifth value
+**************************************************************************/
+void write_debug_message_float(float val1, float val2, float val3, float val4,
+								float val5)
+{
+	uint8_t packet_length = 1 + 1 + 2 + 1 + 20 + 1 + 1;
+	uint8_t data[packet_length];
+	int index = 0;
+	
+	// Start byte
+	data[index++] = PACKET_START_BYTE;
+	// Message type
+	data[index++] = 0x20;
+	// Command type
+	uint16_t cmdtype = 0x0101;
+	memcpy(data + index, &cmdtype, 2);
+	index += 2;
+	// Data Length
+	data[index++] = 20;
+	// val1
+	memcpy(data + index, &val1, 4);
+	index += 4;
+	// val2
+	memcpy(data + index, &val2, 4);
+	index += 4;
+	// val3
+	memcpy(data + index, &val3, 4);
+	index += 4;
+	// val4
+	memcpy(data + index, &val4, 4);
+	index += 4;
+	// val5
+	memcpy(data + index, &val5, 4);
+	index += 4;
+	// CRC
+	data[index++] = 0x88;
+	// Stop byte
+	data[index] = PACKET_STOP_BYTE;
+	
+	write_packet(data, index+1);
+}
+
+/**************************************************************************
+* \brief Writes a debug message to the serial line. The message is a string.
+*
+* \param message	String to write to the serial line.
+* \param message_length		The length of the message.
+**************************************************************************/
+void write_debug_message_string(char* message, uint8_t message_length)
+{
+	uint16_t packet_length = 1 + 1 + 2 + 1 + message_length + 1 + 1;
+	uint8_t data[packet_length];
+	int index = 0;
+	
+	// Start byte
+	data[index++] = PACKET_START_BYTE;
+	// Message type
+	data[index++] = 0x20;
+	// Command type
+	uint16_t cmdtype = 0x0102;
+	memcpy(data + index, &cmdtype, 2);
+	index += 2;
+	// Data Length
+	data[index++] = message_length;
+	// val1
+	memcpy(data + index, message, message_length);
+	index += message_length;
+	// CRC
+	data[index++] = 0x88;
+	// Stop byte
+	data[index] = PACKET_STOP_BYTE;
+	
+	write_packet(data, index+1);
+}
+
+/**************************************************************************
 * This method checks if the given character is a whitespace character.
 **************************************************************************/
 static char is_whitespace(char c)
