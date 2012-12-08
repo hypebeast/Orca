@@ -88,14 +88,7 @@ static uint16_t MS5611_read(uint8_t number, uint8_t *datarec)
 	
 	return SYSTEM_INFO_TRUE;
 }
-/**************************************************************************
-* \\brief MPU 6000 Get z Gyroscope
-*	Returns the z-rate of rotation in deg/s /n
-*
-* \\param ---
-*
-* \\return  z rate
-***************************************************************************/
+
 void MS5611_reset(void)
 {
 	/* send reset sequence */

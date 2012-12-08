@@ -549,6 +549,12 @@
     <Compile Include="src\filters.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\gps.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gps.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\MPU6000.c">
       <SubType>compile</SubType>
     </Compile>
@@ -585,6 +591,12 @@
     <Compile Include="src\system_info.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\usart.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\usart.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\user_interface.c">
       <SubType>compile</SubType>
     </Compile>
@@ -595,12 +607,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\voltage_sens.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\engine.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\engine.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\flight_controller.c">

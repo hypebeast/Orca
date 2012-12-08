@@ -10,6 +10,10 @@
 #ifndef USART_H_
 #define USART_H_
 
+#include <asf.h>
+#include <string.h>
+#include <stdlib.h>
+
 /* \brief  Receive buffer size: 2,4,8,16,32,64,128 or 256 bytes. */
 #define USART_RX_BUFFER_SIZE 256
 /* \brief Transmit buffer size: 2,4,8,16,32,64,128 or 256 bytes */
@@ -149,6 +153,22 @@ typedef struct Usart_and_buffer
  */
 #define USART_Tx_Disable(_usart) ((_usart)->CTRLB &= ~USART_TXEN_bm)
 
+
+/* Function declarations */
+
+void USART_InterruptDriver_Initialize(USART_data_t * usart_data,
+										USART_t * usart,
+										USART_DREINTLVL_t dreIntLevel );
+
+void USART_InterruptDriver_DreInterruptLevel_Set(USART_data_t * usart_data,
+													USART_DREINTLVL_t dreIntLevel);
+
+bool USART_TXBuffer_FreeSpace(USART_data_t * usart_data);
+bool USART_TXBuffer_PutByte(USART_data_t * usart_data, uint8_t data);
+bool USART_RXBufferData_Available(USART_data_t * usart_data);
+uint8_t USART_RXBuffer_GetByte(USART_data_t * usart_data);
+bool USART_RXComplete(USART_data_t * usart_data);
+void USART_DataRegEmpty(USART_data_t * usart_data);
 
 
 #endif /* USART_H_ */

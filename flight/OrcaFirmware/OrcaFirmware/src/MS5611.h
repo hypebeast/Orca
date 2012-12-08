@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------
 //	MS5611 Register Address
 //---------------------------------------------------------------------
-#define MS5611_CMD_RESET			0x1E		/*!< brief  ADC reset command */
+#define MS5611_CMD_RESET			0x1E		/*!< brief ADC reset command */
 #define MS5611_CMD_ADC_READ			0x00		/*!< brief ADC read command */
 #define MS5611_CMD_ADC_CONV			0x40		/*!< brief ADC conversion command */
 #define MS5611_CMD_ADC_D1			0x00		/*!< brief ADC D1 conversion */

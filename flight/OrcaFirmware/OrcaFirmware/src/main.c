@@ -30,16 +30,23 @@
 #include "serial_flash.h"
 #include "filters.h"
 #include "MS5611.h"
+#include "gps.h"
 
-/* global variables */
+
+//////////////////////////////////////////////////////////////////////////
+// Global variables
+//////////////////////////////////////////////////////////////////////////
+
 BOARD_CONFIG_t board;  								/*!< \brief board module */
-SERVO_IN_t servoInput;									/*!< \brief servo input module */
+SERVO_IN_t servoInput;								/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
 VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
 MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing unit module */
 FILTER_DATA_t orcafilter;							/*!< \brief filter module */
 ORCA_FLASH_SETTINGS_t orcaSettings;					/*!< \brief orca settings module */
-VARIOMETER_MODULET_t variometer;
+VARIOMETER_MODULET_t variometer;					/*!< \brief Variometer data */
+gps_data_t gpsData;									/*!< \brief GPS data */
+
 
 unsigned long ulFcTickCounter = 0;			/*!< \brief Flight Controller system tick counter */
 unsigned long ulVsTickCounter = 0;			/*!< \brief Voltage sensor system tick counter */
@@ -126,6 +133,9 @@ void orca_init(void)
 
 	/* Initialize the serial interface */
 	serial_api_init();
+	
+	/* Initializes the GPS subsystem */
+	gps_init(&gpsData);
 	
 	/* Initialize the I2C intern interface*/
 	i2c_intern_init();
