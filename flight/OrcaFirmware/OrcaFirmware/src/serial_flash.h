@@ -32,15 +32,18 @@ typedef struct ORCA_FLASH_SETTINGS
 	float Q_angle;				/*!< brief Startup prozess covariance. In this case, it indicates how much we trust the accelerometer relative to the gyros. */
 	float Q_gyro;				/*!< brief Startup prozess covariance. In this case, it indicates how much we trust the accelerometer relative to the gyros. */
 	float R_angle;				/*!< brief Startup covariance, our observation noise from the accelerometer. */
+	
+	float Kp_rollPitch;
+	float Ki_rollPitch;
 	/* PID controller settings */
 	float pid_roll_p_factor;	/*!< brief Startup p factor for the roll PID controller. */
 	float pid_roll_i_factor;	/*!< brief Startup i factor for the roll PID controller. */
 	float pid_roll_d_factor;	/*!< brief Startup d factor for the roll PID controller. */
 	float pid_roll_i_limit;		/*!< brief Startup i limit value for the roll PID controller. */
-	//float pid_pitch_p_factor;	/*!< brief Startup p factor for the roll PID controller. */
-	//float pid_pitch_i_factor;	/*!< brief Startup i factor for the roll PID controller. */
-	//float pid_pitch_d_factor;	/*!< brief Startup d factor for the roll PID controller. */
-	//float pid_pitch_i_limit;	/*!< brief Startup i limit value for the roll PID controller. */
+	float pid_pitch_p_factor;	/*!< brief Startup p factor for the roll PID controller. */
+	float pid_pitch_i_factor;	/*!< brief Startup i factor for the roll PID controller. */
+	float pid_pitch_d_factor;	/*!< brief Startup d factor for the roll PID controller. */
+	float pid_pitch_i_limit;	/*!< brief Startup i limit value for the roll PID controller. */
 } ORCA_FLASH_SETTINGS_t;
 
 

@@ -154,11 +154,20 @@ uint16_t serial_flash_init(void)
 	settings->Q_angle = filter_get_roll_qangle();
 	settings->Q_gyro = filter_get_roll_qgyro(); 
 	
+	settings->Kp_rollPitch = filter_get_roll_qangle();
+	settings->Ki_rollPitch = filter_get_roll_qgyro(); 
+	
 	/* PID controller settings roll */
 	settings->pid_roll_p_factor = flight_controller_get_pid_roll_p_factor();
 	settings->pid_roll_i_factor = flight_controller_get_pid_roll_i_factor();
 	settings->pid_roll_d_factor = flight_controller_get_pid_roll_d_factor();
 	settings->pid_roll_i_limit = flight_controller_get_pid_roll_i_limit();
+	
+	/* PID controller settings pitch */
+	settings->pid_pitch_p_factor = flight_controller_get_pid_pitch_p_factor();
+	settings->pid_pitch_i_factor = flight_controller_get_pid_pitch_i_factor();
+	settings->pid_pitch_d_factor = flight_controller_get_pid_pitch_d_factor();
+	settings->pid_pitch_i_limit = flight_controller_get_pid_pitch_i_limit();
 	
 	/* Store data on serial flash */ 
 	serial_flash_save_settings_to_flash();
@@ -213,10 +222,19 @@ uint16_t serial_flash_init(void)
 	settings->Q_angle = FILTER_Q_ANGLE_CONF;
 	settings->R_angle = FILTER_R_ANGLE_CONF;
 	settings->Q_gyro = FILTER_Q_GYRO_CONF;
+	
+	settings->Kp_rollPitch = FILTER_KP_ROLLPITCH;
+	settings->Ki_rollPitch = FILTER_KI_ROLLPITCH;
+	
 	settings->pid_roll_p_factor = PID_ROLL_P_FACTOR_CONF;   
 	settings->pid_roll_i_factor = PID_ROLL_I_FACTOR_CONF; 
 	settings->pid_roll_d_factor = PID_ROLL_D_FACTOR_CONF;
 	settings->pid_roll_i_limit = PID_ROLL_I_LIMIT_CONF; 
+	
+	settings->pid_pitch_p_factor = PID_PITCH_P_FACTOR_CONF;
+	settings->pid_pitch_i_factor = PID_PITCH_I_FACTOR_CONF;
+	settings->pid_pitch_d_factor = PID_PITCH_D_FACTOR_CONF;
+	settings->pid_pitch_i_limit = PID_PITCH_I_LIMIT_CONF;
 	
 	/* Write to serial flash */
 	serial_flash_save_settings_to_flash();

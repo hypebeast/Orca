@@ -9,7 +9,7 @@
 #include "twi_common.h"
 #include "sysclk.h"
 #include <delay.h>
-
+#include "math.h"
 #include "system_info.h"
 #include "MS5611.h"
 
@@ -17,18 +17,58 @@ static uint16_t MS5611_write(uint8_t value);
 static uint16_t MS5611_read(uint8_t number, uint8_t *datarec);
 static void MS5611_read_all_coefficient(void);
 static uint8_t crc4(uint16_t n_prom[]);
+static void MS5611_prepare_adc_read(uint8_t cmd);
+static void MS5611_adc_read(uint8_t cmd);
+static void MS5611_calculate_p_and_t(void);
 
 VARIOMETER_MODULET_t *ms5611;
 uint16_t coefficient[8];				/*!< brief MS5611 coefficients */
-
+uint8_t adcReadStep;
+uint8_t waitTime;
+unsigned long measStartMicros;	
+unsigned long timeSinceStart;
+unsigned long D1; // ADC value of the pressure conversion
+unsigned long D2; // ADC value of the temperature conversion
 	
-void MS5611_init(VARIOMETER_MODULET_t *variometer)
+void MS5611_init(VARIOMETER_MODULET_t *variometer, uint8_t res)
 {
 	ms5611 = variometer;
+	measStartMicros = 0;
 	
 	MS5611_reset();
+	ms5611->res = res;
 	
+	switch (res)
+	{
+		case MS5611_ADC_RES_256:
+			waitTime = MS5611_WAIT_TIME_ADC_256;
+		break;
+		
+		case MS5611_ADC_RES_512:
+			waitTime = MS5611_WAIT_TIME_ADC_512;
+		break;
+		
+		case MS5611_ADC_RES_1024:
+			waitTime = MS5611_WAIT_TIME_ADC_1024;
+		break;
+		
+		case MS5611_ADC_RES_2048:
+			waitTime = MS5611_WAIT_TIME_ADC_2048;
+		break;
+		
+		case MS5611_ADC_RES_4096:
+			waitTime = MS5611_WAIT_TIME_ADC_4096;
+		break;
+	}
+	
+	/* Get the offsets */
 	MS5611_read_all_coefficient();
+	
+	/* Calculate the CRC */
+	crc4(coefficient);
+	
+	/* Al done! We can now read the measurements */
+	adcReadStep = MS5611_READ_STEP_IDLE;
 }
 
 /**************************************************************************
@@ -47,7 +87,9 @@ static uint16_t MS5611_write(uint8_t value)
 	uint8_t data = value;
 	
 	package.chip = MS5611_DEV_ADDRESS;
-	//package.addr[0] = addr;
+	package.addr[0] = 0;
+	package.addr[1] = 0;
+	package.addr[2] = 0;
 	package.addr_length = 0;
 	package.buffer = &data;
 	package.length = 0x01;
@@ -145,4 +187,115 @@ static uint8_t crc4(uint16_t n_prom[])
 	n_prom[7]=crc_read; // restore the crc_read to its original place
 	
 	return (n_rem ^ 0x0);
+}
+
+static void MS5611_prepare_adc_read(uint8_t cmd)
+{
+	/* Start the conversion */
+	MS5611_write(MS5611_CMD_ADC_CONV + cmd + ms5611->res);	
+}
+
+static void MS5611_adc_read(uint8_t cmd)
+{
+	uint8_t recdata[3];
+	
+	MS5611_write(MS5611_CMD_ADC_READ);
+	MS5611_read(3,recdata);
+	
+	if(cmd == MS5611_CMD_ADC_D2)
+		D2 = (unsigned long)(recdata[0]<<16) + (unsigned long)(recdata[1]<<8) + recdata[2];
+	else if(cmd == MS5611_CMD_ADC_D1)
+		D1 = (unsigned long)(recdata[0]<<16) + (unsigned long)(recdata[1]<<8) + recdata[2];
+}
+
+static void MS5611_calculate_p_and_t(void)
+{
+	double dT; // difference between actual and measured temperature
+	double OFF; // offset at actual temperature
+	double SENS; // sensitivity at actual temperature
+	double T2;
+	double OFF2;
+	double SENS2;
+		
+	/* Difference between actual and reference temperature */
+	dT=D2-coefficient[5]*pow(2,8);
+	
+	/* Actual temperature (-40…85°C with 0.01°C resolution) */
+	ms5611->t=(2000+(dT*coefficient[6])/pow(2,23))/100;
+	
+	/* SECOND ORDER TEMPERATURE COMPENSATION */ 
+	if(ms5611->t < 20)
+	{
+		/* Low temperature */
+		T2 = dT*dT / pow(2,31);
+		OFF2 = 5*square((ms5611->t - 2000))/2;
+		SENS2 = 5*square((ms5611->t - 2000))/pow(2,2);
+		
+		if(ms5611->t < -15)
+		{
+			/* Very low Temperature */
+			OFF2 = OFF2 + 7*square((ms5611->t +1500));
+			SENS2 = SENS2 + 11*square((ms5611->t +1500))/2;
+		}
+	}
+	else
+	{
+		/* High temperature */
+		T2 = 0;
+		OFF2 = 0;
+		SENS2 = 0;		
+	}
+	
+	ms5611->t = ms5611->t - T2;
+		
+	/* Offset at actual temperature */
+	OFF=coefficient[2]*pow(2,17)+dT*coefficient[4]/pow(2,6);
+	OFF = OFF - OFF2;
+	
+	/* Sensitivity at actual temperature */
+	SENS=coefficient[1]*pow(2,16)+dT*coefficient[3]/pow(2,7);
+	SENS = SENS - SENS2;
+	
+	/* Temperature compensated pressure (10…1200mbar with 0.01mbar resolution) */
+	ms5611->p=(((D1*SENS)/pow(2,21)-OFF)/pow(2,15))/100;
+}
+
+void MS5611_read_T_P(unsigned long  time)
+{
+	if(adcReadStep == MS5611_READ_STEP_IDLE)
+		measStartMicros = time;
+	else
+		timeSinceStart = time - measStartMicros;
+	
+	switch (adcReadStep)
+	{
+		case MS5611_READ_STEP_IDLE:
+			/* Prepare reading of D2 */
+			MS5611_prepare_adc_read(MS5611_CMD_ADC_D2);
+			adcReadStep = MS5611_READ_STEP_WAITING_D2;
+		break;
+		
+		case MS5611_READ_STEP_WAITING_D2:
+			if(timeSinceStart >= waitTime)
+			{
+				/* Reading of D2 */
+				MS5611_adc_read(MS5611_CMD_ADC_D2);
+				/* Prepare reading of D1 */
+				MS5611_prepare_adc_read(MS5611_CMD_ADC_D1);
+				adcReadStep = MS5611_READ_STEP_WAITING_D1;
+			}				
+		break;
+		
+		case MS5611_READ_STEP_WAITING_D1:
+			if(timeSinceStart >= waitTime*2)
+			{
+				/* Reading of D2 */
+				MS5611_adc_read(MS5611_CMD_ADC_D1);
+				adcReadStep = MS5611_READ_STEP_IDLE;		
+				/* Calculate P and T */
+				MS5611_calculate_p_and_t();
+			}			
+		break;
+					
+	}
 }
