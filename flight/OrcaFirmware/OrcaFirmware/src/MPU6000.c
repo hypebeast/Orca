@@ -644,6 +644,8 @@ uint8_t mpu_6000_task(void)
 {
 	mpu->time += 10000;
 	mpu_6000_get_new_data();
+	
+	return true;
 }
 
 void isr_mpu_6000_int_pin(void)

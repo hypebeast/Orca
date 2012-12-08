@@ -46,6 +46,7 @@
 //---------------------------------------------------------------------
 //	Front EDF Definitions
 //---------------------------------------------------------------------
+#define FLIGHT_CONTROLLER_EDF_START_OFFSET				1200	/*!< brief Don't start EDF controlling until this offset from RC is reached */
 #define FLIGHT_CONTROLLER_EDF_OFFSET					300		/*!< brief Additions-Offset für die EDF's links und Rechts */
 #define FLIGHT_CONTROLLER_EDF_Factor					0.5f	/*!< brief External RC controlled */
 #define FLIGHT_CONTROLLER_AILERON_FACTOR				0.1f	/*!< brief Factor für die EDF Subtraktion für die EDF's */
@@ -100,5 +101,11 @@ float flight_controller_get_pid_roll_p_factor(void);
 float flight_controller_get_pid_roll_i_factor(void);
 float flight_controller_get_pid_roll_d_factor(void);
 float flight_controller_get_pid_roll_i_limit(void);
-
+float flight_controller_get_pid_pitch_p_factor(void);
+float flight_controller_get_pid_pitch_i_factor(void);
+float flight_controller_get_pid_pitch_d_factor(void);
+float flight_controller_get_pid_pitch_i_limit(void);
+float flight_controller_get_actuating_pitch_angle(void);
+float flight_controller_get_sensor_pitch_angle(void);
+float flight_controller_get_set_pitch_angle(void);
 #endif /* FLIGHT_CONTROLLER_H_ */

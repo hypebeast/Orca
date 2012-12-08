@@ -39,10 +39,13 @@
 #include "servo.h"
 #include "pid.h"
 
-pidData_t rollPid;
+PID_DATA_t rollPid;
+PID_DATA_t pitchPid;
 FILTER_DATA_t *actualSensorData;
 float actuatingRoll = 0;
 float rollSetValue = 0;
+float actuatingPitch = 0;
+float pitchSetValue = 0;
 
 /**************************************************************************
 * \\brief Flight Controller Initialization
@@ -54,8 +57,7 @@ float rollSetValue = 0;
 *
 * \\return  ---
 ***************************************************************************/
-void flight_controller_init(BOARD_CONFIG_t *board,
-							ORCA_FLASH_SETTINGS_t *settings,
+void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settings,
 							SERVO_IN_t *servo, FILTER_DATA_t *filter,
 							FLIGHT_CONTROLLER_t *flightController)
 {
@@ -73,6 +75,11 @@ void flight_controller_init(BOARD_CONFIG_t *board,
 	pid_Init(settings->pid_roll_p_factor, settings->pid_roll_i_factor,
 			settings->pid_roll_d_factor, settings->pid_roll_i_limit,
 			&rollPid);	
+			
+	/* Pitch PID Init */
+	pid_Init(settings->pid_pitch_p_factor, settings->pid_pitch_i_factor,
+			settings->pid_pitch_d_factor, settings->pid_pitch_i_limit,
+			&pitchPid);
 }	
 
 /**************************************************************************
@@ -103,22 +110,29 @@ int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 ***************************************************************************/
 int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController)
 {
-	flightController->leftEdfSetPoint = FLIGHT_CONTROLLER_EDF_OFFSET + flightController->rcServoIn->servo3;
-	
-	/* Pitch/Aileron Control */
-	//if(flightController->rcServoIn->servo2 > FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
-		//flightController->leftEdfSetPoint -= (flightController->rcServoIn->servo2
-												//- FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_AILERON_FACTOR;
-	if(actuatingRoll>0)
+	/* Wait for EDF controlling until the RC throttle stick gives enough input.
+	 * This avoid unwanted EDF running from the INS. */
+	if(flightController->rcServoIn->servo3 > FLIGHT_CONTROLLER_EDF_START_OFFSET)
 	{
-		flightController->leftEdfSetPoint -= (uint16_t)(actuatingRoll *
-			(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		/* Use the throttle RC input as the main EDF speed */
+		flightController->leftEdfSetPoint = FLIGHT_CONTROLLER_EDF_OFFSET + flightController->rcServoIn->servo3;
+	
+		/* Reduce and add the roll PID output to the EDF speed */
+		if(actuatingRoll>0)
+		{
+			flightController->leftEdfSetPoint -= (uint16_t)actuatingRoll;
+			//flightController->leftEdfSetPoint -= (uint16_t)(actuatingRoll *
+				//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		}
+		else
+		{
+			flightController->leftEdfSetPoint += (uint16_t)(-1*actuatingRoll);
+			//flightController->leftEdfSetPoint += (uint16_t)(-1*actuatingRoll *
+			//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		}
 	}
 	else
-	{
-		flightController->leftEdfSetPoint += (uint16_t)(-1*actuatingRoll *
-		(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
-	}
+		flightController->leftEdfSetPoint = FLIGHT_CONTROLLER_SERVO_LOWER_PULSE_WIDTH;		
 	 
 	return SYSTEM_INFO_TRUE;	
 }
@@ -133,22 +147,30 @@ int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController)
 ***************************************************************************/
 int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController)
 {
-	flightController->rightEdfSetPoint = FLIGHT_CONTROLLER_EDF_OFFSET + flightController->rcServoIn->servo3;
-	
-	/* Pitch/Aileron Control */
-	//if(flightController->rcServoIn->servo2 < FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
-		//flightController->rightEdfSetPoint -= (FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH
-												//- flightController->rcServoIn->servo2)*FLIGHT_CONTROLLER_AILERON_FACTOR;
-	if(actuatingRoll<0)
+	/* Wait for EDF controlling until the RC throttle stick gives enough input.
+	 * This avoid unwanted EDF running from the INS. */
+	if(flightController->rcServoIn->servo3 > FLIGHT_CONTROLLER_EDF_START_OFFSET)
 	{
-		flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll *
-			(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		/* Use the throttle RC input as the main EDF speed */
+		flightController->rightEdfSetPoint = FLIGHT_CONTROLLER_EDF_OFFSET + flightController->rcServoIn->servo3;
+	
+		/* Reduce and add the roll PID output to the EDF speed */
+		if(actuatingRoll<0)
+		{
+			flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll);
+			//flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll *
+				//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+		}
+		else
+		{
+			flightController->rightEdfSetPoint += (uint16_t)(actuatingRoll);
+			//flightController->rightEdfSetPoint += (uint16_t)(actuatingRoll *
+			//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));		
+		}
 	}
 	else
-	{
-		flightController->rightEdfSetPoint += (uint16_t)(actuatingRoll *
-		(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));		
-	}	
+		flightController->rightEdfSetPoint = FLIGHT_CONTROLLER_SERVO_LOWER_PULSE_WIDTH;	
+				
 	return SYSTEM_INFO_TRUE;	
 }
 
@@ -260,7 +282,7 @@ void flight_controller_update_pid_roll_coefficients(float p_factor, float i_fact
 ***************************************************************************/
 void flight_controller_update_pid_pitch_coefficients(float p_factor, float i_factor, float d_factor, float i_limit)
 {
-	// TODO
+	pid_update_tuning_constants(p_factor, i_factor, d_factor, i_limit, &pitchPid);
 }
 
 /**************************************************************************
@@ -290,12 +312,22 @@ void flight_controller_update_pid_yaw_coefficients(float p_factor, float i_facto
 ***************************************************************************/
 float flight_controller_get_actuating_roll_angle(void)
 {
-	if(actuatingRoll == 0)
-	{
-		nop();
-		return 0;
-	}
 	return actuatingRoll;
+}
+
+/**************************************************************************
+* \brief Flight Controller Get Actuating Pitch
+*
+*  Returns the actuating pitch angle in degrees. This is the value calculated
+*  by the PID controller.
+*
+* \param -
+*
+* \return  actuating ropitch angle
+***************************************************************************/
+float flight_controller_get_actuating_pitch_angle(void)
+{
+	return actuatingPitch;
 }
 
 /**************************************************************************
@@ -313,6 +345,20 @@ float flight_controller_get_sensor_roll_angle(void)
 }
 
 /**************************************************************************
+* \brief Flight Controller Get Actuating Pitch
+*
+*  Returns the estimated pitch angle in degrees.
+*
+* \param -
+*
+* \return  actuating pitch angle
+***************************************************************************/
+float flight_controller_get_sensor_pitch_angle(void)
+{
+	return actualSensorData->pitch;
+}
+
+/**************************************************************************
 * \brief Flight Controller Get Set Roll Angle
 *
 *  Returns the set roll angle in degrees. The angle is calculated from the 
@@ -325,6 +371,21 @@ float flight_controller_get_sensor_roll_angle(void)
 float flight_controller_get_set_roll_angle(void)
 {
 	return rollSetValue;
+}
+
+/**************************************************************************
+* \brief Flight Controller Get Set Pitch Angle
+*
+*  Returns the set pitch angle in degrees. The angle is calculated from the
+*  servo input signals.
+*
+* \param -
+*
+* \return  set rpitch angle
+***************************************************************************/
+float flight_controller_get_set_pitch_angle(void)
+{
+	return pitchSetValue;
 }
 
 /**************************************************************************
@@ -367,6 +428,45 @@ float flight_controller_get_pid_roll_i_limit(void)
 	return rollPid.I_Limit;
 }
 
+/**************************************************************************
+* \\brief Returns the P-Factor for the pitch PID controller.
+*
+* \\return The P-Factor.
+***************************************************************************/
+float flight_controller_get_pid_pitch_p_factor(void)
+{
+	return pitchPid.P_Factor;
+}
+
+/**************************************************************************
+* \\brief Returns the I-Factor for the pitch PID controller.
+*
+* \\return The I-Factor.
+***************************************************************************/
+float flight_controller_get_pid_pitch_i_factor(void)
+{
+	return pitchPid.I_Factor;
+}
+
+/**************************************************************************
+* \\brief Returns the D-Factor for the pitch PID controller.
+*
+* \\return The D-Factor.
+***************************************************************************/
+float flight_controller_get_pid_pitch_d_factor(void)
+{
+	return pitchPid.D_Factor;
+}
+
+/**************************************************************************
+* \\brief Returns the I-Limit for the pitch PID controller.
+*
+* \\return The I-Limit.
+***************************************************************************/
+float flight_controller_get_pid_pitch_i_limit(void)
+{
+	return pitchPid.I_Limit;
+}
 /**************************************************************************
 * \\brief Flight Controller Task
 *

@@ -140,7 +140,12 @@ void orca_init(void)
 	mpu_6000_init(&motionProcessingUnit, false, false);
 	
 	/* Initialize the filter module */
-	filter_init(&orcafilter, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
+	#ifdef FILTER_USE_DCM
+		filter_init(&orcafilter, orcaSettings.Kp_rollPitch, orcaSettings.Ki_rollPitch, orcaSettings.R_angle);
+	#else /* Use kalman settings */
+		filter_init(&orcafilter, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
+	#endif // FILTER_USE_DCM
+
 	
 
 			
@@ -152,7 +157,7 @@ void orca_init(void)
 
 	delay_ms(100);
 	
-		MS5611_init(&variometer);
+	MS5611_init(&variometer, MS5611_ADC_RES_4096);
 		
 	/* Initialize and start the System Timer */
 	rtc_init();

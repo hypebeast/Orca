@@ -537,6 +537,9 @@
     <None Include="src\config\conf_spi_master.h">
       <SubType>compile</SubType>
     </None>
+    <Compile Include="src\calculations.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\crc8.c">
       <SubType>compile</SubType>
     </Compile>
@@ -589,6 +592,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\user_interface.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vector.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vector.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\voltage_sens.c">
