@@ -37,7 +37,8 @@ from ScopePage import ScopePage
 from FlightDisplay import FlightDisplay
 from SerialConnection import SerialError
 from SettingsDialog import SettingsDialog
-from ControllerManager import ControllerManager
+from FMUManager import FMUManager
+from SystemPage import SystemPage
 from logger import Logger
 import defs
 import utils
@@ -131,8 +132,8 @@ class MainAppWindow(QtGui.QMainWindow):
 
         # TODO: Load configuration
 
-        # Provides methods for interacting with the flight controller
-        self.controllerManager = ControllerManager()
+        # Provides methods for interacting with the flight management unit
+        self.fmuManager = FMUManager()
 
         # Create UI
         self._createUi()
@@ -157,7 +158,7 @@ class MainAppWindow(QtGui.QMainWindow):
         self.mainLayout = QtGui.QHBoxLayout()
 
         # Info panel
-        self.infoPanel = InfoPanel(self.availableComPorts, self.controllerManager)
+        self.infoPanel = InfoPanel(self.availableComPorts, self.fmuManager)
         self.infoPanel.bConnect.clicked.connect(self.connectToController)
         self.mainLayout.addWidget(self.infoPanel)
 
@@ -178,7 +179,7 @@ class MainAppWindow(QtGui.QMainWindow):
         # Welcome page
         self.welcomePage = WelcomePage()
         self.pages.append(self.welcomePage)
-        icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "config.png"))
+        icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "orca_icon.png"))
         self.mainContainer.addTab(self.welcomePage, icon, "Home")
 
         # Flight display page
@@ -191,15 +192,21 @@ class MainAppWindow(QtGui.QMainWindow):
         #self.pages.append(self.flightControlPage)
         #icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "joystick.png"))
         #self.mainContainer.addTab(self.flightControlPage, icon, "Flight Control")
-        
+
         # Configuration page
-        self.configurationPage = ConfigurationPage(self.controllerManager)
+        self.configurationPage = ConfigurationPage(self.fmuManager)
         self.pages.append(self.configurationPage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "config.png"))
         self.mainContainer.addTab(self.configurationPage, icon, "Configuration")
 
+        # System Page
+        self.systemPage = SystemPage(self.fmuManager)
+        self.pages.append(self.systemPage)
+        icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "system.png"))
+        self.mainContainer.addTab(self.systemPage, icon, "System")
+
         # Scope page
-        self.scopePage = ScopePage(self.controllerManager)
+        self.scopePage = ScopePage(self.fmuManager)
         self.pages.append(self.scopePage)
         icon = QtGui.QIcon(os.path.join(self.appDefs.IconsPath, "scopes.png"))
         self.mainContainer.addTab(self.scopePage, icon, "Scopes")
@@ -238,18 +245,18 @@ class MainAppWindow(QtGui.QMainWindow):
         pass
 
     def updateUi(self):
-        if self.controllerManager.connected():
+        if self.fmuManager.connected():
             self.lStatusBarLabel.setText("<b>Connected</b>")
         else:
             self.lStatusBarLabel.setText("<b>Disconnected</b>")
 
     def connectToController(self):
-        if not self.controllerManager.connected():
+        if not self.fmuManager.connected():
             self.statusBar().showMessage("Connecting to controller...", 2000)
 
-            try:    
+            try:
                 # Connect
-                self.controllerManager.connect()
+                self.fmuManager.connect()
 
                 self.statusBar().showMessage("Connected!", 2000)
                 self.lStatusBarLabel.setText("<b>Connected</b>")
@@ -264,9 +271,9 @@ class MainAppWindow(QtGui.QMainWindow):
                 msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
                 msgBox.setIcon(QtGui.QMessageBox.Warning)
                 msgBox.exec_()
-        elif self.controllerManager.connected():
+        elif self.fmuManager.connected():
             # Disconnect
-            self.controllerManager.disconnect()
+            self.fmuManager.disconnect()
 
             self.statusBar().showMessage("Disconnected!", 2000)
             self.lStatusBarLabel.setText("<b>Connected</b>")
@@ -281,8 +288,8 @@ class MainAppWindow(QtGui.QMainWindow):
         dialog.show()
 
     def comPortChanged(self, index):
-        #self.controllerManager.set_serial_port(self.comPorts[index]["value"])
-        self.controllerManager.set_serial_port(self.availableComPorts[index])
+        #self.fmuManager.set_serial_port(self.comPorts[index]["value"])
+        self.fmuManager.set_serial_port(self.availableComPorts[index])
 
     def showSettingsDialog(self):
         dlg = SettingsDialog()
@@ -290,14 +297,15 @@ class MainAppWindow(QtGui.QMainWindow):
 
 
 class App():
-    def __init__(self, options= None, args=None):
+    def __init__(self, options=None, args=None):
         """
         Run the app.
         """
         app_defs = defs.AppDefs()
 
         app = QtGui.QApplication(sys.argv)
-        qss = QtCore.QFile(os.path.join(app_defs.StylesheetPath, "default_windows.qss"))
+        qss = QtCore.QFile(os.path.join(app_defs.StylesheetPath,
+                            "default_windows.qss"))
         qss.open(QtCore.QFile.ReadOnly)
         app.setStyleSheet(QtCore.QString(qss.readAll()))
         qss.close()

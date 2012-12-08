@@ -147,8 +147,6 @@ void orca_init(void)
 	#endif // FILTER_USE_DCM
 
 	
-
-			
 	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
 	pmic_init();
 

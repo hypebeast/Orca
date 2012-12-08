@@ -39,7 +39,10 @@ from logger import Logger
 from utils import get_all_from_queue 
 
 
-class ControllerManager(QObject):
+# Global firmware settings object
+fmuManager = None
+
+class _FMUManager(QObject):
 	"""
 	This class manages the communication with the controller, e.g. the
 	connection, status updates, etc.
@@ -53,6 +56,9 @@ class ControllerManager(QObject):
 
 	# This signal is emitted when the board settings are updated
 	board_settings_updated = pyqtSignal()
+
+	# This signal is emitted when a new data object message was received
+	data_object_received = pyqtSignal()
 
 	def __init__(self):
 		QObject.__init__(self)
@@ -145,7 +151,7 @@ class ControllerManager(QObject):
 
 	def _onMessageReceived(self):
 		"""
-		Callback method which is called when a new messages was received from
+		Callback method which is called when a new messages was received by
 		the serial connection.
 		"""
 		try:
@@ -166,6 +172,20 @@ class ControllerManager(QObject):
 						self._updateStatus(message[0], message[1])
 					elif message[0].commandType == CommandTypes.GET_BOARD_SETTINGS:
 						self._onBoardSettingsUpdated(message[0], message[1])
+					elif message[0].commandType == CommandTypes.DEBUG_INT_VALUES:
+						self.boardStatus.updateFromMessage(message[0], message[1])
+						# Emit signal
+						self.board_status_updated.emit()
+					elif message[0].commandType == CommandTypes.DEBUG_FLOAT_VALUES:
+						self.boardStatus.updateFromMessage(message[0], message[1])
+						# Emit signal
+						self.board_status_updated.emit()
+					elif message[0].commandType == CommandTypes.DEBUG_STRING_MESSAGE:
+						self.boardStatus.updateFromMessage(message[0], message[1])
+						# Emit signal
+						self.board_status_updated.emit()
+					else:
+						self.data_object_received.emit()
 		except StopIteration:
 			return
 
@@ -219,3 +239,11 @@ class ControllerManager(QObject):
 	def setRollKalmanConstants(self, q_angle, q_gyro, r_angle):
 		message = SetRollKalmanConstantsMessage(q_angle, q_gyro, r_angle)
 		self.serial.writeMessage(message)
+
+
+def FMUManager():
+	"""Singleton instance for the FMU Manager"""
+	global fmuManager
+	if not fmuManager:
+		fmuManager = _FMUManager()
+	return fmuManager

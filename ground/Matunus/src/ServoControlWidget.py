@@ -123,8 +123,9 @@ class ServoControlWidget(QtGui.QWidget):
 
     def positionBarValueChanged(self, value):
         self.leServoPosition.setText(str(value))
-
         self.runMoveServo(value)
 
     def updateServoPosition(self, pos):
+        if not pos:
+            return
         self.actualPositionServo.display(int(pos))

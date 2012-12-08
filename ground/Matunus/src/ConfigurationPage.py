@@ -34,7 +34,6 @@ from AttitudePage import AttitudePage
 from GpsPage import GpsPage
 from StabilizationPage import StabilizationPage
 from HardwareSettingsPage import HardwareSettingsPage
-
 import defs
 
 

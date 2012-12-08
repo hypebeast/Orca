@@ -18,11 +18,10 @@ __author__ = 'Sebastian Ruml'
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
 import os
 
 try:
-    from PyQt4 import QtGui, QtSvg
+    from PyQt4 import QtGui, QtSvg, QtCore
     #from PyQt4.QtCore import QUrl
 except ImportError:
     print "No PyQt found!"
@@ -47,7 +46,7 @@ class WelcomePage(QtGui.QWidget):
         mainLayout = QtGui.QVBoxLayout()
         #mainLayout.addWidget(self.view)
 
-        #image_file = os.path.join(self.app_defs.ArtworkPath, "welcome_background.png")
+        image_file = os.path.join(self.app_defs.ArtworkPath, "welcome_background.png")
         #self.backgroundImage = QtGui.QGraphicsPixmapItem(QtGui.QPixmap(image_file), None, self.scene)
 
         label = QtGui.QLabel("<b><font size=\"8\" color='black'>Matunus</font></b>")
@@ -55,7 +54,7 @@ class WelcomePage(QtGui.QWidget):
         label = QtGui.QLabel("<font size=\"5\" color='black'>Orca Ground Control Station</font>")
         mainLayout.addWidget(label)
 
-        #self.background = os.path.join(self.app_defs.ArtworkPath, "welcome_background.svg")
+        self.background = os.path.join(self.app_defs.ArtworkPath, "welcome_background.svg")
 
         # QML stuff
         #self.mainViewFile = os.path.join(self.app_defs.QmlPath, "welcomepage", "welcomepage.qml")
@@ -64,14 +63,18 @@ class WelcomePage(QtGui.QWidget):
         #self.mainView.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)
         #mainLayout.addWidget(self.mainView)
 
+        #styleSheet = "background-image: url(\"%s\")" % image_file
+        #print styleSheet
+        #self.setStyleSheet(styleSheet)
+
         mainLayout.addStretch()
         self.setLayout(mainLayout)
 
-    #def paintEvent(self, e):
-    #    qp = QtGui.QPainter()
-    #    qp.begin(self)
-    #    #self._drawWidget(qp)
-    #    qp.end()
+    def paintEvent(self, e):
+        qp = QtGui.QPainter()
+        qp.begin(self)
+        #self._drawWidget(qp)
+        qp.end()
 
     #def resizeEvent(self, event):
     #    self.scene.setSceneRect(0, 0, event.size().width(), event.size().height())

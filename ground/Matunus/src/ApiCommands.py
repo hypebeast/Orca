@@ -25,7 +25,6 @@ except ImportError:
     import sys
     sys.exit(2)
 
-import binascii
 import struct
 
 from crc8 import crc8
@@ -48,6 +47,9 @@ class CommandTypes:
     SET_KALMAN_ROLL_CONSTANTS = 0x0025
     SET_KALMAN_PITCH_CONSTANTS = 0x0026
     SET_KALMAN_YAW_CONSTANTS = 0x0027
+    DEBUG_INT_VALUES = 0x0100
+    DEBUG_FLOAT_VALUES = 0x0101
+    DEBUG_STRING_MESSAGE = 0x0102
 
 
 class MessageTypes:
@@ -86,8 +88,14 @@ class MessageFactory:
             message = GetBoardStatusMessage().fromPacket(data)
         elif command_type == CommandTypes.GET_BOARD_SETTINGS:
             message = GetBoardSettingsMessage().fromPacket(data)
+        elif command_type == CommandTypes.DEBUG_INT_VALUES:
+            message = DebugIntValuesMessage().fromPacket(data)
+        elif command_type == CommandTypes.DEBUG_FLOAT_VALUES:
+            message = DebugFloatValuesMessage().fromPacket(data)
+        elif command_type == CommandTypes.DEBUG_STRING_MESSAGE:
+            message = DebugStringMessage().fromPacket(data)
         else:
-            logger.warn("Mesage type not found")    
+            logger.warn("Message type not found")    
 
         return message
 
@@ -631,3 +639,131 @@ class SetYawKalmanConstantsMessage(BaseMessage):
     @staticmethod
     def fromPacket(package):
         raise NotImplementedError
+
+
+class DebugIntValuesMessage(BaseMessage):
+    """
+    Debug integer values message (Command Type: 0x0100)
+    """
+    def __init__(self):
+        BaseMessage.__init__(self, CommandTypes.DEBUG_INT_VALUES)
+        self.messageType = MessageTypes.RESPONSE_MESSAGE
+
+        self.value1 = 0
+        self.value2 = 0
+        self.value3 = 0
+        self.value4 = 0
+        self.value5 = 0
+
+    def getPacket(self):
+        return self._encodePackage([])
+
+    @staticmethod
+    def fromPacket(package):
+         # Check if we received a message with ID 0x0100
+        command_type = struct.unpack_from("H", package, 2)
+        if command_type[0] != CommandTypes.DEBUG_INT_VALUES:
+            return None
+
+        message = DebugIntValuesMessage()
+        message.messageType = MessageTypes.RESPONSE_MESSAGE
+
+        # Parse the data
+        offset = 5
+        try:
+            message.value1 = struct.unpack_from("H", package, offset)[0]
+            offset += 2
+            message.value2 = struct.unpack_from("H", package, offset)[0]
+            offset += 2
+            message.value3 = struct.unpack_from("H", package, offset)[0]
+            offset += 2
+            message.value4 = struct.unpack_from("H", package, offset)[0]
+            offset += 2
+            message.value5 = struct.unpack_from("H", package, offset)[0]
+        except:
+            pass
+
+        return message
+
+
+class DebugFloatValuesMessage(BaseMessage):
+    """
+    Debug float values message (Command Type: 0x0101)
+    """
+    def __init__(self):
+        BaseMessage.__init__(self, CommandTypes.DEBUG_FLOAT_VALUES)
+        self.messageType = MessageTypes.RESPONSE_MESSAGE
+
+        self.value1 = 0
+        self.value2 = 0
+        self.value3 = 0
+        self.value4 = 0
+        self.value5 = 0
+
+    def getPacket(self):
+        return self._encodePackage([])
+
+    @staticmethod
+    def fromPacket(package):
+         # Check if we received a message with ID 0x0101
+        command_type = struct.unpack_from("H", package, 2)
+        if command_type[0] != CommandTypes.DEBUG_FLOAT_VALUES:
+            return None
+
+        message = DebugFloatValuesMessage()
+        message.messageType = MessageTypes.RESPONSE_MESSAGE
+
+        # Parse the data
+        offset = 5
+        try:
+            message.value1 = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.value2 = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.value3 = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.value4 = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.value5 = struct.unpack_from("f", package, offset)[0]
+        except:
+            pass
+
+        return message
+
+
+class DebugStringMessage(BaseMessage):
+    """
+    Debug float values message (Command Type: 0x0101)
+    """
+    def __init__(self):
+        BaseMessage.__init__(self, CommandTypes.DEBUG_STRING_MESSAGE)
+        self.messageType = MessageTypes.RESPONSE_MESSAGE
+
+        self.message = ""
+
+    def getPacket(self):
+        return self._encodePackage([])
+
+    @staticmethod
+    def fromPacket(package):
+         # Check if we received a message with ID 0x0102
+        command_type = struct.unpack_from("H", package, 2)
+        if command_type[0] != CommandTypes.DEBUG_STRING_MESSAGE:
+            return None
+
+        message = DebugStringMessage()
+        message.messageType = MessageTypes.RESPONSE_MESSAGE
+
+        # Get the data length
+        length = struct.unpack_from("B", package, 4)
+        length = length[0] + 1
+        fmtString = "%ip" % length
+
+        # Parse the data
+        offset = 4
+        try:
+            message.message = struct.unpack_from(fmtString, package, offset)[0]
+        except:
+            pass
+
+        return message

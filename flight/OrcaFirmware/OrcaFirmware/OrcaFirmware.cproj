@@ -627,12 +627,6 @@
     <Compile Include="src\orca_init.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\receiver.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\receiver.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="src\servo.c">
       <SubType>compile</SubType>
     </Compile>
