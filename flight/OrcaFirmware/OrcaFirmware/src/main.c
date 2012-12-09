@@ -144,7 +144,7 @@ void orca_init(void)
 	delay_ms(300);
 	
 	/* Initialize the the voltage sensor */
-	voltage_sens_init(&voltageSensor, 0x02);
+	//voltage_sens_init(&voltageSensor, 0x02);
 	
 	/* Initialize the gyro/acc sensor*/
 	mpu_6000_init(&motionProcessingUnit, false, false);
@@ -227,10 +227,10 @@ void system_timer(uint32_t time)
 
 	}
 			
-	/* Call the voltage sensor every 500 */
+	/* Call the voltage sensor every 500 ms */
 	if(ulVsTickCounter >= 50)
 	{
-		voltage_sens_task(&voltageSensor);
+		//voltage_sens_task(&voltageSensor);
 		ulVsTickCounter = 0;
 	}
 			

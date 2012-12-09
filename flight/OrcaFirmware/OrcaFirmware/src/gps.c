@@ -70,6 +70,19 @@ static void decode_gsv_message(uint8_t received_byte);
 **************************************************************************/
 static void decode_gsa_message(uint8_t received_byte);
 
+/**************************************************************************
+* \brief Calculates the CRC for the given message.
+**************************************************************************/
+static uint8_t nmea_calc_crc(uint8_t *s);
+
+/**************************************************************************
+* \brief Writes a NMEA message to the serial connection.
+*
+* \param message	The NMEA message to send.	
+* \param length		The length of the message.
+**************************************************************************/
+static void nmea_write_message(uint8_t *message, uint8_t length);
+
 
 //////////////////////////////////////////////////////////////////////////
 // Function definitions
@@ -245,31 +258,31 @@ static void decode_gga_message(uint8_t received_byte)
 			
 		case 24:
 			// First digit of the longitude degrees
-			gps_data->gga.longitude_degrees[0];
+			gps_data->gga.longitude_degrees[0] = received_byte;
 			gga_state++;
 			break;
 			
 		case 25:
 			// Second digit of the longitude degrees
-			gps_data->gga.longitude_degrees[1];
+			gps_data->gga.longitude_degrees[1] = received_byte;
 			gga_state++;
 			break;
 			
 		case 26:
 			// Third digit of the longitude degrees
-			gps_data->gga.longitude_degrees[2];
+			gps_data->gga.longitude_degrees[2] = received_byte;
 			gga_state++;
 			break;
 			
 		case 27:
 			// First digit of the longitude minutes
-			gps_data->gga.longitude_minutes[0];
+			gps_data->gga.longitude_minutes[0] = received_byte;
 			gga_state++;
 			break;
 			
 		case 28:
 			// Second digit of the longitude minutes
-			gps_data->gga.longitude_minutes[1];
+			gps_data->gga.longitude_minutes[1] = received_byte;
 			gga_state++;
 			break;
 			
@@ -283,25 +296,25 @@ static void decode_gga_message(uint8_t received_byte)
 			
 		case 30:
 			// First digit of the longitude decimal part of minutes
-			gps_data->gga.longitude_decimal_minutes[0];
+			gps_data->gga.longitude_decimal_minutes[0] = received_byte;
 			gga_state++;
 			break;
 			
 		case 31:
 			// Second digit of the longitude decimal part of minutes
-			gps_data->gga.longitude_decimal_minutes[1];
+			gps_data->gga.longitude_decimal_minutes[1] = received_byte;
 			gga_state++;
 			break;
 		
 		case 32:
 			// Third digit of the longitude decimal part of minutes
-			gps_data->gga.longitude_decimal_minutes[2];
+			gps_data->gga.longitude_decimal_minutes[2] = received_byte;
 			gga_state++;
 			break;
 		
 		case 33:
 			// Fourth digit of the longitude decimal part of minutes
-			gps_data->gga.longitude_decimal_minutes[3];
+			gps_data->gga.longitude_decimal_minutes[3] = received_byte;
 			gga_state++;
 			break;
 			
@@ -320,12 +333,20 @@ static void decode_gga_message(uint8_t received_byte)
 			break;
 			
 		case 36:
+			// Wait for ','
+			if (received_byte == 0x2c)
+			{
+				gga_state++;
+			}
+			break;
+			
+		case 37:
 			// Fix valid indicator
 			gps_data->gga.fix_valid_indicator = received_byte;
 			gga_state++;
 			break;
 			
-		case 37:
+		case 38:
 			// Wait for ','
 			if (received_byte == 0x2c)
 			{
@@ -333,19 +354,19 @@ static void decode_gga_message(uint8_t received_byte)
 			}
 			break;
 			
-		case 38:
+		case 39:
 			// First digit of number of satellites
 			gps_data->gga.number_of_satellites[0] = received_byte;
 			gga_state++;
 			break;
 			
-		case 39:
+		case 40:
 			// Second digit of number of satellites
 			gps_data->gga.number_of_satellites[1] = received_byte;
 			gga_state++;
 			break;
 			
-		case 40:
+		case 41:
 			// Wait for ','
 			if (received_byte == 0x2c)
 			{
@@ -353,13 +374,13 @@ static void decode_gga_message(uint8_t received_byte)
 			}
 			break;
 			
-		case 41:
+		case 42:
 			// HDOP: Supported formats: x.x to x.xxx
 			gps_data->gga.hdop = received_byte;
 			gga_state++;
 			break;
 			
-		case 42:
+		case 43:
 			// Wait for '.'
 			if (received_byte == 0x2e)
 			{
@@ -367,7 +388,7 @@ static void decode_gga_message(uint8_t received_byte)
 			}
 			break;
 			
-		case 43:
+		case 44:
 			// HDOP fractional part: minimum digits before the next comma is 1
 			gps_data->gga.hdop_fractional_part[0] = received_byte;
 			gps_data->gga.hdop_fractional_part[1] = 0x30;
@@ -375,11 +396,11 @@ static void decode_gga_message(uint8_t received_byte)
 			gga_state++;
 			break;
 			
-		case 44:
+		case 45:
 			// Check if we have one more digit or the next comma
 			if (received_byte == 0x2c)
 			{
-				gga_state = 47;
+				gga_state = 48;
 			}
 			else
 			{
@@ -388,11 +409,11 @@ static void decode_gga_message(uint8_t received_byte)
 			}
 			break;
 			
-		case 45:
+		case 46:
 			// Check if we got the last digit or a comma
 			if (received_byte == 0x2c)
 			{
-				gga_state = 47;
+				gga_state = 48;
 			}
 			else
 			{
@@ -401,7 +422,7 @@ static void decode_gga_message(uint8_t received_byte)
 			}
 			break;
 			
-		case 46:
+		case 47:
 			// Wait for ','
 			if (received_byte == 0x2c)
 			{
@@ -409,7 +430,7 @@ static void decode_gga_message(uint8_t received_byte)
 			}
 			break;
 			
-		case 47:
+		case 48:
 			// Altitude: Supported formats are h.h to hhhhh.h
 			gps_data->gga.altitude[0] = 0x30;
 			gps_data->gga.altitude[1] = 0x30;
@@ -419,11 +440,11 @@ static void decode_gga_message(uint8_t received_byte)
 			gga_state++;
 			break;
 			
-		case 48:
+		case 49:
 			// Check if we received one more digit or the decimal point
 			if (received_byte == 0x2e)
 			{
-				gga_state = 53;
+				gga_state = 54;
 			}
 			else
 			{
@@ -434,11 +455,11 @@ static void decode_gga_message(uint8_t received_byte)
 			}
 			break;
 			
-		case 49:
+		case 50:
 			// Check if we received one more digit or the decimal point
 			if (received_byte == 0x2e)
 			{
-				gga_state = 53;
+				gga_state = 54;
 			}
 			else
 			{
@@ -450,11 +471,11 @@ static void decode_gga_message(uint8_t received_byte)
 			}
 			break;
 			
-		case 50:
+		case 51:
 			// Check if we received one more digit or the decimal point
 			if (received_byte == 0x2e)
 			{
-				gga_state = 53;
+				gga_state = 54;
 			}
 			else
 			{
@@ -467,11 +488,11 @@ static void decode_gga_message(uint8_t received_byte)
 			}
 			break;
 			
-		case 51:
+		case 52:
 			// Check if we received one more digit or the decimal point
 			if (received_byte == 0x2e)
 			{
-				gga_state = 53;
+				gga_state = 54;
 			}
 			else
 			{
@@ -485,27 +506,29 @@ static void decode_gga_message(uint8_t received_byte)
 			}
 			break;
 			
-		case 52:
+		case 53:
 			// Wait for '.'
 			if (received_byte == 0x2e)
 			{
-				gga_state = 53;
+				gga_state++;
 			}
 			break;
 			
-		case 53:
+		case 54:
 			// Altitude decimeters
 			gps_data->gga.altitude_decimeters = received_byte;
 			gga_state++;
 			break;
 			
-		case 54:
+		case 55:
 			// Where are done. The rest of the message is not interesting for us
 			gga_state = 1;
 			nmea_state = 1;
 			break;
 			
 		default:
+			gga_state = 1;
+			nmea_state = 1;
 			break;
 	}
 }
@@ -515,7 +538,471 @@ static void decode_gga_message(uint8_t received_byte)
 **************************************************************************/
 static void decode_rmc_message(uint8_t received_byte)
 {
-	
+	switch (rmc_state)
+	{
+		case 1:
+			// Wait for ','
+			if (received_byte == 0x2c)
+			{
+				rmc_state++;
+			}
+			break;
+		
+		case 2:
+			// First digit of the UTC hours
+			gps_data->rmc.utc_time_hours[0] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 3:
+			// Second digit of the UTC hours
+			gps_data->rmc.utc_time_hours[1] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 4:
+			// First digit of the UTC minutes
+			gps_data->rmc.utc_time_minutes[0] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 5:
+			// Second digit of the UTC minutes
+			gps_data->rmc.utc_time_minutes[1] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 6:
+			// First digit of the UTC seconds
+			gps_data->rmc.utc_time_seconds[0] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 7:
+			// Second digit of the UTC seconds
+			gps_data->rmc.utc_time_seconds[1] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 8:
+			// Wait for '.'
+			if (received_byte == 0x2e)
+			{
+				rmc_state++;
+			}
+			break;
+		
+		case 9:
+			// First digit of the decimal part of seconds
+			gps_data->rmc.utc_time_decimal_seconds[0] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 10:
+			// First digit of the decimal part of seconds
+			gps_data->rmc.utc_time_decimal_seconds[1] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 11:
+			// Wait for ','
+			if (received_byte == 0x2c)
+			{
+				rmc_state++;
+			}
+			break;
+		
+		case 12:
+			// Status
+			gps_data->rmc.status = received_byte;
+			rmc_state++;
+			break;
+			
+		case 13:
+			// Wait for ','
+			if (received_byte == 0x2c)
+			{
+				rmc_state++;
+			}
+			break;
+		
+		case 14:
+			// First digit of the latitude degrees
+			gps_data->rmc.latitude_degrees[0] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 15:
+			// Second digit of the latitude degrees
+			gps_data->rmc.latitude_degrees[1] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 16:
+			// First digit of the latitude minutes
+			gps_data->rmc.latitude_minutes[0] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 17:
+			// Second digit of the latitude minutes
+			gps_data->rmc.latitude_minutes[1] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 18:
+			// Wait for '.'
+			if (received_byte == 0x2e)
+			{
+				rmc_state++;
+			}
+			break;
+		
+		case 19:
+			// First digit of the latitude decimal part of minutes
+			gps_data->rmc.utc_time_decimal_seconds[0] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 20:
+			// Second digit of the latitude decimal part of minutes
+			gps_data->rmc.utc_time_decimal_seconds[1] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 21:
+			// Third digit of the latitude decimal part of minutes
+			gps_data->rmc.utc_time_decimal_seconds[2] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 22:
+			// Fourth digit of the latitude decimal part of minutes
+			gps_data->rmc.utc_time_decimal_seconds[3] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 23:
+			// Wait for ','
+			if (received_byte == 0x2c)
+			{
+				rmc_state++;
+			}
+			break;
+		
+		case 24:
+			// Latitude direction
+			gps_data->rmc.latitude_direction = received_byte;
+			rmc_state++;
+			break;
+		
+		case 25:
+			// Wait for ','
+			if (received_byte == 0x2c)
+			{
+				rmc_state++;
+			}
+			break;
+			
+		case 26:
+			// First digit of the longitude degrees
+			gps_data->rmc.longitude_degrees[0] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 27:
+			// Second digit of the longitude degrees
+			gps_data->rmc.longitude_degrees[1] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 28:
+			// Third digit of the longitude degrees
+			gps_data->rmc.longitude_degrees[2] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 29:
+			// First digit of the longitude minutes
+			gps_data->rmc.longitude_minutes[0] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 30:
+			// Second digit of the longitude minutes
+			gps_data->rmc.longitude_minutes[1] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 31:
+			// Wait for '.'
+			if (received_byte == 0x2e)
+			{
+				rmc_state++;
+			}
+			break;
+		
+		case 32:
+			// First digit of the longitude decimal part of minutes
+			gps_data->rmc.longitude_decimal_minutes[0] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 33:
+			// Second digit of the longitude decimal part of minutes
+			gps_data->rmc.longitude_decimal_minutes[1] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 34:
+			// Third digit of the longitude decimal part of minutes
+			gps_data->rmc.longitude_decimal_minutes[2] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 35:
+			// Fourth digit of the longitude decimal part of minutes
+			gps_data->rmc.longitude_decimal_minutes[3] = received_byte;
+			rmc_state++;
+			break;
+		
+		case 36:
+			// Wait for ','
+			if (received_byte == 0x2c)
+			{
+				rmc_state++;
+			}
+			break;
+		
+		case 37:
+			// Longitude direction
+			gps_data->rmc.latitude_direction = received_byte;
+			rmc_state++;
+			break;
+			
+		case 38:
+			// Wait for ','
+			if (received_byte == 0x2c)
+			{
+				rmc_state++;
+			}
+			break;
+			
+		case 39:
+			// Speed: Supported formats are from x.x to xxxx.xx
+			gps_data->rmc.speed[0] = 0x30;
+			gps_data->rmc.speed[1] = 0x30;
+			gps_data->rmc.speed[2] = 0x30;
+			gps_data->rmc.speed[3] = received_byte;
+			rmc_state++;
+			break;
+			
+		case 40:
+			// Check if we received one more digit or the decimal point
+			if (received_byte == 0x2e)
+			{
+				rmc_state = 44;
+			}
+			else
+			{
+				// We need to do some reordering
+				gps_data->rmc.speed[2] = gps_data->rmc.speed[3];
+				gps_data->rmc.speed[3] = received_byte;
+				rmc_state++;
+			}
+			break;
+			
+		case 41:
+			// Check if we received one more digit or the decimal point
+			if (received_byte == 0x2e)
+			{
+				rmc_state = 44;
+			}
+			else
+			{
+				// We need to do some reordering
+				gps_data->rmc.speed[1] = gps_data->rmc.speed[2];
+				gps_data->rmc.speed[2] = gps_data->rmc.speed[3];
+				gps_data->rmc.speed[3] = received_byte;
+				rmc_state++;
+			}
+			break;
+			
+		case 42:
+			// Check if we received one more digit or the decimal point
+			if (received_byte == 0x2e)
+			{
+				rmc_state = 44;
+			}
+			else
+			{
+				// We need to do some reordering
+				gps_data->rmc.speed[0] = gps_data->rmc.speed[1];
+				gps_data->rmc.speed[1] = gps_data->rmc.speed[2];
+				gps_data->rmc.speed[2] = gps_data->rmc.speed[3];
+				gps_data->rmc.speed[3] = received_byte;
+				rmc_state++;
+			}
+			break;
+			
+		case 43:
+			// Wait for '.'
+			if (received_byte == 0x2e)
+			{
+				rmc_state++;
+			}
+			break;
+			
+		case 44:
+			// Speed decimal part
+			gps_data->rmc.speed_decimal[0] = received_byte;
+			gps_data->rmc.speed_decimal[1] = 0x30;
+			rmc_state++;
+			break;
+			
+		case 45:
+			// Check if we received on more digit or a comma
+			if (received_byte == 0x2c)
+			{
+				rmc_state = 47;
+			}
+			else
+			{
+				gps_data->rmc.speed_decimal[1] = received_byte;
+				rmc_state++;
+			}
+			break;
+			
+		case 46:
+			// Wait for ','
+			if (received_byte == 0x2c)
+			{
+				rmc_state++;
+			}
+			break;
+			
+		case 47:
+			// Heading: Supported formats are from x.x to xxx.xx
+			gps_data->rmc.heading[0] = 0x30;
+			gps_data->rmc.heading[1] = 0x30;
+			gps_data->rmc.heading[2] = received_byte;
+			rmc_state++;
+			break;
+			
+		case 48:
+			// Check if we received one more digit or the decimal point
+			if (received_byte == 0x2e)
+			{
+				rmc_state = 51;
+			}
+			else
+			{
+				// We need to do some reordering
+				gps_data->rmc.heading[1] = gps_data->rmc.heading[2];
+				gps_data->rmc.heading[2] = received_byte;
+				rmc_state++;
+			}
+			break;
+			
+		case 49:
+			// Check if we received one more digit or the decimal point
+			if (received_byte == 0x2e)
+			{
+				rmc_state = 51;
+			}
+			else
+			{
+				// We need to do some reordering
+				gps_data->rmc.heading[0] = gps_data->rmc.heading[1];
+				gps_data->rmc.heading[1] = gps_data->rmc.heading[2];
+				gps_data->rmc.heading[2] = received_byte;
+				rmc_state++;
+			}
+			break;
+			
+		case 50:
+			// Wait for '.'
+			if (received_byte == 0x2e)
+			{
+				rmc_state++;
+			}
+			break;
+			
+		case 51:
+			// Heading: decimal part
+			gps_data->rmc.heading_decimal[0] = received_byte;
+			gps_data->rmc.heading_decimal[1] = 0x30;
+			break;
+			
+		case 52:
+			// Check if we received on more digit or a comma
+			if (received_byte == 0x2c)
+			{
+				rmc_state = 54;
+			}
+			else
+			{
+				gps_data->rmc.heading_decimal[1] = received_byte;
+				rmc_state++;
+			}
+			break;
+			
+		case 53:
+			// Wait for ','
+			if (received_byte == 0x2c)
+			{
+				rmc_state++;
+			}
+			break;
+			
+		case 54:
+			// First digit of the UTC date day
+			gps_data->rmc.utc_date_day[0] = received_byte;
+			rmc_state++;
+			break;
+			
+		case 55:
+			// Second digit of the UTC date day
+			gps_data->rmc.utc_date_day[1] = received_byte;
+			rmc_state++;
+			break;
+			
+		case 56:
+			// First digit of the UTC date month
+			gps_data->rmc.utc_date_month[0] = received_byte;
+			rmc_state++;
+			break;
+			
+		case 57:
+			// Second digit of the UTC date month
+			gps_data->rmc.utc_date_month[1] = received_byte;
+			rmc_state++;
+			break;
+			
+		case 58:
+			// First digit of the UTC date year
+			gps_data->rmc.utc_date_year[0] = received_byte;
+			rmc_state++;
+			break;
+			
+		case 59:
+			// Second digit of the UTC date year
+			gps_data->rmc.utc_date_year[1] = received_byte;
+			rmc_state++;
+			break;
+			
+		case 60:
+			// We're done. We don't care about the rest of the message
+			rmc_state = 1;
+			nmea_state = 1;
+			break;
+			
+		default:
+			// This should never happen, but in case we reset the state
+			rmc_state = 1;
+			nmea_state = 1;
+			break;
+	}
 }
 
 /**************************************************************************
@@ -670,6 +1157,39 @@ static void process_received_nmea_byte(void)
 				break;
 		}	
 	}
+}
+
+/**************************************************************************
+* \brief Writes a NMEA message to the serial connection.
+*
+* \param message	The NMEA message to send.
+* \param length		The length of the message.
+**************************************************************************/
+static void nmea_write_message(uint8_t *message, uint8_t length)
+{
+	int i = 0;
+	while (i < length)
+	{
+		bool byteToBuffer;
+		byteToBuffer = USART_TXBuffer_PutByte(&GPS_USART_data, message[i]);
+		if (byteToBuffer)
+		{
+			i++;
+		}
+	}
+}
+
+/**************************************************************************
+* \brief Calculates the CRC for the given message.
+**************************************************************************/
+static uint8_t nmea_calc_crc(uint8_t *s)
+{
+	uint8_t c = 0;
+	
+	while(*s)
+		c ^= *s++;
+	
+	return c;
 }
 
 /**************************************************************************
