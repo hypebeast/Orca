@@ -23,14 +23,14 @@
 //	Factory Settings for the PID Controller
 //  Edit this settings for different configurations
 //---------------------------------------------------------------------
-#define PID_ROLL_P_FACTOR_CONF			0.005f	/*!< brief Default p factor for the roll PID controller. */
-#define PID_ROLL_I_FACTOR_CONF			0.0002f		/*!< brief Default p factor for the roll PID controller. */
-#define PID_ROLL_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_P_FACTOR_CONF			0.3f	/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_I_FACTOR_CONF			0.02f		/*!< brief Default p factor for the roll PID controller. */
+#define PID_ROLL_D_FACTOR_CONF			0.08f		/*!< brief Default p factor for the roll PID controller. */
 #define PID_ROLL_I_LIMIT_CONF			1.0f		/*!< brief Default I limit value. */
-#define PID_PITCH_P_FACTOR_CONF			0.05f		/*!< brief Default p factor for the pitch PID controller. */
-#define PID_PITCH_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the pitch PID controller. */
+#define PID_PITCH_P_FACTOR_CONF			10.0f		/*!< brief Default p factor for the pitch PID controller. */
+#define PID_PITCH_I_FACTOR_CONF			0.02f		/*!< brief Default p factor for the pitch PID controller. */
 #define PID_PITCH_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the pitch PID controller. */
-#define PID_PITCH_I_LIMIT_CONF			5.0f		/*!< brief Default I limit value. */
+#define PID_PITCH_I_LIMIT_CONF			8.0f		/*!< brief Default I limit value. */
 #define PID_YAW_P_FACTOR_CONF			0.05f		/*!< brief Default p factor for the yaw PID controller. */
 #define PID_YAW_I_FACTOR_CONF			0.002f		/*!< brief Default p factor for the yaw PID controller. */
 #define PID_YAW_D_FACTOR_CONF			0.00f		/*!< brief Default p factor for the yaw PID controller. */
@@ -69,7 +69,13 @@
 #define FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF				20.0f	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
 #define FLIGHT_CONTROLLER_AILERON_MIN_VALUE_CONF			1130	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
 #define FLIGHT_CONTROLLER_AILERON_MAX_VALUE_CONF			1948	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
-#define FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF			(FLIGHT_CONTROLLER_AILERON_MAX_VALUE_CONF -	FLIGHT_CONTROLLER_AILERON_MIN_VALUE_CONF)/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF			(FLIGHT_CONTROLLER_AILERON_MAX_VALUE_CONF-FLIGHT_CONTROLLER_AILERON_MIN_VALUE_CONF)/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+
+#define FLIGHT_CONTROLLER_PITCH_MAX_ANGLE_CONF				10.0f	/*!< brief Maximaler Pitch Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_PITCH_PROPORTIONAL_RC_AILERON		0.85f	/*!< brief Maximaler Pitch Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_ELEVATOR_MIN_VALUE_CONF			1128	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_ELEVATOR_MAX_VALUE_CONF			1944	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
+#define FLIGHT_CONTROLLER_ELEVATOR_DELTA_VALUE_CONF			(FLIGHT_CONTROLLER_ELEVATOR_MAX_VALUE_CONF-FLIGHT_CONTROLLER_ELEVATOR_MIN_VALUE_CONF)
 
 /*! Flight Controller Struct */
 typedef struct FLIGHT_CONTROLLER {
@@ -90,10 +96,10 @@ int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_task(FLIGHT_CONTROLLER_t *flightController);
-int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController);
+void flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController);
 void flight_controller_update_pid_roll_coefficients(float p_factor, float i_factor, float d_factor, float i_limit);
-void flight_controller_update_pitch_roll_coefficients(float p_factor, float i_factor, float d_factor, float i_limit);
-void flight_controller_update_yaw_roll_coefficients(float p_factor, float i_factor, float d_factor, float i_limit);
+void flight_controller_update_pid_pitch_coefficients(float p_factor, float i_factor, float d_factor, float i_limit);
+void flight_controller_update_pid_yaw_coefficients(float p_factor, float i_factor, float d_factor, float i_limit);
 float flight_controller_get_actuating_roll_angle(void);
 float flight_controller_get_set_roll_angle(void);
 float flight_controller_get_sensor_roll_angle(void);
@@ -105,6 +111,10 @@ float flight_controller_get_pid_pitch_p_factor(void);
 float flight_controller_get_pid_pitch_i_factor(void);
 float flight_controller_get_pid_pitch_d_factor(void);
 float flight_controller_get_pid_pitch_i_limit(void);
+float flight_controller_get_pid_yaw_p_factor(void);
+float flight_controller_get_pid_yaw_i_factor(void);
+float flight_controller_get_pid_yaw_d_factor(void);
+float flight_controller_get_pid_yaw_i_limit(void);
 float flight_controller_get_actuating_pitch_angle(void);
 float flight_controller_get_sensor_pitch_angle(void);
 float flight_controller_get_set_pitch_angle(void);

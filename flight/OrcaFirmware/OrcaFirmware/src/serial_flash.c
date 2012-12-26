@@ -145,17 +145,23 @@ uint16_t serial_flash_init(void)
  * \return  true	all right
  * \return	false	error
  ***************************************************************************/
- uint16_t serial_flash_save_settings(void)
+ void serial_flash_save_settings(void)
  {
-	 /* Save actual values to settings struct */
+	/* Save actual values to settings struct */
 	 
-	 /* Filter settings roll */
-	settings->R_angle = filter_get_roll_rangle();
-	settings->Q_angle = filter_get_roll_qangle();
-	settings->Q_gyro = filter_get_roll_qgyro(); 
+	/* Filter settings roll */
+	/* Kalman */
+	settings->R_angle = filter_kalman_get_roll_rangle();
+	settings->Q_angle = filter_kalman_get_roll_qangle();
+	settings->Q_gyro = filter_kalman_get_roll_qgyro(); 
+	/* DCM */
+	settings->Kp_rollPitch = filter_dcm_get_rollPitch_kp();
+	settings->Ki_rollPitch = filter_dcm_get_rollPitch_ki(); 
 	
-	settings->Kp_rollPitch = filter_get_roll_qangle();
-	settings->Ki_rollPitch = filter_get_roll_qgyro(); 
+	/* Filter settings yaw */
+	/* DCM */
+	settings->Kp_yaw = filter_dcm_get_yaw_kp();
+	settings->Ki_yaw = filter_dcm_get_yaw_ki();
 	
 	/* PID controller settings roll */
 	settings->pid_roll_p_factor = flight_controller_get_pid_roll_p_factor();
@@ -169,6 +175,12 @@ uint16_t serial_flash_init(void)
 	settings->pid_pitch_d_factor = flight_controller_get_pid_pitch_d_factor();
 	settings->pid_pitch_i_limit = flight_controller_get_pid_pitch_i_limit();
 	
+	/* PID controller settings yaw */
+	settings->pid_yaw_p_factor = flight_controller_get_pid_yaw_p_factor();
+	settings->pid_yaw_i_factor = flight_controller_get_pid_yaw_i_factor();
+	settings->pid_yaw_d_factor = flight_controller_get_pid_yaw_d_factor();
+	settings->pid_yaw_i_limit = flight_controller_get_pid_yaw_i_limit();
+		
 	/* Store data on serial flash */ 
 	serial_flash_save_settings_to_flash();
  }
@@ -226,6 +238,9 @@ uint16_t serial_flash_init(void)
 	settings->Kp_rollPitch = FILTER_KP_ROLLPITCH;
 	settings->Ki_rollPitch = FILTER_KI_ROLLPITCH;
 	
+	settings->Kp_yaw = FILTER_KP_YAW;
+	settings->Ki_yaw = FILTER_KI_YAW;	
+	
 	settings->pid_roll_p_factor = PID_ROLL_P_FACTOR_CONF;   
 	settings->pid_roll_i_factor = PID_ROLL_I_FACTOR_CONF; 
 	settings->pid_roll_d_factor = PID_ROLL_D_FACTOR_CONF;
@@ -236,6 +251,11 @@ uint16_t serial_flash_init(void)
 	settings->pid_pitch_d_factor = PID_PITCH_D_FACTOR_CONF;
 	settings->pid_pitch_i_limit = PID_PITCH_I_LIMIT_CONF;
 	
+	settings->pid_yaw_p_factor = PID_YAW_P_FACTOR_CONF;
+	settings->pid_yaw_i_factor = PID_YAW_I_FACTOR_CONF;
+	settings->pid_yaw_d_factor = PID_YAW_D_FACTOR_CONF;
+	settings->pid_yaw_i_limit = PID_YAW_I_LIMIT_CONF;
+		
 	/* Write to serial flash */
 	serial_flash_save_settings_to_flash();
 	
