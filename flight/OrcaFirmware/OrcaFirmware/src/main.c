@@ -30,16 +30,23 @@
 #include "serial_flash.h"
 #include "filters.h"
 #include "MS5611.h"
+#include "gps.h"
 
-/* global variables */
+
+//////////////////////////////////////////////////////////////////////////
+// Global variables
+//////////////////////////////////////////////////////////////////////////
+
 BOARD_CONFIG_t board;  								/*!< \brief board module */
-SERVO_IN_t servoInput;									/*!< \brief servo input module */
+SERVO_IN_t servoInput;								/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
 VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
 MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing unit module */
 FILTER_DATA_t orcafilter;							/*!< \brief filter module */
 ORCA_FLASH_SETTINGS_t orcaSettings;					/*!< \brief orca settings module */
-VARIOMETER_MODULET_t variometer;
+VARIOMETER_MODULET_t variometer;					/*!< \brief Variometer data */
+gps_data_t gpsData;									/*!< \brief GPS data */
+
 
 unsigned long ulFcTickCounter = 0;			/*!< \brief Flight Controller system tick counter */
 unsigned long ulVsTickCounter = 0;			/*!< \brief Voltage sensor system tick counter */
@@ -127,6 +134,9 @@ void orca_init(void)
 	/* Initialize the serial interface */
 	serial_api_init();
 	
+	/* Initializes the GPS subsystem */
+	gps_init(&gpsData);
+	
 	/* Initialize the I2C intern interface*/
 	i2c_intern_init();
 		
@@ -134,7 +144,7 @@ void orca_init(void)
 	delay_ms(300);
 	
 	/* Initialize the the voltage sensor */
-	voltage_sens_init(&voltageSensor, 0x02);
+	//voltage_sens_init(&voltageSensor, 0x02);
 	
 	/* Initialize the gyro/acc sensor*/
 	mpu_6000_init(&motionProcessingUnit, false, false);
@@ -218,10 +228,10 @@ void system_timer(uint32_t time)
 
 	}
 			
-	/* Call the voltage sensor every 500 */
+	/* Call the voltage sensor every 500 ms */
 	if(ulVsTickCounter >= 50)
 	{
-		voltage_sens_task(&voltageSensor);
+		//voltage_sens_task(&voltageSensor);
 		ulVsTickCounter = 0;
 	}
 			

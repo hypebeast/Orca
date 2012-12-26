@@ -336,12 +336,7 @@
 	     // Memory busy.
 	     at45dbx_busy = true;
  }
-
-
-
-
-
-
+ 
 
  uint8_t at45dbx_read_byte(void)
  {
@@ -400,11 +395,6 @@
  }
 
 
-
-
-
-
-
  bool at45dbx_read_multiple_sector(uint16_t nb_sector)
  {
 	     while (nb_sector--) {
@@ -425,9 +415,6 @@
 	     }
 	     return true;
  }
-
-
-
 
 
  bool at45dbx_read_sector_to_ram(void *ram)
