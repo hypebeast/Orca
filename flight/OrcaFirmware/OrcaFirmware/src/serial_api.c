@@ -358,9 +358,9 @@ static void command_get_board_settings(void)
 	float pidYawKi = 0.0f;
 	float pidYawKd = 0.0f;
 	float pidYawILimit = 0.0f;
-	float kalmanRollQAngle = filter_get_roll_qangle();
-	float kalmanRollQGyro = filter_get_roll_qgyro();
-	float kalmanRollRAngle = filter_get_roll_rangle();
+	float kalmanRollQAngle = filter_kalman_get_roll_qangle();
+	float kalmanRollQGyro = filter_kalman_get_roll_qgyro();
+	float kalmanRollRAngle = filter_kalman_get_roll_rangle();
 	float kalmanPitchQAngle = 0.0f;
 	float kalmanPitchQGyro = 0.0f;
 	float kalmanPitchRAngle = 0.0f;
@@ -541,7 +541,7 @@ static void command_set_kalman_roll_constants(void)
 	memcpy(&r_angle, rx_command_packet.data + index, sizeof(r_angle));
 	index += 4;
 	
-	filter_update_constants(q_angle, q_gyro, r_angle);
+	filter_kalman_update_constants(q_angle, q_gyro, r_angle);
 }
 
 /**************************************************************************

@@ -25,7 +25,6 @@ VARIOMETER_MODULET_t *ms5611;
 uint16_t coefficient[8];				/*!< brief MS5611 coefficients */
 uint8_t adcReadStep;
 uint8_t waitTime;
-unsigned long measStartMicros;	
 unsigned long timeSinceStart;
 unsigned long D1; // ADC value of the pressure conversion
 unsigned long D2; // ADC value of the temperature conversion
@@ -33,7 +32,6 @@ unsigned long D2; // ADC value of the temperature conversion
 void MS5611_init(VARIOMETER_MODULET_t *variometer, uint8_t res)
 {
 	ms5611 = variometer;
-	measStartMicros = 0;
 	
 	MS5611_reset();
 	ms5611->res = res;
@@ -117,7 +115,6 @@ static uint16_t MS5611_read(uint8_t number, uint8_t *datarec)
 {
 
 	twi_package_t packetReceived;
-	int8_t status = 0x00;
 	
 	packetReceived.chip = MS5611_DEV_ADDRESS;
 	//packetReceived.addr[0] = addr;
@@ -126,7 +123,7 @@ static uint16_t MS5611_read(uint8_t number, uint8_t *datarec)
 	packetReceived.length = number;
 	packetReceived.no_wait = true;		// Don't wait, remove quickly if sending is not possible
 	
-	status = twi_master_read(BOARD_I2C_INTERN_INTERFACE,&packetReceived);
+	twi_master_read(BOARD_I2C_INTERN_INTERFACE,&packetReceived);
 	
 	return SYSTEM_INFO_TRUE;
 }
@@ -142,9 +139,6 @@ void MS5611_reset(void)
 
 static void MS5611_read_all_coefficient(void)
 {
-	unsigned int ret;
-	unsigned int rC=0;
-	
 	uint8_t i;
 	uint8_t recdata[2];
 	
@@ -218,10 +212,10 @@ static void MS5611_calculate_p_and_t(void)
 	double SENS2;
 		
 	/* Difference between actual and reference temperature */
-	dT=D2-coefficient[5]*pow(2,8);
+	dT=(double)D2-(double)coefficient[5]*pow(2,8);
 	
 	/* Actual temperature (-40…85°C with 0.01°C resolution) */
-	ms5611->t=(2000+(dT*coefficient[6])/pow(2,23))/100;
+	ms5611->t=(2000+(dT*(double)coefficient[6])/pow(2,23))/100;
 	
 	/* SECOND ORDER TEMPERATURE COMPENSATION */ 
 	if(ms5611->t < 20)
@@ -263,9 +257,9 @@ static void MS5611_calculate_p_and_t(void)
 void MS5611_read_T_P(unsigned long  time)
 {
 	if(adcReadStep == MS5611_READ_STEP_IDLE)
-		measStartMicros = time;
+		timeSinceStart = 0;
 	else
-		timeSinceStart = time - measStartMicros;
+		timeSinceStart = time + timeSinceStart;
 	
 	switch (adcReadStep)
 	{
@@ -290,10 +284,12 @@ void MS5611_read_T_P(unsigned long  time)
 			if(timeSinceStart >= waitTime*2)
 			{
 				/* Reading of D2 */
-				MS5611_adc_read(MS5611_CMD_ADC_D1);
-				adcReadStep = MS5611_READ_STEP_IDLE;		
+				MS5611_adc_read(MS5611_CMD_ADC_D1);		
 				/* Calculate P and T */
 				MS5611_calculate_p_and_t();
+				
+				adcReadStep = MS5611_READ_STEP_IDLE;
+				timeSinceStart = 0;
 			}			
 		break;
 					

@@ -41,11 +41,14 @@
 
 PID_DATA_t rollPid;
 PID_DATA_t pitchPid;
+PID_DATA_t yawPid;
 FILTER_DATA_t *actualSensorData;
 float actuatingRoll = 0;
 float rollSetValue = 0;
 float actuatingPitch = 0;
 float pitchSetValue = 0;
+
+static void flight_controller_calc_pitch(FLIGHT_CONTROLLER_t *flightController);
 
 /**************************************************************************
 * \\brief Flight Controller Initialization
@@ -80,6 +83,11 @@ void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settin
 	pid_Init(settings->pid_pitch_p_factor, settings->pid_pitch_i_factor,
 			settings->pid_pitch_d_factor, settings->pid_pitch_i_limit,
 			&pitchPid);
+			
+	/* Yaw PID Init */
+	pid_Init(settings->pid_yaw_p_factor, settings->pid_yaw_i_factor,
+			settings->pid_yaw_d_factor, settings->pid_yaw_i_limit,
+			&yawPid);
 }	
 
 /**************************************************************************
@@ -90,14 +98,32 @@ void flight_controller_init(BOARD_CONFIG_t *board, ORCA_FLASH_SETTINGS_t *settin
 *
 * \\return  ---
 ***************************************************************************/
-int flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
+void flight_controller_calc_roll(FLIGHT_CONTROLLER_t *flightController)
 {
 	/* Sollwert für Rollwinkel berechnen. Sollwert wird von der Fernsteuerung vorgegeben. */
 	rollSetValue = ((float)(flightController->rcServoIn->servo2)-1534) * 
 					(float)(FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF);
 	
-	/*  */
+	/* Process the roll PID controller */
 	actuatingRoll = pid_Controller(rollSetValue, actualSensorData->roll, 10000, &rollPid);	
+}
+
+/**************************************************************************
+* \\brief Flight Controller Calculate Left EDF
+*
+*
+* \\param *flightController Flight Controller data structure
+*
+* \\return  ---
+***************************************************************************/
+static void flight_controller_calc_pitch(FLIGHT_CONTROLLER_t *flightController)
+{
+	/* Sollwert für Rollwinkel berechnen. Sollwert wird von der Fernsteuerung vorgegeben. */
+	pitchSetValue = ((float)(flightController->rcServoIn->servo1)-1558) *
+	(float)(FLIGHT_CONTROLLER_PITCH_MAX_ANGLE_CONF/FLIGHT_CONTROLLER_ELEVATOR_DELTA_VALUE_CONF);
+	
+	/* Process the pitch PID controller */
+	actuatingPitch = pid_Controller(pitchSetValue, actualSensorData->pitch, 10000, &pitchPid);
 }
 
 /**************************************************************************
@@ -250,8 +276,21 @@ int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 	flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_EDF_REAR_OFFSET;
 
 	if(flightController->rcServoIn->servo3 >= FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET)
-		flightController->rearEdfSetPoint = flightController->rcServoIn->servo3;
-	
+	{
+		/* Proportionalwe Anteil vom RC Aileron  */
+		flightController->rearEdfSetPoint = (uint16_t)((float)(flightController->rcServoIn->servo3)*FLIGHT_CONTROLLER_PITCH_PROPORTIONAL_RC_AILERON);
+				
+		/* Reduce and add the pitch PID output to the rear EDF speed */
+		if(actuatingPitch<0)
+		{
+			flightController->rearEdfSetPoint -= (uint16_t)(-1*actuatingPitch);
+		}
+		else
+		{
+			flightController->rearEdfSetPoint += (uint16_t)(actuatingPitch);
+		}	
+	}
+			
 	return SYSTEM_INFO_TRUE;	
 }
 
@@ -467,6 +506,47 @@ float flight_controller_get_pid_pitch_i_limit(void)
 {
 	return pitchPid.I_Limit;
 }
+
+/**************************************************************************
+* \\brief Returns the P-Factor for the yaw PID controller.
+*
+* \\return The P-Factor.
+***************************************************************************/
+float flight_controller_get_pid_yaw_p_factor(void)
+{
+	return yawPid.P_Factor;
+}
+
+/**************************************************************************
+* \\brief Returns the I-Factor for the yaw PID controller.
+*
+* \\return The I-Factor.
+***************************************************************************/
+float flight_controller_get_pid_yaw_i_factor(void)
+{
+	return yawPid.I_Factor;
+}
+
+/**************************************************************************
+* \\brief Returns the D-Factor for the yaw PID controller.
+*
+* \\return The D-Factor.
+***************************************************************************/
+float flight_controller_get_pid_yaw_d_factor(void)
+{
+	return yawPid.D_Factor;
+}
+
+/**************************************************************************
+* \\brief Returns the I-Limit for the yaw PID controller.
+*
+* \\return The I-Limit.
+***************************************************************************/
+float flight_controller_get_pid_yaw_i_limit(void)
+{
+	return yawPid.I_Limit;
+}
+
 /**************************************************************************
 * \\brief Flight Controller Task
 *
@@ -481,6 +561,7 @@ int flight_controller_task(FLIGHT_CONTROLLER_t *flightController)
 	{
 		//Note: Do not change the call sequence!
 		flight_controller_calc_roll(flightController);
+		flight_controller_calc_pitch(flightController);
 		
 		/* Reset PID Controller if we get no input signal */
 		if(flightController->rcServoIn->servo3 <= 1200)

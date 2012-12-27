@@ -184,7 +184,6 @@ uint16_t mpu_6000_read(uint8_t addr, uint8_t number, uint8_t *datarec)
 {
 
 	twi_package_t packetReceived;
-	int8_t status = 0x00;
 		
 	packetReceived.chip = MPU_6000_DEV_ADDRESS;
 	packetReceived.addr[0] = addr;
@@ -193,7 +192,7 @@ uint16_t mpu_6000_read(uint8_t addr, uint8_t number, uint8_t *datarec)
 	packetReceived.length = number;	
 	packetReceived.no_wait = true;		// Don't wait, remove quickly if sending is not possible
 	
-	status = twi_master_read(BOARD_I2C_INTERN_INTERFACE,&packetReceived);
+	twi_master_read(BOARD_I2C_INTERN_INTERFACE,&packetReceived);
 		
 	return SYSTEM_INFO_TRUE;
 }	
@@ -274,6 +273,8 @@ uint16_t mpu_6000_burst_read_all_measurements(void)
 		mpuXGyr = (int16_t)(mpuReceived[8]<<8) + mpuReceived[9];
 		mpuYGyr = (int16_t)(mpuReceived[10]<<8) + mpuReceived[11];
 		mpuZGyr = (int16_t)(mpuReceived[12]<<8) + mpuReceived[13];
+		
+		return SYSTEM_INFO_TRUE;
 }
 	
 /**************************************************************************
@@ -313,7 +314,8 @@ uint16_t mpu_6000_read_fifo_measurements(void)
 		mpuXGyr = (int16_t)(mpuReceived[8]<<8) + mpuReceived[9];
 		mpuYGyr = (int16_t)(mpuReceived[10]<<8) + mpuReceived[11];
 		mpuZGyr = (int16_t)(mpuReceived[12]<<8) + mpuReceived[13];
-	}			
+	}
+	return SYSTEM_INFO_TRUE; 			
 }
 
 /**************************************************************************

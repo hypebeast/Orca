@@ -64,7 +64,7 @@ int main (void)
 	user_interface_stat_led_pattern(USER_INTERFACE_LED_BLINKING);
 	
 	/* Uncomment this method to restore the factory settings on the next startup */
-	//serial_flash_write_factory_settings();
+	serial_flash_write_factory_settings();
 	
 	/* Calibrate the accelerometer and the gyroscopes */
 	mpu_6000_calibrate();
@@ -151,9 +151,9 @@ void orca_init(void)
 	
 	/* Initialize the filter module */
 	#ifdef FILTER_USE_DCM
-		filter_init(&filterData, orcaSettings.Kp_rollPitch, orcaSettings.Ki_rollPitch, orcaSettings.R_angle);
+		filter_dcm_init(&orcafilter, orcaSettings.Kp_rollPitch, orcaSettings.Ki_rollPitch, orcaSettings.Kp_yaw, orcaSettings.Ki_yaw);
 	#else /* Use kalman settings */
-		filter_init(&filterData, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
+		filter_kalman_init(&orcafilter, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
 	#endif // FILTER_USE_DCM
 
 	
@@ -223,6 +223,7 @@ void system_timer(uint32_t time)
 			/* Do the kalman filter */
 			filter_task(motionProcessingUnit.time);
 		}
+		MS5611_read_T_P(10);
 		ulFcTickCounter = 0;
 
 	}

@@ -35,6 +35,9 @@ typedef struct ORCA_FLASH_SETTINGS
 	
 	float Kp_rollPitch;
 	float Ki_rollPitch;
+	float Kp_yaw;
+	float Ki_yaw;
+	
 	/* PID controller settings */
 	float pid_roll_p_factor;	/*!< brief Startup p factor for the roll PID controller. */
 	float pid_roll_i_factor;	/*!< brief Startup i factor for the roll PID controller. */
@@ -44,6 +47,10 @@ typedef struct ORCA_FLASH_SETTINGS
 	float pid_pitch_i_factor;	/*!< brief Startup i factor for the roll PID controller. */
 	float pid_pitch_d_factor;	/*!< brief Startup d factor for the roll PID controller. */
 	float pid_pitch_i_limit;	/*!< brief Startup i limit value for the roll PID controller. */
+	float pid_yaw_p_factor;		/*!< brief Startup p factor for the yaw PID controller. */
+	float pid_yaw_i_factor;		/*!< brief Startup i factor for the yaw PID controller. */
+	float pid_yaw_d_factor;		/*!< brief Startup d factor for the yaw PID controller. */
+	float pid_yaw_i_limit;		/*!< brief Startup i limit value for the yaw PID controller. */
 } ORCA_FLASH_SETTINGS_t;
 
 
@@ -52,7 +59,7 @@ uint16_t serial_flash_init_factory_settings(ORCA_FLASH_SETTINGS_t *data);
 uint16_t serial_flash_factory_reset(void);
 uint16_t serial_flash_read_settings(void);
 uint16_t serial_flash_write_factory_settings(void);
-uint16_t serial_flash_save_settings(void);
+void serial_flash_save_settings(void);
 uint16_t serial_flash_save_settings_to_flash(void);
 
 #endif /* SERIAL_FLASH_H_ */

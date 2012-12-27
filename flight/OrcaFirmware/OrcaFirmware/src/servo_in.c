@@ -60,7 +60,7 @@ static void isr_servo_in(void);
  **************************************************************************/
 uint16_t servo_in_get_current_value(uint8_t servo_nr) {
 	if (servo_nr < 1 || servo_nr > 7) {
-		return;
+		return 0;
 	}
 	
 	uint16_t pos = 0;

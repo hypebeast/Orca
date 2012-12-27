@@ -15,7 +15,7 @@
 //	General Filter Settings
 //---------------------------------------------------------------------
 #define FILTER_USE_DCM					/*!< brief Use either DCM or Kalman for the sensor fusion */
-
+//#define FILTER_USE_MAGNETOMETER			/*!< brief Use the magnetometer */
 
 //---------------------------------------------------------------------
 //	DCM Settings
@@ -25,26 +25,13 @@
 #define FILTER_KP_YAW					1.2			/*!< brief Startup KP setting for yaw calculation */
 #define FILTER_KI_YAW					0.00002		/*!< brief Startup KI setting for yaw calculation */
 
-#define FILTER_PERFORMANCE_REPORTING	0
-#define FILTER_PRINT_DEBUG				0
-#define FILTER_USE_MAGNETOMETER			0
-
-#define GRAVITY 248  //this equivalent to 1G in the raw data coming from the accelerometer
-
-/*For debugging purposes*/
-//OUTPUTMODE=1 will print the corrected data,
-//OUTPUTMODE=0 will print uncorrected data of the gyros (with drift)
-#define OUTPUTMODE 1
-
 //---------------------------------------------------------------------
-//	Roll Filter Startup Settings
+//	Kalman Roll Filter Startup Settings
 //  Edit this settings for different configurations
 //---------------------------------------------------------------------
 #define FILTER_R_ANGLE_CONF			0.001		/*!< brief 0.69Startup covariance, our observation noise from the accelerometer. */
 #define FILTER_Q_ANGLE_CONF			0.001f		/*!< brief 0.0001 Startup prozess covariance. In this case, it indicates how much we trust the accelerometer relative to the gyros. */
 #define FILTER_Q_GYRO_CONF			0.007f		/*!< brief 0.0003 Startup prozess covariance. In this case, it indicates how much we trust the accelerometer relative to the gyros. */
-
-
 
 /*! Filter struct */
 typedef struct FILTER_DATA{	
@@ -52,59 +39,61 @@ typedef struct FILTER_DATA{
 	float yAcc;				/*!< brief Actual acceleration y-axis in g (should be towards the right wingtip). */
 	float zAcc;				/*!< brief Actual acceleration z-axis in g (should be towards the ground).*/
 	
-	float xGyr;				/*!< brief Actual rotation x-axis in degrees per second */
-	float yGyr;				/*!< brief Actual rotation y-axis in degrees per second */
-	float zGyr;				/*!< brief Actual rotation z-axis in degrees per second */
+	float xGyr;				/*!< brief Actual rotation x-axis in degrees per seconds */
+	float yGyr;				/*!< brief Actual rotation y-axis in degrees per seconds */
+	float zGyr;				/*!< brief Actual rotation z-axis in degrees per seconds */
 	
-	float pitch;
-	float roll;
-	float yaw;
-	
-	float x_angle;			/*!< brief These variables represent our state matrix x */	
-	float x_bias;			/*!< brief These variables represent our state matrix x */
-	float P_00;				/*!< brief Our error covariance matrix */
-	float P_01;				/*!< brief Our error covariance matrix */
-	float P_10;				/*!< brief Our error covariance matrix */
-	float P_11;				/*!< brief Our error covariance matrix */
-	
+	float pitch;			/*!< brief Estimated (current) pitch angle in degrees */
+	float roll;				/*!< brief Estimated (current) roll angle in degrees */
+	float yaw;				/*!< brief Estimated (current) yaw angle in degrees */
+			
 	/* 
 	 * Q is a 2x2 matrix of the covariance. Because we
-	 * assuma the gyro and accelero noise to be independend
-	 * of eachother, the covariances on the / diagonal are 0.
+	 * assume the gyro and acceleration noise to be independent
+	 * of each other, the covariances on the / diagonal are 0.
 	 *
 	 * Covariance Q, the process noise, from the assumption
 	 *    x = F x + B u + w
 	 * with w having a normal distribution with covariance Q.
 	 * (covariance = E[ (X - E[X])*(X - E[X])' ]
-	 * We assume is linair with dt
+	 * We assume is linear with dt
 	 */
 	float Q_angle; 
 	float Q_gyro;
 	/*
 	 * Covariance R, our observation noise (from the accelerometer)
-	 * Also assumed to be linair with dt
+	 * Also assumed to be linear with dt
 	 */
-	float R_angle;
+	float R_angle;			/*!< brief Covariance R */
 	
-	float Kp_rollPitch;
-	float Ki_rollPitch;
-	float Kp_yaw;
-	float Ki_yaw;
+	float Kp_rollPitch;		/*!< brief Kp Roll/Pitch */
+	float Ki_rollPitch;		/*!< brief Ki Roll/Pitch */
+	float Kp_yaw;			/*!< brief Kp Yaw */
+	float Ki_yaw;			/*!< brief Ki Yaw */
 	
 }FILTER_DATA_t;
-
-#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
 #define PI 3.14159265358979f
 #define ToRad(x) (x*0.01745329252)  // *pi/180
 #define ToDeg(x) (x*57.2957795131)  // *180/pi
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
-void filter_init(FILTER_DATA_t *filter, float Q_angle, float Q_gyro, float R_angle);
-void filter_update_constants(float Q_angle, float Q_gyro, float R_angle);
+
+#ifdef FILTER_USE_DCM
+	void filter_dcm_init(FILTER_DATA_t *filter, float KpRollPitch, float KiRollPitch, float KpYaw, float KiYaw);
+#else /* Use Kalman */
+	void filter_kalman_init(FILTER_DATA_t *filter, float Q_angle, float Q_gyro, float R_angle);
+#endif // FILTER_USE_DCM
+
+void filter_kalman_update_constants(float Q_angle, float Q_gyro, float R_angle);
+void filter_dcm_update_constants(float KpRollPitch, float KiRollPitch, float KpYaw, float KiYaw);
 void filter_task(unsigned long time);
 float filter_get_acc_roll(void);
-float filter_get_roll_qangle(void);
-float filter_get_roll_qgyro(void);
-float filter_get_roll_rangle(void);
-
+float filter_kalman_get_roll_qangle(void);
+float filter_kalman_get_roll_qgyro(void);
+float filter_kalman_get_roll_rangle(void);
+float filter_dcm_get_rollPitch_kp(void);
+float filter_dcm_get_rollPitch_ki(void);
+float filter_dcm_get_yaw_kp(void);
+float filter_dcm_get_yaw_ki(void);
 #endif /* FILTERS_H_ */
