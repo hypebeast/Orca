@@ -301,7 +301,7 @@ void flight_controller_update_pid_yaw_coefficients(float p_factor, float i_facto
 }
 
 /**************************************************************************
-* \brief Flight Controller Get Actuating Roll
+* \brief Returns the actuating roll value
 *
 *  Returns the actuating roll angle in degrees. This is the value calculated
 *  by the PID controller.
@@ -316,14 +316,14 @@ float flight_controller_get_actuating_roll_angle(void)
 }
 
 /**************************************************************************
-* \brief Flight Controller Get Actuating Pitch
+* \brief Returns the actuating pitch value
 *
 *  Returns the actuating pitch angle in degrees. This is the value calculated
 *  by the PID controller.
 *
 * \param -
 *
-* \return  actuating ropitch angle
+* \return  Actuating pitch angle
 ***************************************************************************/
 float flight_controller_get_actuating_pitch_angle(void)
 {

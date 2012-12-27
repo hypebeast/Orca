@@ -67,6 +67,6 @@ typedef struct VARIOMETER_MODULE{
 }VARIOMETER_MODULET_t;
 
 void MS5611_init(VARIOMETER_MODULET_t *variometer, uint8_t res);
-void MS5611_reset();
+void MS5611_reset(void);
 void MS5611_read_T_P(unsigned long  time);
 #endif /* MS5611_H_ */

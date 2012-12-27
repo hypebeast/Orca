@@ -95,6 +95,7 @@ void flight_controller_update_pid_roll_coefficients(float p_factor, float i_fact
 void flight_controller_update_pitch_roll_coefficients(float p_factor, float i_factor, float d_factor, float i_limit);
 void flight_controller_update_yaw_roll_coefficients(float p_factor, float i_factor, float d_factor, float i_limit);
 float flight_controller_get_actuating_roll_angle(void);
+float flight_controller_get_actuating_pitch_angle(void);
 float flight_controller_get_set_roll_angle(void);
 float flight_controller_get_sensor_roll_angle(void);
 float flight_controller_get_pid_roll_p_factor(void);

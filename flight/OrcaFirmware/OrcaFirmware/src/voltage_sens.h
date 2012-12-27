@@ -6,8 +6,8 @@
  */ 
 
 
-#ifndef VOLTAGE_SENS_H_
-#define VOLTAGE_SENS_H_
+#ifndef __VOLTAGE_SENS_H_
+#define __VOLTAGE_SENS_H_
 
 #include "user_board.h"
 
@@ -73,7 +73,7 @@
 
 
 //---------------------------------------------------------------------
-//	Channel selection in Sengle-Ended Mode, Data sheet Page 14
+//	Channel selection in Single-Ended Mode, Data sheet Page 14
 //---------------------------------------------------------------------
 #define VOLTAGE_SENS_CS_AIN0			((0x00)<<VOLTAGE_SENS_CS0_bp)		/*!< brief Select AIN0 */
 #define VOLTAGE_SENS_CS_AIN1			((0x01)<<VOLTAGE_SENS_CS0_bp)		/*!< brief Select AIN1 */
@@ -105,14 +105,13 @@ typedef struct VOLTAGE_SENSOR {
 	volatile uint16_t ai1;						/*!< brief DAC Input 01 value */
 	uint16_t voltage0;							/*!< brief Voltage 0 in mV */
 	uint16_t voltage1;							/*!< brief Voltage 1 in mV */
-
 }VOLTAGE_SENSOR_t;
 
 uint16_t voltage_sens_init(VOLTAGE_SENSOR_t *sensor, uint8_t chNumber);
-uint16_t voltage_sens_write_Setup(uint8_t setup);
+uint16_t voltage_sens_write_setup(uint8_t setup);
 uint16_t voltage_sens_write_config(uint8_t conf);
 uint16_t voltage_sens_reset_conf(void);
 uint16_t voltage_sens_read_channels(VOLTAGE_SENSOR_t *sensor);
 uint16_t voltage_sens_task(VOLTAGE_SENSOR_t *sensor);
 
-#endif /* VOLTAGE_SENS_H_ */
+#endif /* __VOLTAGE_SENS_H_ */

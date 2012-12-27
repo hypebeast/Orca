@@ -13,7 +13,7 @@ float Vector_Dot_Product(float vector1[3],float vector2[3])
   
   for(int c=0; c<3; c++)
   {
-  op+=vector1[c]*vector2[c];
+	op+=vector1[c]*vector2[c];
   }
   
   return op; 
@@ -32,7 +32,7 @@ void Vector_Scale(float vectorOut[3],float vectorIn[3], float scale2)
 {
   for(int c=0; c<3; c++)
   {
-   vectorOut[c]=vectorIn[c]*scale2; 
+	vectorOut[c]=vectorIn[c]*scale2; 
   }
 }
 

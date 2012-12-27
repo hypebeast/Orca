@@ -37,12 +37,12 @@
 // Global variables
 //////////////////////////////////////////////////////////////////////////
 
-BOARD_CONFIG_t board;  								/*!< \brief board module */
+BOARD_CONFIG_t boardConfig;  						/*!< \brief board module */
 SERVO_IN_t servoInput;								/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
 VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
 MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing unit module */
-FILTER_DATA_t orcafilter;							/*!< \brief filter module */
+FILTER_DATA_t filterData;							/*!< \brief filter module */
 ORCA_FLASH_SETTINGS_t orcaSettings;					/*!< \brief orca settings module */
 VARIOMETER_MODULET_t variometer;					/*!< \brief Variometer data */
 gps_data_t gpsData;									/*!< \brief GPS data */
@@ -114,7 +114,7 @@ void orca_init(void)
 	delay_init(sysclk_get_cpu_hz());
 	
 	/* Board Init */
-	orca_board_init(&board);
+	orca_board_init(&boardConfig);
 	
 	/* Initialize serial flash and get settings */
 	if(serial_flash_init() == true)
@@ -123,13 +123,13 @@ void orca_init(void)
 	}
 		
 	/* servo in subsystem init */
-	servo_in_init(&board, &servoInput);
+	servo_in_init(&boardConfig, &servoInput);
 	
 	/* Initialize the servo output subsystem */
 	servo_init();
 	
 	/* flight controller subsystem init */
-	flight_controller_init(&board, &orcaSettings, &servoInput, &orcafilter, &flightController);
+	flight_controller_init(&boardConfig, &orcaSettings, &servoInput, &filterData, &flightController);
 
 	/* Initialize the serial interface */
 	serial_api_init();
@@ -151,9 +151,9 @@ void orca_init(void)
 	
 	/* Initialize the filter module */
 	#ifdef FILTER_USE_DCM
-		filter_init(&orcafilter, orcaSettings.Kp_rollPitch, orcaSettings.Ki_rollPitch, orcaSettings.R_angle);
+		filter_init(&filterData, orcaSettings.Kp_rollPitch, orcaSettings.Ki_rollPitch, orcaSettings.R_angle);
 	#else /* Use kalman settings */
-		filter_init(&orcafilter, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
+		filter_init(&filterData, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
 	#endif // FILTER_USE_DCM
 
 	
@@ -219,7 +219,7 @@ void system_timer(uint32_t time)
 			/* Get new data from the mpu6000 */
 			mpu_6000_task();
 			/* Save the new measurements to the filter module */
-			mpu_6000_save_data_to_filter(&orcafilter);
+			mpu_6000_save_data_to_filter(&filterData);
 			/* Do the kalman filter */
 			filter_task(motionProcessingUnit.time);
 		}

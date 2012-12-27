@@ -235,13 +235,20 @@ static void command_get_board_status(void)
 	float gyroX = mpu_6000_get_x_gyr();
 	float gyroY = mpu_6000_get_y_gyr();
 	float gyroZ = mpu_6000_get_z_gyr();
-	float kalmanOutputRoll = flight_controller_get_sensor_roll_angle();
+	
+	float sensorRollAngle = flight_controller_get_sensor_roll_angle();
 	// TODO: Pitch
+	float sensorPitchAngle = flight_controller_get_sensor_pitch_angle();
+	
 	float kalmanReferenceValueRoll = filter_get_acc_roll();
+	
 	float setValueRollAngle = flight_controller_get_set_roll_angle();
 	// TODO: Pitch
+	float setValuePitchAngle = flight_controller_get_set_pitch_angle();
+	
 	float actuatingVariablePidRoll = flight_controller_get_actuating_roll_angle();
 	// TODO: Pitch
+	float actuatingVariablePidPitch = flight_controller_get_actuating_pitch_angle();
 		
 	// Start byte
 	data[index++] = PACKET_START_BYTE;
@@ -311,7 +318,7 @@ static void command_get_board_status(void)
 	memcpy(data + index, &gyroZ, 4);
 	index += 4;
 	// Kalman Output Roll
-	memcpy(data + index, &kalmanOutputRoll, 4);
+	memcpy(data + index, &sensorRollAngle, 4);
 	index += 4;
 	// Kalman Reference Value Roll
 	memcpy(data + index, &kalmanReferenceValueRoll, 4);
