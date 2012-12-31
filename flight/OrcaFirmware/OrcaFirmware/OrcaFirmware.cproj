@@ -136,7 +136,7 @@
       </OverrideVtorValue>
       <Channel>
         <host>127.0.0.1</host>
-        <port>49858</port>
+        <port>63240</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
@@ -598,6 +598,8 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\user_interface.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\vector.c">
       <SubType>compile</SubType>
     </Compile>

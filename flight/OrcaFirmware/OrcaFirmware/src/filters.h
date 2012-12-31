@@ -89,6 +89,8 @@ void filter_kalman_update_constants(float Q_angle, float Q_gyro, float R_angle);
 void filter_dcm_update_constants(float KpRollPitch, float KiRollPitch, float KpYaw, float KiYaw);
 void filter_task(unsigned long time);
 float filter_get_acc_roll(void);
+float filter_get_acc_pitch(void);
+float filter_get_acc_yaw(void);
 float filter_kalman_get_roll_qangle(void);
 float filter_kalman_get_roll_qgyro(void);
 float filter_kalman_get_roll_rangle(void);

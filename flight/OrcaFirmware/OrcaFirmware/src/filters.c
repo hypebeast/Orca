@@ -644,6 +644,35 @@ float filter_get_acc_roll(void)
 }
 
 /**************************************************************************
+* \brief Filter Get Acc Pitch
+*	Returns the calculated roll angle from the acceleration measurements. \n
+*
+* \param ---
+*
+* \return  accPitch angle
+***************************************************************************/
+float filter_get_acc_pitch(void)
+{
+	//TODO
+	return 0;
+}
+
+/**************************************************************************
+* \brief Filter Get Acc Yaw
+*	Returns the calculated roll angle from the acceleration measurements. \n
+*
+* \param ---
+*
+* \return  accYaw angle
+***************************************************************************/
+float filter_get_acc_yaw(void)
+{
+	//TODO
+	return 0;
+
+}
+
+/**************************************************************************
 * \brief Filter Task
 *	Process all filter calculations. \n
 *

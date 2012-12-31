@@ -1,0 +1,7 @@
+Service , Message , Max , Min , Average , Count , frequency , TimedOut
+
+Stream,setLogBits,11.0007,7.0004,9.00055,2,0
+Tool,setupTool,540.0308,9.0005,64.5453583333333,4,0
+Tool,getContext,362.0207,3.0002,91.588575,4,0
+Tool,connect,5013.2868,5007.2864,2086.994375,4,0
+Tool,tearDownTool,5.0003,2.0001,1.791775,4,0

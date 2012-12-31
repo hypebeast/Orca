@@ -105,11 +105,10 @@ typedef struct VOLTAGE_SENSOR {
 	volatile uint16_t ai1;						/*!< brief DAC Input 01 value */
 	uint16_t voltage0;							/*!< brief Voltage 0 in mV */
 	uint16_t voltage1;							/*!< brief Voltage 1 in mV */
-
 }VOLTAGE_SENSOR_t;
 
-uint16_t voltage_sens_init(VOLTAGE_SENSOR_t *sensor, uint8_t chNumber);
 uint16_t voltage_sens_write_Setup(uint8_t setup);
+uint16_t voltage_sens_init(VOLTAGE_SENSOR_t *sensor, uint8_t chNumber);
 uint16_t voltage_sens_write_config(uint8_t conf);
 uint16_t voltage_sens_reset_conf(void);
 uint16_t voltage_sens_read_channels(VOLTAGE_SENSOR_t *sensor);

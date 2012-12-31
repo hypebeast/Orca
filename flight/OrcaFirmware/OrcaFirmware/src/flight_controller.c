@@ -39,6 +39,9 @@
 #include "servo.h"
 #include "pid.h"
 
+//////////////////////////////////////////////////////////////////////////
+// Variables
+//////////////////////////////////////////////////////////////////////////
 PID_DATA_t rollPid;
 PID_DATA_t pitchPid;
 PID_DATA_t yawPid;
@@ -47,7 +50,12 @@ float actuatingRoll = 0;
 float rollSetValue = 0;
 float actuatingPitch = 0;
 float pitchSetValue = 0;
+float actuatingYaw = 0;
+float yawSetValue = 0;
 
+//////////////////////////////////////////////////////////////////////////
+// Function declarations
+//////////////////////////////////////////////////////////////////////////
 static void flight_controller_calc_pitch(FLIGHT_CONTROLLER_t *flightController);
 
 /**************************************************************************
@@ -362,11 +370,26 @@ float flight_controller_get_actuating_roll_angle(void)
 *
 * \param -
 *
-* \return  actuating ropitch angle
+* \return  actuating pitch angle
 ***************************************************************************/
 float flight_controller_get_actuating_pitch_angle(void)
 {
 	return actuatingPitch;
+}
+
+/**************************************************************************
+* \brief Flight Controller Get Actuating Yaw
+*
+*  Returns the actuating yaw angle in degrees. This is the value calculated
+*  by the PID controller.
+*
+* \param -
+*
+* \return  actuating yaw angle
+***************************************************************************/
+float flight_controller_get_actuating_yaw_angle(void)
+{
+	return actuatingYaw;
 }
 
 /**************************************************************************
@@ -398,6 +421,20 @@ float flight_controller_get_sensor_pitch_angle(void)
 }
 
 /**************************************************************************
+* \brief Flight Controller Get Actuating Yaw
+*
+*  Returns the estimated yaw angle in degrees.
+*
+* \param -
+*
+* \return  actuating yaw angle
+***************************************************************************/
+float flight_controller_get_sensor_yaw_angle(void)
+{
+	return actualSensorData->yaw;
+}
+
+/**************************************************************************
 * \brief Flight Controller Get Set Roll Angle
 *
 *  Returns the set roll angle in degrees. The angle is calculated from the 
@@ -420,11 +457,26 @@ float flight_controller_get_set_roll_angle(void)
 *
 * \param -
 *
-* \return  set rpitch angle
+* \return  set pitch angle
 ***************************************************************************/
 float flight_controller_get_set_pitch_angle(void)
 {
 	return pitchSetValue;
+}
+
+/**************************************************************************
+* \brief Flight Controller Get Set Yaw Angle
+*
+*  Returns the set yaw angle in degrees. The angle is calculated from the
+*  servo input signals.
+*
+* \param -
+*
+* \return  set yaw angle
+***************************************************************************/
+float flight_controller_get_set_yaw_angle(void)
+{
+	return yawSetValue;
 }
 
 /**************************************************************************
