@@ -55,7 +55,7 @@ typedef struct ORCA_FLASH_SETTINGS
 
 
 uint16_t serial_flash_init(void);
-uint16_t serial_flash_init_factory_settings(ORCA_FLASH_SETTINGS_t *data);
+uint16_t serial_flash_init_settings(ORCA_FLASH_SETTINGS_t *data);
 uint16_t serial_flash_factory_reset(void);
 uint16_t serial_flash_read_settings(void);
 uint16_t serial_flash_write_factory_settings(void);

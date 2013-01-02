@@ -74,7 +74,7 @@ uint16_t serial_flash_init(void)
  * \return  true	init done
  * \return	false	error
  ***************************************************************************/
- uint16_t serial_flash_init_factory_settings(ORCA_FLASH_SETTINGS_t *data)
+ uint16_t serial_flash_init_settings(ORCA_FLASH_SETTINGS_t *data)
  {
 	 settings = data;
 	 

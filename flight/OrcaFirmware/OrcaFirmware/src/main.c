@@ -42,7 +42,7 @@ SERVO_IN_t servoInput;								/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
 VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
 MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing unit module */
-FILTER_DATA_t filterData;							/*!< \brief filter module */
+FILTER_DATA_t orcafilter;							/*!< \brief filter module */
 ORCA_FLASH_SETTINGS_t orcaSettings;					/*!< \brief orca settings module */
 VARIOMETER_MODULET_t variometer;					/*!< \brief Variometer data */
 gps_data_t gpsData;									/*!< \brief GPS data */
@@ -117,9 +117,9 @@ void orca_init(void)
 	orca_board_init(&boardConfig);
 	
 	/* Initialize serial flash and get settings */
-	if(serial_flash_init() == true)
+	if(serial_flash_init())
 	{
-		serial_flash_init_factory_settings(&orcaSettings);
+		serial_flash_init_settings(&orcaSettings);
 	}
 		
 	/* servo in subsystem init */
@@ -129,7 +129,7 @@ void orca_init(void)
 	servo_init();
 	
 	/* flight controller subsystem init */
-	flight_controller_init(&boardConfig, &orcaSettings, &servoInput, &filterData, &flightController);
+	flight_controller_init(&boardConfig, &orcaSettings, &servoInput, &orcafilter, &flightController);
 
 	/* Initialize the serial interface */
 	serial_api_init();
@@ -219,7 +219,7 @@ void system_timer(uint32_t time)
 			/* Get new data from the mpu6000 */
 			mpu_6000_task();
 			/* Save the new measurements to the filter module */
-			mpu_6000_save_data_to_filter(&filterData);
+			mpu_6000_save_data_to_filter(&orcafilter);
 			/* Do the kalman filter */
 			filter_task(motionProcessingUnit.time);
 		}
