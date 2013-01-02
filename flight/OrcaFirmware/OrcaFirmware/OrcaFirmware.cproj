@@ -137,6 +137,7 @@
       <Channel>
         <host>127.0.0.1</host>
         <port>49220</port>
+        <port>63240</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>

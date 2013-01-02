@@ -117,6 +117,9 @@ float flight_controller_get_pid_yaw_i_factor(void);
 float flight_controller_get_pid_yaw_d_factor(void);
 float flight_controller_get_pid_yaw_i_limit(void);
 float flight_controller_get_actuating_pitch_angle(void);
+float flight_controller_get_actuating_yaw_angle(void);
 float flight_controller_get_sensor_pitch_angle(void);
 float flight_controller_get_set_pitch_angle(void);
+float flight_controller_get_set_yaw_angle(void);
+float flight_controller_get_sensor_yaw_angle(void);
 #endif /* FLIGHT_CONTROLLER_H_ */

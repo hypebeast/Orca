@@ -24,7 +24,7 @@
 #include "servo_in.h"
 #include "servo.h"
 #include "flight_controller.h"
-#include "voltage_sens.h"
+//#include "voltage_sens.h"
 #include "MPU6000.h"
 #include "user_interface.h"
 #include "serial_flash.h"
@@ -40,11 +40,11 @@
 BOARD_CONFIG_t boardConfig;  						/*!< \brief board module */
 SERVO_IN_t servoInput;								/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
-VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
+//VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
 MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing unit module */
 FILTER_DATA_t orcafilter;							/*!< \brief filter module */
 ORCA_FLASH_SETTINGS_t orcaSettings;					/*!< \brief orca settings module */
-VARIOMETER_MODULET_t variometer;					/*!< \brief Variometer data */
+AIR_PRESSURE_SENSOR_t orcaAirPressureSensor;		/*!< \brief Variometer data */
 gps_data_t gpsData;									/*!< \brief GPS data */
 
 
@@ -64,7 +64,7 @@ int main (void)
 	user_interface_stat_led_pattern(USER_INTERFACE_LED_BLINKING);
 	
 	/* Uncomment this method to restore the factory settings on the next startup */
-	serial_flash_write_factory_settings();
+	//serial_flash_write_factory_settings();
 	
 	/* Calibrate the accelerometer and the gyroscopes */
 	mpu_6000_calibrate();
@@ -165,7 +165,7 @@ void orca_init(void)
 
 	delay_ms(100);
 	
-	MS5611_init(&variometer, MS5611_ADC_RES_4096);
+	MS5611_init(&orcaAirPressureSensor, MS5611_ADC_RES_4096);
 		
 	/* Initialize and start the System Timer */
 	rtc_init();
@@ -178,9 +178,9 @@ void orca_init(void)
 uint16_t i2c_intern_init(void)
 {
 	twi_options_t opt;
-	opt.speed = VOLTAGE_SENS_I2C_SPEED;
-	opt.chip = VOLTAGE_SENS_DEV_ADDRESS;
-	opt.speed_reg = TWI_BAUD(32000000,VOLTAGE_SENS_I2C_SPEED);
+	opt.speed = 400000;
+	opt.chip = 0x35;
+	opt.speed_reg = TWI_BAUD(32000000,400000);
 	
 	sysclk_enable_peripheral_clock(BOARD_I2C_INTERN_INTERFACE);
 		
@@ -223,7 +223,7 @@ void system_timer(uint32_t time)
 			/* Do the kalman filter */
 			filter_task(motionProcessingUnit.time);
 		}
-		MS5611_read_T_P(10);
+		MS5611_altimeter_task(10);
 		ulFcTickCounter = 0;
 
 	}

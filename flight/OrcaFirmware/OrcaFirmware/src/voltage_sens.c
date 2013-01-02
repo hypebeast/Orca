@@ -15,72 +15,41 @@
 #include "voltage_sens.h"
 
 
-uint16_t voltage_sens_init(VOLTAGE_SENSOR_t *sensor, uint8_t chNumber)
-{
-//	twi_options_t opt;
-	
-	sensor->channelNumber = chNumber;
-	sensor->state = VOLTAGE_SENS_STATE_ERR;
-	sensor->ai0 = 0x00;
-	sensor->ai1 = 0x00;
-	sensor->voltage0 = 0x00;
-	sensor->voltage1 = 0x00;
-		
-//	opt.speed = VOLTAGE_SENS_I2C_SPEED;
-//	opt.chip = VOLTAGE_SENS_DEV_ADDRESS;
-//	opt.speed_reg = TWI_BAUD(32000000,VOLTAGE_SENS_I2C_SPEED);
-	
-//	sysclk_enable_peripheral_clock(BOARD_I2C_INTERN_INTERFACE);
-//	
-//	/* Init TWI interface */
-//	if(twi_master_init(BOARD_I2C_INTERN_INTERFACE, &opt) != STATUS_OK)
-//		return SYSTEM_INFO_VOLTAGE_SENSOR_INIT_ERR;
 
-	twi_master_enable(BOARD_I2C_INTERN_INTERFACE);
-		
-	/*	Write ADC Setup Settings:
-	* - Unipolar measurement
-	* - Internal clock
-	* - Internal reference voltage
-	*/
-	//if(voltage_sens_write_setup(VOLTAGE_SENS_NO_RST|VOLTAGE_SENS_UNIPOLAR|VOLTAGE_SENS_INT_CLK|VOLTAGE_SENS_REF_VOLT_INT_4) != SYSTEM_INFO_TRUE)
+//uint16_t voltage_sens_init(VOLTAGE_SENSOR_t *sensor, uint8_t chNumber)
+//{	
+	//sensor->channelNumber = chNumber;
+	//sensor->state = VOLTAGE_SENS_STATE_ERR;
+	//sensor->ai0 = 0x00;
+	//sensor->ai1 = 0x00;
+	//sensor->voltage0 = 0x00;
+	//sensor->voltage1 = 0x00;
+		//
+	//twi_master_enable(BOARD_I2C_INTERN_INTERFACE);
+		//
+	///*	Write ADC Setup Settings:
+	//* - Unipolar measurement
+	//* - Internal clock
+	//* - Internal reference voltage
+	//*/
+	//if(voltage_sens_write_Setup(VOLTAGE_SENS_NO_RST|VOLTAGE_SENS_UNIPOLAR|VOLTAGE_SENS_INT_CLK|VOLTAGE_SENS_REF_VOLT_INT_4) != SYSTEM_INFO_TRUE)
 		//return SYSTEM_INFO_VOLTAGE_SENSOR_INIT_ERR;
-	//VOLTAGE_SENS_REF_VOLT_INT_1
-		
-	/*	Write ADC Config Settings:
-	* - Scans up from AIN0 to AIN1 
-	* - Single Ended Mode
-	*/
+	////VOLTAGE_SENS_REF_VOLT_INT_1
+		//
+	///*	Write ADC Config Settings:
+	//* - Scans up from AIN0 to AIN1 
+	//* - Single Ended Mode
+	//*/
 	//if (voltage_sens_write_config(VOLTAGE_SENS_SCAN_TO_SELECT|VOLTAGE_SENS_CS_AIN1|VOLTAGE_SENS_SGL) != SYSTEM_INFO_TRUE)
 		//return SYSTEM_INFO_VOLTAGE_SENSOR_INIT_ERR;
-		
-	sensor->state = VOLTAGE_SENS_STATE_OK;
-	
-	return SYSTEM_INFO_TRUE;
-}
-
-uint16_t voltage_sens_write_setup(uint8_t setup)
-{
-	twi_package_t package;
-	uint8_t data = VOLTAGE_SENS_SETUP_CMD;
-	int8_t status = 0x00; 
-	
-	package.chip = VOLTAGE_SENS_DEV_ADDRESS;
-	package.addr[0] = 0;
-	package.addr_length = 0;
-	package.buffer = &data;
-	package.length = 0x01;
-	package.no_wait = true;		// Don't wait, remove quickly if sending is not possible
-	
-	data |= setup ;
-	  
-	status = twi_master_write(BOARD_I2C_INTERN_INTERFACE,&package);
-	
-	if (status != STATUS_OK)
-		return SYSTEM_INFO_VOLTAGE_SENSOR_WRITE_ERR;
-		
-	return SYSTEM_INFO_TRUE;
-}
+		//
+	//sensor->state = VOLTAGE_SENS_STATE_OK;
+	//
+	//return SYSTEM_INFO_TRUE;
+//}
+//
+//
+//
 
 //uint16_t voltage_sens_write_config(uint8_t conf)
 //{
@@ -105,10 +74,12 @@ uint16_t voltage_sens_write_setup(uint8_t setup)
 	//return SYSTEM_INFO_TRUE;
 //}
 
+//
 //uint16_t voltage_sens_reset_conf(void)
 //{
-	//return voltage_sens_write_setup(VOLTAGE_SENS_RST);
+	//return voltage_sens_write_Setup(VOLTAGE_SENS_RST);
 //}
+//
 
 //uint16_t voltage_sens_read_channels(VOLTAGE_SENSOR_t *sensor)
 //{
