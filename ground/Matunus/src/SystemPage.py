@@ -59,7 +59,7 @@ class SystemPage(QtGui.QWidget):
 		testButton = QtGui.QPushButton("Test")
 		hLayout.addWidget(testButton)
 		hLayout.addStretch()
-		mainLayout.addLayout(hLayout)
+		#mainLayout.addLayout(hLayout)
 
 		# Tree View
 		self._tree = QtGui.QTreeWidget()
@@ -86,7 +86,7 @@ class SystemPage(QtGui.QWidget):
 		settings = QtGui.QTreeWidgetItem(self._tree)
 		settings.setText(0, "Settings")
 		# Add some dummy data
-		for field in self._boardManager.boardSettings.dataFields:
+		for field in self._boardManager.fmuSettings.dataFields:
 			item = QtGui.QTreeWidgetItem(settings)
 			item.setText(0, field.name)
 			item.setText(1, str(field.value))
@@ -104,7 +104,7 @@ class SystemPage(QtGui.QWidget):
 					break
 
 	def _onBoardSettingsUpdated(self):
-		settingsField = self._boardManager.boardSettings.dataFields
+		settingsField = self._boardManager.fmuSettings.dataFields
 
 		for field in settingsField:
 			for tItem in self._settingsTreeItems:

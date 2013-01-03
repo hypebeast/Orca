@@ -294,10 +294,18 @@ class GetBoardStatusMessage(BaseMessage):
         self.gyroX = 0
         self.gyroY = 0
         self.gyroZ = 0
-        self.kalmanOutputRoll = 0
-        self.kalmanReferenceValueRoll = 0
-        self.setValueRollAngle = 0
-        self.actuatingVariablePidRoll = 0
+        self.sensorRollAngle = 0
+        self.sensorPitchAngle = 0
+        self.sensorYawAngle = 0
+        self.dcmOutputRoll = 0
+        self.dcmOutputPitch = 0
+        self.dcmOutputYaw = 0
+        self.setRollAngle = 0
+        self.setPitchAngle = 0
+        self.setYawAngle = 0
+        self.pidRollActuatingValue = 0
+        self.pidPitchActuatingValue = 0
+        self.pidYawActuatingValue = 0
 
     def getPacket(self):
         return self._encodePackage([])
@@ -318,7 +326,7 @@ class GetBoardStatusMessage(BaseMessage):
         #print "Message length: " + str(len(package))
 
         # FIXME: Quick hack to filter out malformed packages
-        if len(package) != 73:
+        if len(package) != 105:
             return None
 
         # Parse the data
@@ -362,13 +370,30 @@ class GetBoardStatusMessage(BaseMessage):
             offset += 4
             message.gyroZ = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.kalmanOutputRoll = struct.unpack_from("f", package, offset)[0]
+            message.sensorRollAngle = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.kalmanReferenceValueRoll = struct.unpack_from("f", package, offset)[0]
+            message.sensorPitchAngle = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.setValueRollAngle = struct.unpack_from("f", package, offset)[0]
+            message.sensorYawAngle = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.actuatingVariablePidRoll = struct.unpack_from("f", package, offset)[0]
+            message.dcmOutputRoll = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.dcmOutputPitch = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.dcmOutputYaw = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.setRollAngle = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.setPitchAngle = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.setYawAngle = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidRollActuatingValue = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidPitchActuatingValue = struct.unpack_from("f", package, offset)[0]
+            offset += 4
+            message.pidYawActuatingValue = struct.unpack_from("f", package, offset)[0]
+            offset += 4
         except:
             print "Unpacking Error"
 
@@ -395,15 +420,12 @@ class GetBoardSettingsMessage(BaseMessage):
         self.pidYawIFactor = 0
         self.pidYawDFactor = 0
         self.pidYawILimit = 0
-        self.kalmanRollQAngle = 0
-        self.kalmanRollQGyro = 0
-        self.kalmanRollRAngle = 0
-        self.kalmanPitchQAngle = 0
-        self.kalmanPitchQGyro = 0
-        self.kalmanPitchRAngle = 0
-        self.kalmanYawQAngle = 0
-        self.kalmanYawQGyro = 0
-        self.kalmanYawRAngle = 0
+        self.dcmRollPFactor = 0
+        self.dcmRollIFactor = 0
+        self.dcmPitchPFactor = 0
+        self.dcmPitchIFactor = 0
+        self.dcmYawPFactor = 0
+        self.dcmYawIFactor = 0
 
     def getPacket(self):
         return self._encodePackage([])
@@ -445,23 +467,17 @@ class GetBoardSettingsMessage(BaseMessage):
             offset += 4
             message.pidYawILimit = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.kalmanRollQAngle = struct.unpack_from("f", package, offset)[0]
+            message.dcmRollPFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.kalmanRollQGyro = struct.unpack_from("f", package, offset)[0]
+            message.dcmRollIFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.kalmanRollRAngle = struct.unpack_from("f", package, offset)[0]
+            message.dcmPitchPFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.kalmanPitchQAngle = struct.unpack_from("f", package, offset)[0]
+            message.dcmPitchIFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.kalmanPitchQGyro = struct.unpack_from("f", package, offset)[0]
+            message.dcmYawPFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
-            message.kalmanPitchRAngle = struct.unpack_from("f", package, offset)[0]
-            offset += 4
-            message.kalmanYawQAngle = struct.unpack_from("f", package, offset)[0]
-            offset += 4
-            message.kalmanYawQGyro = struct.unpack_from("f", package, offset)[0]
-            offset += 4
-            message.kalmanYawRAngle = struct.unpack_from("f", package, offset)[0]
+            message.dcmYawIFactor = struct.unpack_from("f", package, offset)[0]
             offset += 4
         except:
             pass
@@ -471,7 +487,7 @@ class GetBoardSettingsMessage(BaseMessage):
 
 class SaveSettingsMessage(BaseMessage):
     """
-    Saves the board settings to the flash (Command Type: 0x0021)
+    Saves the FMU settings on the FMU (Command Type: 0x0021).
     """
     def __init__(self):
         BaseMessage.__init__(self, CommandTypes.SAVE_BOARD_SETTINGS)
@@ -487,7 +503,7 @@ class SaveSettingsMessage(BaseMessage):
 
 class SetRollPIDCoefficientsMessage(BaseMessage):
     """
-    Sets the PID coeficients for the roll axis (Command Type: 0x0022)
+    Sets the PID coeficients for the roll axis (Command Type: 0x0022).
     """
     def __init__(self, p_factor, i_factor, d_factor, i_limit):
         BaseMessage.__init__(self, CommandTypes.SET_ROLL_PID_COEFFICIENTS)
@@ -566,23 +582,21 @@ class SetYawPIDCoefficientsMessage(BaseMessage):
         raise NotImplementedError
 
 
-class SetRollKalmanConstantsMessage(BaseMessage):
+class SetDcmRollCoefficientsMessage(BaseMessage):
     """
     Sets the Kalman constants for the roll axis (Command Type: 0x0025)
     """
-    def __init__(self, q_angle, q_gyro, r_angle):
+    def __init__(self, p_factor, i_factor):
         BaseMessage.__init__(self, CommandTypes.SET_KALMAN_ROLL_CONSTANTS)
         self.messageType = MessageTypes.COMMAND_MESSAGE
 
-        self.qAngle = q_angle
-        self.qGyro = q_gyro
-        self.rAngle = r_angle
+        self.p_factor = p_factor
+        self.i_factor = i_factor
 
     def getPacket(self):
         data = []
-        data.append({"value": self.qAngle, "format": "f"})
-        data.append({"value": self.qGyro, "format": "f"})
-        data.append({"value": self.rAngle, "format": "f"})
+        data.append({"value": self.p_factor, "format": "f"})
+        data.append({"value": self.i_factor, "format": "f"})
 
         return self._encodePackage(data)
 
@@ -591,23 +605,21 @@ class SetRollKalmanConstantsMessage(BaseMessage):
         raise NotImplementedError
 
 
-class SetPitchKalmanConstantsMessage(BaseMessage):
+class SetDcmPitchCoefficientsMessage(BaseMessage):
     """
     Sets the Kalman constants for the pitch axis (Command Type: 0x0026)
     """
-    def __init__(self, q_angle, q_gyro, r_angle):
+    def __init__(self, p_factor, i_factor):
         BaseMessage.__init__(self, CommandTypes.SET_KALMAN_PITCH_CONSTANTS)
         self.messageType = MessageTypes.COMMAND_MESSAGE
 
-        self.qAngle = q_angle
-        self.qGyro = q_gyro
-        self.rAngle = r_angle
+        self.p_factor = p_factor
+        self.i_factor = i_factor
 
     def getPacket(self):
         data = []
-        data.append({"value": self.qAngle, "format": "f"})
-        data.append({"value": self.qGyro, "format": "f"})
-        data.append({"value": self.rAngle, "format": "f"})
+        data.append({"value": self.p_factor, "format": "f"})
+        data.append({"value": self.i_factor, "format": "f"})
 
         return self._encodePackage(data)
 
@@ -616,23 +628,21 @@ class SetPitchKalmanConstantsMessage(BaseMessage):
         raise NotImplementedError
 
 
-class SetYawKalmanConstantsMessage(BaseMessage):
+class SetDcmYawCoefficientsMessage(BaseMessage):
     """
     Sets the Kalman constants for the pitch axis (Command Type: 0x0027)
     """
-    def __init__(self, q_angle, q_gyro, r_angle):
+    def __init__(self, p_factor, i_factor):
         BaseMessage.__init__(self, CommandTypes.SET_KALMAN_YAW_CONSTANTS)
         self.messageType = MessageTypes.COMMAND_MESSAGE
 
-        self.qAngle = q_angle
-        self.qGyro = q_gyro
-        self.rAngle = r_angle
+        self.p_factor = p_factor
+        self.i_factor = i_factor
 
     def getPacket(self):
         data = []
-        data.append({"value": self.qAngle, "format": "f"})
-        data.append({"value": self.qGyro, "format": "f"})
-        data.append({"value": self.rAngle, "format": "f"})
+        data.append({"value": self.p_factor, "format": "f"})
+        data.append({"value": self.i_factor, "format": "f"})
 
         return self._encodePackage(data)
 

@@ -19,14 +19,14 @@
 __author__ = 'Sebastian Ruml'
 
 try:
-	from PyQt4 import QtGui
+	from PyQt4 import QtGui, QtCore
 except ImportError:
 	print "No PyQt found!"
 	import sys
 	sys.exit(2)
 
 from HeadingLabel import HeadingLabel
-from BoardSettings import BoardSettings
+from BoardSettings import FmuSettings
 
 
 class StabilizationPage(QtGui.QWidget):
@@ -36,11 +36,12 @@ class StabilizationPage(QtGui.QWidget):
 		if controllerManager is None:
 			raise Exception
 
-		self.boardController = controllerManager
-		self.boardController.board_settings_updated.connect(self._onBoardSettingsUpdated)
+		self.fmuController = controllerManager
+		self.fmuController.board_settings_updated.connect(self._onBoardSettingsUpdated)
 
-		self._boardSettings = BoardSettings()
+		self._fmuSettings = FmuSettings()
 
+		# Create the UI
 		self._createUi()
 
 	def _createUi(self):
@@ -48,7 +49,7 @@ class StabilizationPage(QtGui.QWidget):
 		mainLayout = QtGui.QVBoxLayout()
 
 		# Stabilization Coefficients
-		groupBox = QtGui.QGroupBox("Stabilization Coefficients")
+		groupBox = QtGui.QGroupBox("Rate Stabilization (Inner Loop)")
 		groupBoxLayout = QtGui.QVBoxLayout()
 		groupBox.setLayout(groupBoxLayout)
 		
@@ -56,21 +57,25 @@ class StabilizationPage(QtGui.QWidget):
 		hLayout = QtGui.QHBoxLayout()
 		hLayout.addSpacing(250)
 		header = HeadingLabel()
-		header.setText("Kp")
+		header.setTextAlign(QtCore.Qt.AlignHCenter)
+		header.setText("Proportional")
 		header.setMinimumWidth(100)
 		hLayout.addWidget(header)
 		hLayout.addSpacing(50)
 		header = HeadingLabel()
-		header.setText("Ki")
+		header.setTextAlign(QtCore.Qt.AlignHCenter)
+		header.setText("Integral")
 		header.setMinimumWidth(100)
 		hLayout.addWidget(header)
 		hLayout.addSpacing(50)
 		header = HeadingLabel()
-		header.setText("Kd")
+		header.setTextAlign(QtCore.Qt.AlignHCenter)
+		header.setText("Derivative")
 		header.setMinimumWidth(100)
 		hLayout.addWidget(header)
 		hLayout.addSpacing(50)
 		header = HeadingLabel()
+		header.setTextAlign(QtCore.Qt.AlignHCenter)
 		header.setText("ILimit")
 		header.setMinimumWidth(100)
 		hLayout.addWidget(header)
@@ -88,28 +93,24 @@ class StabilizationPage(QtGui.QWidget):
 		self.spbRollKp.setMinimum(0)
 		self.spbRollKp.setMaximum(50)
 		self.spbRollKp.setMinimumWidth(150)
-		self.spbRollKp.valueChanged.connect(self._onPidRollKpChanged)
 		hLayout.addWidget(self.spbRollKp)
 		self.spbRollKi = QtGui.QDoubleSpinBox()
 		self.spbRollKi.setDecimals(5)
 		self.spbRollKi.setMinimum(0)
 		self.spbRollKi.setMaximum(50)
 		self.spbRollKi.setMinimumWidth(150)
-		self.spbRollKi.valueChanged.connect(self._onPidRollKiChanged)
 		hLayout.addWidget(self.spbRollKi)
 		self.spbRollKd = QtGui.QDoubleSpinBox()
 		self.spbRollKd.setDecimals(5)
 		self.spbRollKd.setMinimum(0)
 		self.spbRollKd.setMaximum(50)
 		self.spbRollKd.setMinimumWidth(150)
-		self.spbRollKd.valueChanged.connect(self._onPidRollKdChanged)
 		hLayout.addWidget(self.spbRollKd)
 		self.spbRollILimit = QtGui.QDoubleSpinBox()
 		self.spbRollILimit.setDecimals(5)
 		self.spbRollILimit.setMinimum(0)
 		self.spbRollILimit.setMaximum(50)
 		self.spbRollILimit.setMinimumWidth(150)
-		self.spbRollILimit.valueChanged.connect(self._onPidRollILimitChanged)
 		hLayout.addWidget(self.spbRollILimit)
 		hLayout.addStretch()
 		groupBoxLayout.addLayout(hLayout)
@@ -159,8 +160,8 @@ class StabilizationPage(QtGui.QWidget):
 		groupBoxLayout.addSpacing(100)
 		mainLayout.addWidget(groupBox)
 
-		# Kalman Constants
-		groupBox = QtGui.QGroupBox("Kalman Constants")
+		# DCM Constants
+		groupBox = QtGui.QGroupBox("Attitude Stabilization (Outer Loop)")
 		groupBoxLayout = QtGui.QVBoxLayout()
 		groupBox.setLayout(groupBoxLayout)
 
@@ -170,85 +171,58 @@ class StabilizationPage(QtGui.QWidget):
 		hLayout = QtGui.QHBoxLayout()
 		hLayout.addSpacing(250)
 		header = HeadingLabel()
-		header.setText("Q_Angle")
+		header.setTextAlign(QtCore.Qt.AlignHCenter)
+		header.setText("Proportional")
 		header.setMinimumWidth(100)
 		hLayout.addWidget(header)
 		hLayout.addSpacing(50)
 		header = HeadingLabel()
-		header.setText("Q_Gyro")
-		header.setMinimumWidth(100)
-		hLayout.addWidget(header)
-		hLayout.addSpacing(50)
-		header = HeadingLabel()
-		header.setText("R_Angle")
+		header.setText("Integral")
+		header.setTextAlign(QtCore.Qt.AlignHCenter)
 		header.setMinimumWidth(100)
 		hLayout.addWidget(header)
 		hLayout.addStretch()
 		groupBoxLayout.addLayout(hLayout)  
 
-		# Kalman Roll constants
+		# DCM Roll/Pitch
 		hLayout = QtGui.QHBoxLayout()
 		hLayout.addSpacing(50)
-		label = QtGui.QLabel("Roll")
+		label = QtGui.QLabel("Roll/Pitch")
 		hLayout.addWidget(label)
-		hLayout.addSpacing(150)
-		self.spbRollQAngle = QtGui.QDoubleSpinBox()
-		self.spbRollQAngle.setDecimals(5)
-		self.spbRollQAngle.setMinimum(0)
-		self.spbRollQAngle.setMaximum(50)
-		self.spbRollQAngle.setMinimumWidth(150)
-		self.spbRollQAngle.valueChanged.connect(self._onKalmanRollQAngleChanged)
-		hLayout.addWidget(self.spbRollQAngle)
-		self.spbRollQGyro = QtGui.QDoubleSpinBox()
-		self.spbRollQGyro.setDecimals(5)
-		self.spbRollQGyro.setMinimum(0)
-		self.spbRollQGyro.setMaximum(50)
-		self.spbRollQGyro.setMinimumWidth(150)
-		self.spbRollQGyro.valueChanged.connect(self._onKalmanRollQGyroChanged)
-		hLayout.addWidget(self.spbRollQGyro)
-		self.spbRollRAngle = QtGui.QDoubleSpinBox()
-		self.spbRollRAngle.setDecimals(5)
-		self.spbRollRAngle.setMinimum(0)
-		self.spbRollRAngle.setMaximum(50)
-		self.spbRollRAngle.setMinimumWidth(150)
-		self.spbRollRAngle.valueChanged.connect(self._onKalmanRollRAngleChanged)
-		hLayout.addWidget(self.spbRollRAngle)
+		hLayout.addSpacing(120)
+		self.spbDcmRollPitchPFactor = QtGui.QDoubleSpinBox()
+		self.spbDcmRollPitchPFactor.setDecimals(5)
+		self.spbDcmRollPitchPFactor.setMinimum(0)
+		self.spbDcmRollPitchPFactor.setMaximum(50)
+		self.spbDcmRollPitchPFactor.setMinimumWidth(150)
+		hLayout.addWidget(self.spbDcmRollPitchPFactor)
+		self.spbDcmRollPitchIFactor = QtGui.QDoubleSpinBox()
+		self.spbDcmRollPitchIFactor.setDecimals(5)
+		self.spbDcmRollPitchIFactor.setMinimum(0)
+		self.spbDcmRollPitchIFactor.setMaximum(50)
+		self.spbDcmRollPitchIFactor.setMinimumWidth(150)
+		hLayout.addWidget(self.spbDcmRollPitchIFactor)
 		hLayout.addStretch()
 		groupBoxLayout.addLayout(hLayout)
 
-		# Kalman Pitch constants
-		hLayout = QtGui.QHBoxLayout()
-		hLayout.addSpacing(50)
-		label = QtGui.QLabel("Pitch")
-		hLayout.addWidget(label)
-		hLayout.addSpacing(145)
-		self.spbPitchQAngle = QtGui.QDoubleSpinBox()
-		self.spbPitchQAngle.setMinimumWidth(150)
-		hLayout.addWidget(self.spbPitchQAngle)
-		self.spbPitchQGyro = QtGui.QDoubleSpinBox()
-		self.spbPitchQGyro.setMinimumWidth(150)
-		hLayout.addWidget(self.spbPitchQGyro)
-		self.spbPitchRAngle = QtGui.QDoubleSpinBox()
-		self.spbPitchRAngle.setMinimumWidth(150)
-		hLayout.addWidget(self.spbPitchRAngle)
-		hLayout.addStretch()
-		groupBoxLayout.addLayout(hLayout)
-
-		# Kalman Yaw constants
+		# DCM Yaw
 		hLayout = QtGui.QHBoxLayout()
 		hLayout.addSpacing(50)
 		label = QtGui.QLabel("Yaw")
 		hLayout.addWidget(label)
-		hLayout.addSpacing(150)
-		self.spbYawQAngle = QtGui.QDoubleSpinBox()
-		self.spbYawQAngle.setMinimumWidth(150)
-		hLayout.addWidget(self.spbYawQAngle)
-		self.spbYawQGyro = QtGui.QDoubleSpinBox()
-		self.spbYawQGyro.setMinimumWidth(150)
-		hLayout.addWidget(self.spbYawQGyro)
-		self.spbYawRAngle = QtGui.QDoubleSpinBox()
-		self.spbYawRAngle.setMinimumWidth(150)
-		hLayout.addWidget(self.spbYawRAngle)
+		hLayout.addSpacing(145)
+		self.spbDcmYawPFactor = QtGui.QDoubleSpinBox()
+		self.spbDcmYawPFactor.setDecimals(5)
+		self.spbDcmYawPFactor.setMinimum(0)
+		self.spbDcmYawPFactor.setMaximum(50)
+		self.spbDcmYawPFactor.setMinimumWidth(150)
+		hLayout.addWidget(self.spbDcmYawPFactor)
+		self.spbDcmYawIFactor = QtGui.QDoubleSpinBox()
+		self.spbDcmYawIFactor.setDecimals(5)
+		self.spbDcmYawIFactor.setMinimum(0)
+		self.spbDcmYawIFactor.setMaximum(50)
+		self.spbDcmYawIFactor.setMinimumWidth(150)
+		hLayout.addWidget(self.spbDcmYawIFactor)
 		hLayout.addStretch()
 		groupBoxLayout.addLayout(hLayout)
 		groupBoxLayout.addSpacing(100)
@@ -264,16 +238,19 @@ class StabilizationPage(QtGui.QWidget):
 		hLayout = QtGui.QHBoxLayout()
 		hLayout.addSpacing(300)
 		header = HeadingLabel()
+		header.setTextAlign(QtCore.Qt.AlignHCenter)
 		header.setText("Roll")
 		header.setMinimumWidth(100)
 		hLayout.addWidget(header)
 		hLayout.addSpacing(50)
 		header = HeadingLabel()
+		header.setTextAlign(QtCore.Qt.AlignHCenter)
 		header.setText("Pitch")
 		header.setMinimumWidth(100)
 		hLayout.addWidget(header)
 		hLayout.addSpacing(50)
 		header = HeadingLabel()
+		header.setTextAlign(QtCore.Qt.AlignHCenter)
 		header.setText("Yaw")
 		header.setMinimumWidth(100)
 		hLayout.addWidget(header)
@@ -369,18 +346,36 @@ class StabilizationPage(QtGui.QWidget):
 		self.spbRollKi.valueChanged.connect(self._onPidRollKiChanged)
 		self.spbRollKd.valueChanged.connect(self._onPidRollKdChanged)
 		self.spbRollILimit.valueChanged.connect(self._onPidRollILimitChanged)
-		self.spbRollQAngle.valueChanged.connect(self._onKalmanRollQAngleChanged)
-		self.spbRollQGyro.valueChanged.connect(self._onKalmanRollQGyroChanged)
-		self.spbRollRAngle.valueChanged.connect(self._onKalmanRollRAngleChanged)
+		self.spbPitchKp.valueChanged.connect(self._onValueChanged)
+		self.spbPitchKi.valueChanged.connect(self._onValueChanged)
+		self.spbPitchKd.valueChanged.connect(self._onValueChanged)
+		self.spbILimitPitch.valueChanged.connect(self._onValueChanged)
+		self.spbYawKp.valueChanged.connect(self._onValueChanged)
+		self.spbYawKi.valueChanged.connect(self._onValueChanged)
+		self.spbYawKd.valueChanged.connect(self._onValueChanged)
+		self.spbILimitYaw.valueChanged.connect(self._onValueChanged)
+		self.spbDcmRollPitchPFactor.valueChanged.connect(self._onDcmRollPitchPFactorChanged)
+		self.spbDcmRollPitchIFactor.valueChanged.connect(self._onDcmRollPitchIFactorChanged)
+		self.spbDcmYawPFactor.valueChanged.connect(self._onValueChanged)
+		self.spbDcmYawIFactor.valueChanged.connect(self._onValueChanged)
 
 	def _disconnectSignals(self):
 		self.spbRollKp.valueChanged.disconnect(self._onPidRollKpChanged)
 		self.spbRollKi.valueChanged.disconnect(self._onPidRollKiChanged)
 		self.spbRollKd.valueChanged.disconnect(self._onPidRollKdChanged)
 		self.spbRollILimit.valueChanged.disconnect(self._onPidRollILimitChanged)
-		self.spbRollQAngle.valueChanged.disconnect(self._onKalmanRollQAngleChanged)
-		self.spbRollQGyro.valueChanged.disconnect(self._onKalmanRollQGyroChanged)
-		self.spbRollRAngle.valueChanged.disconnect(self._onKalmanRollRAngleChanged)
+		self.spbPitchKp.valueChanged.disconnect(self._onValueChanged)
+		self.spbPitchKi.valueChanged.disconnect(self._onValueChanged)
+		self.spbPitchKd.valueChanged.disconnect(self._onValueChanged)
+		self.spbILimitPitch.valueChanged.disconnect(self._onValueChanged)
+		self.spbYawKp.valueChanged.disconnect(self._onValueChanged)
+		self.spbYawKi.valueChanged.disconnect(self._onValueChanged)
+		self.spbYawKd.valueChanged.disconnect(self._onValueChanged)
+		self.spbILimitYaw.valueChanged.disconnect(self._onValueChanged)
+		self.spbDcmRollPitchPFactor.valueChanged.disconnect(self._onDcmRollPitchPFactorChanged)
+		self.spbDcmRollPitchIFactor.valueChanged.disconnect(self._onDcmRollPitchIFactorChanged)
+		self.spbDcmYawPFactor.valueChanged.disconnect(self._onValueChanged)
+		self.spbDcmYawIFactor.valueChanged.disconnect(self._onValueChanged)
 
 	def _onApplyButtonClicked(self):
 		# Send settings to the controller
@@ -391,14 +386,35 @@ class StabilizationPage(QtGui.QWidget):
 
 	def _applyValues(self):
 		"""Writes all settings values to the controller."""
-		# PID roll settings
-		self.boardController.setRollPIDCoefficients(self.spbRollKp.value(),
-			self.spbRollKi.value(), self.spbRollKd.value(),
-			self.spbRollILimit.value())
+		# PID Roll settings
+		self.fmuController.setPIDRollCoefficients(self.spbRollKp.value(),
+												self.spbRollKi.value(),
+												self.spbRollKd.value(),
+												self.spbRollILimit.value())
 
-		# Kalman roll settings
-		self.boardController.setRollKalmanConstants(self.spbRollQAngle.value(),
-			self.spbRollQGyro.value(), self.spbRollRAngle.value())
+		# PID Pitch settings
+		self.fmuController.setPIDPitchCoefficients(self.spbPitchKp.value(),
+												self.spbPitchKi.value(),
+												self.spbPitchKd.value(),
+												self.spbPitchILimit.value())
+
+		# PID Yaw settings
+		self.fmuController.setPIDYawCoefficients(self.spbYawKp.value(),
+												self.spbYawKi.value(),
+												self.spbYawKd.value(),
+												self.spbILimitYaw.value())
+
+		# DCM Roll settings
+		self.fmuController.setDcmRollCoefficients(self.spbDcmRollPitchPFactor.value(),
+												self.spbDcmRollPitchIFactor.value())
+
+		# DCM Pitch settings
+		self.fmuController.setDcmPitchCoefficients(self.spbDcmRollPitchPFactor.value(),
+												self.spbDcmRollPitchIFactor.value())
+
+		# DCM Yaw settings
+		self.fmuController.setDcmYawCoefficients(self.spbDcmYawPFactor.value(),
+												self.spbDcmYawIFactor.value())
 
 		# Disable apply button
 		self.applyButton.setEnabled(False)
@@ -417,7 +433,7 @@ class StabilizationPage(QtGui.QWidget):
 	def _saveValues(self):
 		"""Saves the settings on the controller."""
 		# Save settings
-		self.boardController.saveBoardSettings()
+		self.fmuController.saveBoardSettings()
 
 	def _onBoardSettingsUpdated(self):
 		"""Called when the board settings are updated."""
@@ -428,17 +444,29 @@ class StabilizationPage(QtGui.QWidget):
 		# Disable events
 		self._disconnectSignals()
 		
-		self.spbRollKp.setValue(self._boardSettings.pidRollPFactor)
-		self.spbRollKi.setValue(self._boardSettings.pidRollIFactor)
-		self.spbRollKd.setValue(self._boardSettings.pidRollDFactor)
-		self.spbRollILimit.setValue(self._boardSettings.pidRollILimit)
+		self.spbRollKp.setValue(self._fmuSettings.pidRollPFactor)
+		self.spbRollKi.setValue(self._fmuSettings.pidRollIFactor)
+		self.spbRollKd.setValue(self._fmuSettings.pidRollDFactor)
+		self.spbRollILimit.setValue(self._fmuSettings.pidRollILimit)
+		self.spbPitchKp.setValue(self._fmuSettings.pidPitchPFactor)
+		self.spbPitchKi.setValue(self._fmuSettings.pidPitchIFactor)
+		self.spbPitchKd.setValue(self._fmuSettings.pidPitchDFactor)
+		self.spbILimitPitch.setValue(self._fmuSettings.pidPitchILimit)
+		self.spbYawKp.setValue(self._fmuSettings.pidYawPFactor)
+		self.spbYawKi.setValue(self._fmuSettings.pidYawIFactor)
+		self.spbYawKd.setValue(self._fmuSettings.pidYawDFactor)
+		self.spbILimitYaw.setValue(self._fmuSettings.pidYawILimit)
 
-		self.spbRollQAngle.setValue(self._boardSettings.kalmanRollQAngle)
-		self.spbRollQGyro.setValue(self._boardSettings.kalmanRollQGyro)
-		self.spbRollRAngle.setValue(self._boardSettings.kalmanRollRAngle)
+		self.spbDcmRollPitchPFactor.setValue(self._fmuSettings.dcmRollPFactor)
+		self.spbDcmRollPitchIFactor.setValue(self._fmuSettings.dcmRollIFactor)
+		self.spbDcmYawPFactor.setValue(self._fmuSettings.dcmYawPFactor)
+		self.spbDcmYawIFactor.setValue(self._fmuSettings.dcmYawIFactor)
 
 		# Re-enable events
 		self._connectSignals()
+
+	def _onValueChanged(self, value):
+		self._enableButtons()
 
 	def _onPidRollKpChanged(self, value):
 		self._enableButtons()
@@ -452,10 +480,10 @@ class StabilizationPage(QtGui.QWidget):
 	def _onPidRollILimitChanged(self, value):
 		self._enableButtons()
 
-	def _onKalmanRollQAngleChanged(self, value):
+	def _onDcmRollPitchPFactorChanged(self, value):
 		self._enableButtons()
 
-	def _onKalmanRollQGyroChanged(self, value):
+	def _onDcmRollPitchIFactorChanged(self, value):
 		self._enableButtons()
 
 	def _onKalmanRollRAngleChanged(self, value):
@@ -467,9 +495,9 @@ class StabilizationPage(QtGui.QWidget):
 		self.applyButton.setEnabled(True)
 
 	def _onbRestoreFactoryClicked(self):
-		self._boardSettings.restoreStabilizationFactorySettings()
+		self._fmuSettings.restoreStabilizationFactorySettings()
 		self._updateValues()
 		self._enableButtons()
 
 	def _onbReloadFromBoard(self):
-		self.boardController.updateBoardSettings()
+		self.fmuController.updateBoardSettings()

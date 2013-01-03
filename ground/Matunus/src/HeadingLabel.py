@@ -20,7 +20,7 @@ __author__ = 'Sebastian Ruml'
 
 
 try:
-    from PyQt4 import QtGui
+    from PyQt4 import QtGui, QtCore
 except ImportError:
     print "No PyQt found!"
     import sys
@@ -43,12 +43,14 @@ class HeadingLabel(QtGui.QFrame):
         self.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Raised)
         self.setLineWidth(2)
 
-        layout = QtGui.QHBoxLayout()
-        layout.setMargin(1)
-        self.setLayout(layout)
+        self.layout = QtGui.QHBoxLayout()
+        self.layout.setMargin(1)
+        self.setLayout(self.layout)
         self.label = QtGui.QLabel("")
         self.label.setStyleSheet("QLabel { font: bold; color: #FFFFFF; }")
-        layout.addWidget(self.label)
+        self.layout.addWidget(self.label)
+
+        self.setObjectName("HeadingLabel")
 
         self.text = ""
 
@@ -68,8 +70,8 @@ class HeadingLabel(QtGui.QFrame):
     def setSize(self, width, height):
         self.setGeometry(0, 0, width, height)
 
-    def setTextAlign(self):
-        pass
+    def setTextAlign(self, alignment):
+        self.layout.setAlignment(alignment)
 
    	def paintEvent(self, e):
 		qp = QtGui.QPainter()

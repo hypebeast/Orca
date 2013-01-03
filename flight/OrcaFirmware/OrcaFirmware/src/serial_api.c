@@ -111,19 +111,19 @@ static void command_set_pitch_pid_coefficients(void);
 static void command_set_yaw_pid_coefficients(void);
 
 /**************************************************************************
-* \brief Sets the Kalman roll constants.
+* \brief Sets the DCM roll constants.
 **************************************************************************/
-static void command_set_kalman_roll_constants(void);
+static void command_set_dcm_roll_coefficients(void);
 
 /**************************************************************************
-* \brief Sets the Kalman pitch constants.
+* \brief Sets the DCM pitch constants.
 **************************************************************************/
-static void command_set_kalman_pitch_constants(void);
+static void command_set_dcm_pitch_coefficients(void);
 
 /**************************************************************************
-* \brief Sets the Kalman yaw constants.
+* \brief Sets the DCM yaw constants.
 **************************************************************************/
-static void command_set_kalman_yaw_constants(void);
+static void command_set_dcm_yaw_coefficients(void);
 
 /* Enabled API commands */
 struct api_command commands[] = {
@@ -136,9 +136,9 @@ struct api_command commands[] = {
 	{ 0x0022, command_set_roll_pid_coefficients},
 	{ 0x0023, command_set_pitch_pid_coefficients},
 	{ 0x0024, command_set_yaw_pid_coefficients},
-	{ 0x0025, command_set_kalman_roll_constants},
-	{ 0x0026, command_set_kalman_pitch_constants},
-	{ 0x0027, command_set_kalman_yaw_constants}
+	{ 0x0025, command_set_dcm_roll_coefficients},
+	{ 0x0026, command_set_dcm_pitch_coefficients},
+	{ 0x0027, command_set_dcm_yaw_coefficients}
 };
 
 
@@ -211,7 +211,7 @@ static void command_get_all_servo_pos(void)
 **************************************************************************/
 static void command_get_board_status(void)
 {
-	uint8_t packet_length = 73;
+	uint8_t packet_length = 1 + 1 + 2 + 1 + 98 + 1 + 1;
 	uint8_t data[packet_length];
 	int index = 0;
 	
@@ -235,20 +235,18 @@ static void command_get_board_status(void)
 	float gyroX = mpu_6000_get_x_gyr();
 	float gyroY = mpu_6000_get_y_gyr();
 	float gyroZ = mpu_6000_get_z_gyr();
-	
 	float sensorRollAngle = flight_controller_get_sensor_roll_angle();
-	// TODO: Pitch
 	float sensorPitchAngle = flight_controller_get_sensor_pitch_angle();
-	
-	float kalmanReferenceValueRoll = filter_get_acc_roll();
-	
-	float setValueRollAngle = flight_controller_get_set_roll_angle();
-	// TODO: Pitch
-	float setValuePitchAngle = flight_controller_get_set_pitch_angle();
-	
-	float actuatingVariablePidRoll = flight_controller_get_actuating_roll_angle();
-	// TODO: Pitch
-	float actuatingVariablePidPitch = flight_controller_get_actuating_pitch_angle();
+	float sensorYawAngle = flight_controller_get_sensor_yaw_angle();
+	float dcmOutputRoll = filter_get_acc_roll();
+	float dcmOutputPitch = filter_get_acc_pitch();
+	float dcmOutputYaw = filter_get_acc_yaw();
+	float setRollAngle = flight_controller_get_set_roll_angle();
+	float setPitchAngle = flight_controller_get_set_pitch_angle();
+	float setYawAngle = flight_controller_get_set_yaw_angle();
+	float pidRollActuatingValue = flight_controller_get_actuating_roll_angle();
+	float pidPitchActuatingValue = flight_controller_get_actuating_pitch_angle();
+	float pidYawActuatingValue = flight_controller_get_actuating_yaw_angle();
 		
 	// Start byte
 	data[index++] = PACKET_START_BYTE;
@@ -259,7 +257,7 @@ static void command_get_board_status(void)
 	memcpy(data + index, &cmdtype, 2);
 	index += 2;
 	// Data Length
-	data[index++] = 66;
+	data[index++] = 98;
 	// Output Channel 1
 	memcpy(data + index, &outChannel1, 2);
 	index += 2;
@@ -317,17 +315,41 @@ static void command_get_board_status(void)
 	// Gyro Z
 	memcpy(data + index, &gyroZ, 4);
 	index += 4;
-	// Kalman Output Roll
+	// Sensor Roll Angle
 	memcpy(data + index, &sensorRollAngle, 4);
 	index += 4;
-	// Kalman Reference Value Roll
-	memcpy(data + index, &kalmanReferenceValueRoll, 4);
+	// Sensor Pitch Angle
+	memcpy(data + index, &sensorPitchAngle, 4);
 	index += 4;
-	// Set value Roll Angle
-	memcpy(data + index, &setValueRollAngle, 4);
+	// Sensor Yaw Angle
+	memcpy(data + index, &sensorYawAngle, 4);
 	index += 4;
-	// Actuating Variable PID Roll
-	memcpy(data + index, &actuatingVariablePidRoll, 4);
+	// DCM Output Roll
+	memcpy(data + index, &dcmOutputRoll, 4);
+	index += 4;
+	// DCM Output Pitch
+	memcpy(data + index, &dcmOutputPitch, 4);
+	index += 4;
+	// DCM Output Yaw
+	memcpy(data + index, &dcmOutputYaw, 4);
+	index += 4;
+	// Set Roll Angle
+	memcpy(data + index, &setRollAngle, 4);
+	index += 4;
+	// Set Pitch Angle
+	memcpy(data + index, &setPitchAngle, 4);
+	index += 4;
+	// Set Yaw Angle
+	memcpy(data + index, &setYawAngle, 4);
+	index += 4;
+	// PID Roll Actuating Value
+	memcpy(data + index, &pidRollActuatingValue, 4);
+	index += 4;
+	// PID Pitch Actuating Value
+	memcpy(data + index, &pidPitchActuatingValue, 4);
+	index += 4;
+	// PID Yaw Actuating Value
+	memcpy(data + index, &pidYawActuatingValue, 4);
 	index += 4;
 	// CRC
 	data[index++] = 0x88;
@@ -342,7 +364,7 @@ static void command_get_board_status(void)
 **************************************************************************/
 static void command_get_board_settings(void)
 {
-	uint8_t packet_length = 91;
+	uint8_t packet_length = 1 + 1 + 2 + 1 + 72 + 1 + 1;
 	uint8_t data[packet_length];
 	int index = 0;
 	
@@ -350,23 +372,20 @@ static void command_get_board_settings(void)
 	float pidRollKi = flight_controller_get_pid_roll_i_factor();
 	float pidRollKd = flight_controller_get_pid_roll_d_factor();
 	float pidRollILimit = flight_controller_get_pid_roll_i_limit();
-	float pidPitchKp = 0.0f;
-	float pidPitchKi = 0.0f;
-	float pidPitchKd = 0.0f;
-	float pidPitchILimit = 0.0f;
-	float pidYawKp = 0.0f;
-	float pidYawKi = 0.0f;
-	float pidYawKd = 0.0f;
-	float pidYawILimit = 0.0f;
-	float kalmanRollQAngle = filter_kalman_get_roll_qangle();
-	float kalmanRollQGyro = filter_kalman_get_roll_qgyro();
-	float kalmanRollRAngle = filter_kalman_get_roll_rangle();
-	float kalmanPitchQAngle = 0.0f;
-	float kalmanPitchQGyro = 0.0f;
-	float kalmanPitchRAngle = 0.0f;
-	float kalmanYawQAngle = 0.0f;
-	float kalmanYawQGyro = 0.0f;
-	float kalmanYawRAngle = 0.0f;
+	float pidPitchKp = flight_controller_get_pid_pitch_p_factor();
+	float pidPitchKi = flight_controller_get_pid_pitch_i_factor();
+	float pidPitchKd = flight_controller_get_pid_pitch_d_factor();
+	float pidPitchILimit = flight_controller_get_pid_pitch_i_limit();
+	float pidYawKp = flight_controller_get_pid_yaw_p_factor();
+	float pidYawKi = flight_controller_get_pid_yaw_i_factor();
+	float pidYawKd = flight_controller_get_pid_yaw_d_factor();
+	float pidYawILimit = flight_controller_get_pid_yaw_i_limit();
+	float dcmRollPFactor = filter_dcm_get_rollPitch_kp();
+	float dcmRollIFactor = filter_dcm_get_rollPitch_ki();
+	float dcmPitchPFactor = filter_dcm_get_rollPitch_kp();
+	float dcmPitchIFactor = filter_dcm_get_rollPitch_ki();
+	float dcmYawPFactor = filter_dcm_get_yaw_kp();
+	float dcmYawIFactor = filter_dcm_get_yaw_ki();
 	
 	// Start byte
 	data[index++] = PACKET_START_BYTE;
@@ -377,7 +396,7 @@ static void command_get_board_settings(void)
 	memcpy(data + index, &cmdtype, 2);
 	index += 2;
 	// Data Length
-	data[index++] = 84;
+	data[index++] = 72;
 	// PID Roll P-Factor
 	memcpy(data + index, &pidRollKp, 4);
 	index += 4;
@@ -414,32 +433,23 @@ static void command_get_board_settings(void)
 	// PID Yaw I-Limit
 	memcpy(data + index, &pidYawILimit, 4);
 	index += 4;
-	// Kalman Roll Q-Angle
-	memcpy(data + index, &kalmanRollQAngle, 4);
+	// DCM Roll P-Factor
+	memcpy(data + index, &dcmRollPFactor, 4);
 	index += 4;
-	// Kalman Roll Q-Gyro
-	memcpy(data + index, &kalmanRollQGyro, 4);
+	// DCM Roll I-Factor
+	memcpy(data + index, &dcmRollIFactor, 4);
 	index += 4;
-	// Kalman Roll R-Angle
-	memcpy(data + index, &kalmanRollRAngle, 4);
+	// DCM Pitch P-Factor
+	memcpy(data + index, &dcmPitchPFactor, 4);
 	index += 4;
-	// Kalman Pitch Q-Angle
-	memcpy(data + index, &kalmanPitchQAngle, 4);
+	// DCM Pitch I-Factor
+	memcpy(data + index, &dcmPitchIFactor, 4);
 	index += 4;
-	// Kalman Pitch Q-Gyro
-	memcpy(data + index, &kalmanPitchQGyro, 4);
+	// DCM Yaw P-Factor
+	memcpy(data + index, &dcmYawPFactor, 4);
 	index += 4;
-	// Kalman Pitch R-Angle
-	memcpy(data + index, &kalmanPitchRAngle, 4);
-	index += 4;
-	// Kalman Yaw Q-Angle
-	memcpy(data + index, &kalmanYawQAngle, 4);
-	index += 4;
-	// Kalman Yaw Q-Gyro
-	memcpy(data + index, &kalmanYawQGyro, 4);
-	index += 4;
-	// Kalman Yaw R-Angle
-	memcpy(data + index, &kalmanYawRAngle, 4);
+	// DCM Yaw I-Factor
+	memcpy(data + index, &dcmYawIFactor, 4);
 	index += 4;
 	// CRC
 	data[index++] = 0x88;
@@ -499,7 +509,8 @@ static void command_set_pitch_pid_coefficients(void)
 	index += 4;
 	memcpy(&i_limit, rx_command_packet.data + index, sizeof(i_limit));
 	
-	// TODO
+	// Update the PID controller
+	flight_controller_update_pid_pitch_coefficients(p_factor, i_factor, d_factor, i_limit);
 }
 
 /**************************************************************************
@@ -521,67 +532,59 @@ static void command_set_yaw_pid_coefficients(void)
 	index += 4;
 	memcpy(&i_limit, rx_command_packet.data + index, sizeof(i_limit));
 	
-	// TODO
+	// Update the PID controller
+	flight_controller_update_pid_yaw_coefficients(p_factor, i_factor, d_factor, i_limit);
 }
 
 /**************************************************************************
-* \brief Sets the Kalman roll constants.
+* \brief Sets the DCM roll constants.
 **************************************************************************/
-static void command_set_kalman_roll_constants(void)
+static void command_set_dcm_roll_coefficients(void)
 {
-	float q_angle;
-	float q_gyro;
-	float r_angle;
+	float p_factor;
+	float i_factor;
 	uint8_t index = 0;
 	
-	memcpy(&q_angle, rx_command_packet.data + index, sizeof(q_angle));
+	memcpy(&p_factor, rx_command_packet.data + index, sizeof(p_factor));
 	index += 4;
-	memcpy(&q_gyro, rx_command_packet.data + index, sizeof(q_gyro));
-	index += 4;
-	memcpy(&r_angle, rx_command_packet.data + index, sizeof(r_angle));
+	memcpy(&i_factor, rx_command_packet.data + index, sizeof(i_factor));
 	index += 4;
 	
-	filter_kalman_update_constants(q_angle, q_gyro, r_angle);
+	filter_dcm_update_roll_constants(p_factor, i_factor);
 }
 
 /**************************************************************************
-* \brief Sets the Kalman pitch constants.
+* \brief Sets the DCM pitch constants.
 **************************************************************************/
-static void command_set_kalman_pitch_constants(void)
+static void command_set_dcm_pitch_coefficients(void)
 {
-	float q_angle;
-	float q_gyro;
-	float r_angle;
+	float p_factor;
+	float i_factor;
 	uint8_t index = 0;
 	
-	memcpy(&q_angle, rx_command_packet.data + index, sizeof(q_angle));
+	memcpy(&p_factor, rx_command_packet.data + index, sizeof(p_factor));
 	index += 4;
-	memcpy(&q_gyro, rx_command_packet.data + index, sizeof(q_gyro));
-	index += 4;
-	memcpy(&r_angle, rx_command_packet.data + index, sizeof(r_angle));
+	memcpy(&i_factor, rx_command_packet.data + index, sizeof(i_factor));
 	index += 4;
 	
-	// TODO
+	filter_dcm_update_pitch_constants(p_factor, i_factor);
 }
 
 /**************************************************************************
-* \brief Sets the Kalman yaw constants.
+* \brief Sets the DCM yaw constants.
 **************************************************************************/
-static void command_set_kalman_yaw_constants(void)
+static void command_set_dcm_yaw_coefficients(void)
 {
-	float q_angle;
-	float q_gyro;
-	float r_angle;
+	float p_factor;
+	float i_factor;
 	uint8_t index = 0;
 	
-	memcpy(&q_angle, rx_command_packet.data + index, sizeof(q_angle));
+	memcpy(&p_factor, rx_command_packet.data + index, sizeof(p_factor));
 	index += 4;
-	memcpy(&q_gyro, rx_command_packet.data + index, sizeof(q_gyro));
-	index += 4;
-	memcpy(&r_angle, rx_command_packet.data + index, sizeof(r_angle));
+	memcpy(&i_factor, rx_command_packet.data + index, sizeof(i_factor));
 	index += 4;
 	
-	// TODO
+	filter_dcm_update_yaw_constants(p_factor, i_factor);
 }
 
 /**************************************************************************

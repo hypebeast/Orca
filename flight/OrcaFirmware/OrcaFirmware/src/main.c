@@ -75,7 +75,7 @@ int main (void)
 	// Loop forever
 	while(1)
 	{
-		// Process incoming API commands from the USB USART
+		// Process incoming API messages from the USB USART
 		serial_api_task();
 		
 		// Flight controller

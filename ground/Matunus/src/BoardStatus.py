@@ -65,10 +65,18 @@ class BoardStatus(object):
 		self.dataFields.append(DataObjectField("gyroX", "Grad", DataFieldTypes.Float))
 		self.dataFields.append(DataObjectField("gyroY", "Grad", DataFieldTypes.Float))
 		self.dataFields.append(DataObjectField("gyroZ", "Grad", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanOutputRoll", "Grad", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanReferenceValueRoll", "Grad", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("setValueRollAngle", "Grad", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("actuatingVariablePidRoll", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("sensorRollAngle", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("sensorPitchAngle", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("sensorYawAngle", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("dcmOutputRoll", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("dcmOutputPitch", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("dcmOutputYaw", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("setRollAngle", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("setPitchAngle", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("setYawAngle", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("pidRollActuating", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("pidPitchActuating", "Grad", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("pidYawActuating", "Grad", DataFieldTypes.Float))
 		self.dataFields.append(DataObjectField("debugIntValue1", "", DataFieldTypes.Int))
 		self.dataFields.append(DataObjectField("debugIntValue2", "", DataFieldTypes.Int))
 		self.dataFields.append(DataObjectField("debugIntValue3", "", DataFieldTypes.Int))
@@ -143,14 +151,30 @@ class BoardStatus(object):
 					field.value = message.gyroY
 				elif field.name == "gyroZ":
 					field.value = message.gyroZ
-				elif field.name == "kalmanOutputRoll":
-					field.value = message.kalmanOutputRoll
-				elif field.name == "kalmanReferenceValueRoll":
-					field.value = message.kalmanReferenceValueRoll
-				elif field.name == "setValueRollAngle":
-					field.value = message.setValueRollAngle
-				elif field.name == "actuatingVariablePidRoll":
-					field.value = message.actuatingVariablePidRoll
+				elif field.name == "sensorRollAngle":
+					field.value = message.sensorRollAngle
+				elif field.name == "sensorPitchAngle":
+					field.value = message.sensorPitchAngle
+				elif field.name == "sensorYawAngle":
+					field.value = message.sensorYawAngle
+				elif field.name == "dcmOutputRoll":
+					field.value = message.dcmOutputRoll
+				elif field.name == "dcmOutputPitch":
+					field.value = message.dcmOutputPitch
+				elif field.name == "dcmOutputYaw":
+					field.value = message.dcmOutputYaw
+				elif field.name == "setRollAngle":
+					field.value = message.setRollAngle
+				elif field.name == "setPitchAngle":
+					field.value = message.setPitchAngle
+				elif field.name == "setYawAngle":
+					field.value = message.setYawAngle
+				elif field.name == "pidRollActuating":
+					field.value = message.pidRollActuatingValue
+				elif field.name == "pidPitchActuating":
+					field.value = message.pidPitchActuatingValue
+				elif field.name == "pidYawActuating":
+					field.value = message.pidYawActuatingValue
 		elif message.commandType == CommandTypes.DEBUG_INT_VALUES:
 			self._lastUpdate = timestamp
 			for field in self.dataFields:
@@ -268,20 +292,52 @@ class BoardStatus(object):
 		return self.getValue('gyroZ')
 
 	@property
-	def kalmanOutputRoll(self):
-		return self.getValue('kalmanOutputRoll')
+	def sensorRollAngle(self):
+		return self.getValue('sensorRollAngle')
 
 	@property
-	def kalmanReferenceValueRoll(self):
-		return self.getValue('kalmanReferenceValueRoll')
+	def sensorPitchAngle(self):
+		return self.getValue('sensorPitchAngle')
 
 	@property
-	def setValueRollAngle(self):
-		return self.getValue('setValueRollAngle')
+	def sensorYawAngle(self):
+		return self.getValue('sensorYawAngle')
 
 	@property
-	def actuatingVariablePidRoll(self):
-		return self.getValue('actuatingVariablePidRoll')
+	def dcmOutputRoll(self):
+		return self.getValue('dcmOutputRoll')
+
+	@property
+	def dcmOutputPitch(self):
+		return self.getValue('dcmOutputPitch')
+
+	@property
+	def dcmOutputYaw(self):
+		return self.getValue('dcmOutputYaw')
+
+	@property
+	def setRollAngle(self):
+		return self.getValue('setRollAngle')
+
+	@property
+	def setPitchAngle(self):
+		return self.getValue('setPitchAngle')
+
+	@property
+	def setYawAngle(self):
+		return self.getValue('setYawAngle')
+
+	@property
+	def pidRollActuating(self):
+		return self.getValue('pidRollActuating')
+
+	@property
+	def pidPitchActuating(self):
+		return self.getValue('pidPitchActuating')
+
+	@property
+	def pidYawActuating(self):
+		return self.getValue('pidYawActuating')
 
 	@property
 	def debugIntValue1(self):

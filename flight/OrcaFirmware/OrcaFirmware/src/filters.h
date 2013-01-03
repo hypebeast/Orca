@@ -86,7 +86,9 @@ typedef struct FILTER_DATA{
 #endif // FILTER_USE_DCM
 
 void filter_kalman_update_constants(float Q_angle, float Q_gyro, float R_angle);
-void filter_dcm_update_constants(float KpRollPitch, float KiRollPitch, float KpYaw, float KiYaw);
+void filter_dcm_update_roll_constants(float p_factor, float i_factor);
+void filter_dcm_update_pitch_constants(float p_factor, float i_factor);
+void filter_dcm_update_yaw_constants(float p_factor, float i_factor);
 void filter_task(unsigned long time);
 float filter_get_acc_roll(void);
 float filter_get_acc_pitch(void);

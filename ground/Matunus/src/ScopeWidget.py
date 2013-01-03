@@ -40,7 +40,7 @@ class ScopeWidget(Qwt.QwtPlot):
 	"""
 	Widget that contains one scope.
 	"""
-	def __init__(self, boardController, dataFields):
+	def __init__(self, fmuManager, dataFields):
 		"""
 		Constructor
 
@@ -51,12 +51,12 @@ class ScopeWidget(Qwt.QwtPlot):
 		"""
 		Qwt.QwtPlot.__init__(self)
 
-		if dataFields is None or boardController is None:
-			raise "Error!"
+		if dataFields is None or fmuManager is None:
+			raise Exception, 'No FMU manager or data field specified!'
 
-		self.boardController = boardController
-		self.boardController.board_status_updated.connect(self._on_status_updated)
-		self.boardStatus = self.boardController.boardStatus
+		self._fmuManager = fmuManager
+		self._fmuManager.board_status_updated.connect(self._on_status_updated)
+		self.boardStatus = self._fmuManager.boardStatus
 		self.plotCurves = list()
 		
 		# This timer updates the plot curves
@@ -197,8 +197,9 @@ class ScopeWidget(Qwt.QwtPlot):
 			# Find max y-value of all curves
 			max_yVal = -sys.maxint - 1
 			for curve in self.plotCurves:
-				if not curve:
+				if not curve or not curve.yData or len(curve.yData) < 1:
 					continue
+					
 				val = max(curve.yData)
 				if val > max_yVal:
 					max_yVal = val
@@ -206,6 +207,9 @@ class ScopeWidget(Qwt.QwtPlot):
 			# Find min y-value of all curves
 			min_yVal = sys.maxint
 			for curve in self.plotCurves:
+				if not curve or not curve.yData or len(curve.yData) < 1:
+					continue
+
 				val = min(curve.yData)
 				if val < min_yVal:
 					min_yVal = val

@@ -19,8 +19,6 @@
 __author__ = 'Sebastian Ruml'
 
 
-import sys
-
 try:
     from PyQt4 import QtGui
 except ImportError:
@@ -37,15 +35,15 @@ from ScopeExportDialog import ScopeExportDialog
 
 class ScopePage(QtGui.QWidget):
     """
-    This page holds all scope widgetes.
+    This page holds all scope widgets.
     """
-    def __init__(self, boardController):
+    def __init__(self, fmuManager):
         super(ScopePage, self).__init__()
 
-        if boardController is None:
+        if fmuManager is None:
             raise "Error!"
 
-        self._boardController = boardController
+        self._fmuManager = fmuManager
         self._scopes = list()
         self._app_defs = defs.AppDefs()
         self._logger = Logger()
@@ -65,15 +63,36 @@ class ScopePage(QtGui.QWidget):
         self.dataObjects.append({'groupName': "Acceleration X, Y, Z",
                                 'fields': ("accelerationX", "accelerationY", "accelerationZ"),
                                 'fieldNames': ("Acceleration X", "Acceleration Y", "Acceleration Z")})
-        self.dataObjects.append({'groupName': "Kalman Reference/Output Value",
-                                'fields': ("kalmanOutputRoll", "kalmanReferenceValueRoll"),
-                                'fieldNames': ("Output Roll", "Reference Roll")})
-        self.dataObjects.append({'groupName': "Set Value Angle",
-                                'fields': ("setValueRollAngle",),
-                                'fieldNames': ("Roll",)})
-        self.dataObjects.append({'groupName': "Actuating Variable PID",
-                                'fields': ("actuatingVariablePidRoll",),
-                                'fieldNames': ("Roll",)})
+        self.dataObjects.append({'groupName': "Sensor Angles",
+                                'fields': ("sensorRollAngle", "sensorPitchAngle", "sensorYawAngle"),
+                                'fieldNames': ("Roll", "Pitch", "Yaw")})
+        self.dataObjects.append({'groupName': "DCM Outputs",
+                                'fields': ("dcmOutputRoll", "dcmOutputPitch", "dcmOutputYaw"),
+                                'fieldNames': ("Roll", "Pitch", "Yaw")})
+        self.dataObjects.append({'groupName': "PID Outputs",
+                                'fields': ("pidRollActuating", "pidPitchActuating", "pidYawActuating"),
+                                'fieldNames': ("Roll", "Pitch", "Yaw")})
+        self.dataObjects.append({'groupName': "RC Set Angles",
+                                'fields': ("setRollAngle", "setPitchAngle", "setYawAngle"),
+                                'fieldNames': ("Roll", "Pitch", "Yaw")})
+        self.dataObjects.append({'groupName': "PID Roll",
+                                'fields': ("setRollAngle", "pidRollActuating", "dcmOutputRoll"),
+                                'fieldNames': ("Set Value", " Actuating Value", "Actual Value")})
+        self.dataObjects.append({'groupName': "PID Pitch",
+                                'fields': ("setPitchAngle", "pidPitchActuating", "dcmPitchRoll"),
+                                'fieldNames': ("Set Value", " Actuating Value", "Actual Value")})
+        self.dataObjects.append({'groupName': "PID Yaw",
+                                'fields': ("setYawAngle", "pidYawActuating", "dcmOutputYaw"),
+                                'fieldNames': ("Set Value", " Actuating Value", "Actual Value")})
+        self.dataObjects.append({'groupName': "DCM Roll",
+                                'fields': ("sensorRollAngle", "dcmOutputRoll"),
+                                'fieldNames': ("Sensor Input", " Output")})
+        self.dataObjects.append({'groupName': "DCM Pitch",
+                                'fields': ("sensorPitchAngle", "dcmOutputPitch"),
+                                'fieldNames': ("Sensor Input", " Output")})   
+        self.dataObjects.append({'groupName': "DCM Yaw",
+                                'fields': ("sensorYawAngle", "dcmOutputYaw"),
+                                'fieldNames': ("Sensor Input", " Output")})     
 
         # Create the UI
         self._createUi()
@@ -97,11 +116,13 @@ class ScopePage(QtGui.QWidget):
         header = QtGui.QFrame()
         header.setPalette(palette)
         header.setMinimumHeight(30)
+        header.setMaximumHeight(35)
         header.setAutoFillBackground(True)
         header.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Raised)
         header.setLineWidth(2)
         layout = QtGui.QHBoxLayout()
         header.setLayout(layout)
+        layout.setMargin(1)
         layout.addWidget(label1)
         self.cbdataObjects1 = QtGui.QComboBox()
         for item in self.dataObjects:
@@ -112,7 +133,7 @@ class ScopePage(QtGui.QWidget):
         mainLayout.addWidget(header)
 
         # Scope 1
-        self.scope1 = ScopeWidget(self._boardController, self.dataObjects[0])
+        self.scope1 = ScopeWidget(self._fmuManager, self.dataObjects[0])
         mainLayout.addWidget(self.scope1)
         self._scopes.append(self.scope1)
 
@@ -120,10 +141,12 @@ class ScopePage(QtGui.QWidget):
         header = QtGui.QFrame()
         header.setPalette(palette)
         header.setMinimumHeight(30)
+        header.setMaximumHeight(35)
         header.setAutoFillBackground(True)
         header.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Raised)
         header.setLineWidth(2)
         layout = QtGui.QHBoxLayout()
+        layout.setMargin(1)
         header.setLayout(layout)
         layout.addWidget(label2)
         self.cbdataObjects2 = QtGui.QComboBox()
@@ -135,7 +158,7 @@ class ScopePage(QtGui.QWidget):
         mainLayout.addWidget(header)
         
         # Scope 2
-        self.scope2 = ScopeWidget(self._boardController, self.dataObjects[0])
+        self.scope2 = ScopeWidget(self._fmuManager, self.dataObjects[0])
         mainLayout.addWidget(self.scope2)
         self._scopes.append(self.scope2)
 

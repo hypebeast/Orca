@@ -55,7 +55,7 @@ class ConfigurationPage(QtGui.QWidget):
         # Left side panel (navigation bar)
         model = QtGui.QStandardItemModel()
         icon = QtGui.QIcon(os.path.join(self.app_defs.IconsPath, "hw_config.png"))
-        item = QtGui.QStandardItem(icon, "HW Settings")
+        item = QtGui.QStandardItem(icon, "Hardware")
         model.appendRow(item)
         # TODO: Add Vehicle config page
         icon = QtGui.QIcon(os.path.join(self.app_defs.IconsPath, "Transmitter.png"))

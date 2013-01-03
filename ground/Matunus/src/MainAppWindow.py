@@ -132,7 +132,7 @@ class MainAppWindow(QtGui.QMainWindow):
 
         # TODO: Load configuration
 
-        # Provides methods for interacting with the flight management unit
+        # Provides methods for working with the flight management unit
         self.fmuManager = FMUManager()
 
         # Create UI

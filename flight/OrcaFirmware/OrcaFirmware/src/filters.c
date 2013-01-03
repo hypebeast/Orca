@@ -544,19 +544,45 @@ float filter_kalman_get_roll_rangle(void)
 #endif // FILTER_USE_DCM
 
 /**************************************************************************
-* \brief Filter DCM Update Constants
-*	Updates the Kalman Settings. \n
+* \brief Updates the coefficients for the roll DCM.
+*	Updates the DCM Settings. \n
 *
 * \param ---
 *
 * \return ---
 ***************************************************************************/
-void filter_dcm_update_constants(float KpRollPitch, float KiRollPitch, float KpYaw, float KiYaw)
+void filter_dcm_update_roll_constants(float p_factor, float i_factor)
 {
-	filterdata->Kp_rollPitch = KpRollPitch;
-	filterdata->Ki_rollPitch  = KiRollPitch;
-	filterdata->Kp_yaw = KpYaw;
-	filterdata->Ki_yaw  = KiYaw;
+	filterdata->Kp_rollPitch = p_factor;
+	filterdata->Ki_rollPitch  = i_factor;
+}
+
+/**************************************************************************
+* \brief Updates the coefficients for the pitch DCM.
+*	Updates the DCM Settings. \n
+*
+* \param ---
+*
+* \return ---
+***************************************************************************/
+void filter_dcm_update_pitch_constants(float p_factor, float i_factor)
+{
+	filterdata->Kp_rollPitch = p_factor;
+	filterdata->Ki_rollPitch  = i_factor;
+}
+
+/**************************************************************************
+* \brief Updates the coefficients for the yaw DCM.
+*	Updates the DCM Settings. \n
+*
+* \param ---
+*
+* \return ---
+***************************************************************************/
+void filter_dcm_update_yaw_constants(float p_factor, float i_factor)
+{
+	filterdata->Kp_yaw = p_factor;
+	filterdata->Ki_yaw  = i_factor;
 }
 
 /**************************************************************************

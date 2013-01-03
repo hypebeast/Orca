@@ -32,9 +32,11 @@ except ImportError:
 from SerialConnection import SerialConnection
 from ApiCommands import CommandTypes, ServoPositionMessage, GetBoardStatusMessage
 from ApiCommands import GetBoardSettingsMessage, SetRollPIDCoefficientsMessage
-from ApiCommands import SetRollKalmanConstantsMessage, SaveSettingsMessage
+from ApiCommands import SetPitchPIDCoefficientsMessage, SetYawPIDCoefficientsMessage
+from ApiCommands import SetDcmRollCoefficientsMessage, SaveSettingsMessage
+from ApiCommands import SetDcmPitchCoefficientsMessage, SetDcmYawCoefficientsMessage
 from BoardStatus import BoardStatus
-from BoardSettings import BoardSettings
+from BoardSettings import FmuSettings
 from logger import Logger
 from utils import get_all_from_queue 
 
@@ -72,7 +74,7 @@ class _FMUManager(QObject):
 		self.boardStatus = BoardStatus()
 
 		# Board settings object
-		self.boardSettings = BoardSettings()
+		self.fmuSettings = FmuSettings()
 
         # Status reader
 		self.statusReaderThread = None
@@ -202,7 +204,7 @@ class _FMUManager(QObject):
 	def _onBoardSettingsUpdated(self, message, timestamp):
 		"""Called when an board settings (0x0020) message was received. The board
 		settings will be updated with the received message."""
-		self.boardSettings.updateFromMessage(message, timestamp)
+		self.fmuSettings.updateFromMessage(message, timestamp)
 		# Emit signal
 		self.board_settings_updated.emit()
 
@@ -232,12 +234,28 @@ class _FMUManager(QObject):
 		message = SaveSettingsMessage()
 		self.serial.writeMessage(message)
 
-	def setRollPIDCoefficients(self, p_fac, i_fac, d_fac, i_limit):
+	def setPIDRollCoefficients(self, p_fac, i_fac, d_fac, i_limit):
 		message = SetRollPIDCoefficientsMessage(p_fac, i_fac, d_fac, i_limit)
 		self.serial.writeMessage(message)
 
-	def setRollKalmanConstants(self, q_angle, q_gyro, r_angle):
-		message = SetRollKalmanConstantsMessage(q_angle, q_gyro, r_angle)
+	def setPIDPitchCoefficients(self, p_fac, i_fac, d_fac, i_limit):
+		message = SetPitchPIDCoefficientsMessage(p_fac, i_fac, d_fac, i_limit)
+		self.serial.writeMessage(message)
+
+	def setPIDYawCoefficients(self, p_fac, i_fac, d_fac, i_limit):
+		message = SetYawPIDCoefficientsMessage(p_fac, i_fac, d_fac, i_limit)
+		self.serial.writeMessage(message)
+
+	def setDcmRollCoefficients(self, p_factor, i_factor):
+		message = SetDcmRollCoefficientsMessage(p_factor, i_factor)
+		self.serial.writeMessage(message)
+
+	def setDcmPitchCoefficients(self, p_factor, i_factor):
+		message = SetDcmPitchCoefficientsMessage(p_factor, i_factor)
+		self.serial.writeMessage(message)
+
+	def setDcmYawCoefficients(self, p_factor, i_factor):
+		message = SetDcmYawCoefficientsMessage(p_factor, i_factor)
 		self.serial.writeMessage(message)
 
 

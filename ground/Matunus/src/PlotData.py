@@ -39,7 +39,7 @@ class PlotData:
 	"""
 	def __init__(self, plot, field, fieldName):
 		if not plot or not field or not fieldName:
-			raise Exception
+			raise Exception, 'Argument exception!'
 
 		self.plot = plot
 		# Data field name

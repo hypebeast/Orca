@@ -24,19 +24,19 @@ from ApiCommands import CommandTypes
 from DataObjectField import DataObjectField, DataFieldTypes
 
 
-# Global firmware settings object
-boardSettings = None
+# Global FMU settings object
+fmuSettings = None
 
-class _BoardSettings():
+class _FmuSettings():
 
 	# Default Settings
 	DEFAULT_PID_ROLL_PFACTOR = 0.05
 	DEFAULT_PID_ROLL_IFACTOR = 0.002
 	DEFAULT_PID_ROLL_DFACTOR = 0.00
 	DEFAULT_PID_ROLL_ILIMIT = 5.0
-	DEFAULT_KALMAN_ROLL_QAngle = 0.2
-	DEFAULT_KALMAN_ROLL_QGyro = 0.0001
-	DEFAULT_KALMAN_ROLL_RAngle = 0.01
+	DEFAULT_DCM_ROLL_P_FACTOR = 0.2
+	DEFAULT_DCM_ROLL_I_FACTOR = 0.0001
+	DEFAULT_DCM_PITCH_P_FACTOR = 0.01
 
 	def __init__(self):
 		self._logger = Logger()
@@ -65,15 +65,12 @@ class _BoardSettings():
 		self.dataFields.append(DataObjectField("pidYawIFactor", "", DataFieldTypes.Float))
 		self.dataFields.append(DataObjectField("pidYawDFactor", "", DataFieldTypes.Float))
 		self.dataFields.append(DataObjectField("pidYawILimit", "", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanRollQAngle", "", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanRollQGyro", "", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanRollRAngle", "", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanPitchQAngle", "", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanPitchQGyro", "", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanPitchRAngle", "", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanYawQAngle", "", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanYawQGyro", "", DataFieldTypes.Float))
-		self.dataFields.append(DataObjectField("kalmanYawRAngle", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("dcmRollPFactor", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("dcmRollIFactor", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("dcmPitchPFactor", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("dcmPitchIFactor", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("dcmYawPFactor", "", DataFieldTypes.Float))
+		self.dataFields.append(DataObjectField("dcmYawIFactor", "", DataFieldTypes.Float))
 
 	def setValue(self, name, value):
 		"""Updates the specified field with the given value."""
@@ -103,15 +100,12 @@ class _BoardSettings():
 		self.setValue("pidYawIFactor", 0)
 		self.setValue("pidYawDFactor", 0)
 		self.setValue("pidYawILimit", 0)
-		self.setValue("kalmanRollQAngle", self.DEFAULT_KALMAN_ROLL_QAngle)
-		self.setValue("kalmanRollQGyro", self.DEFAULT_KALMAN_ROLL_QGyro)
-		self.setValue("kalmanRollRAngle", self.DEFAULT_KALMAN_ROLL_RAngle)
-		self.setValue("kalmanPitchQAngle", 0)
-		self.setValue("kalmanPitchQGyro", 0)
-		self.setValue("kalmanPitchRAngle", 0)
-		self.setValue("kalmanYawQAngle", 0)
-		self.setValue("kalmanYawQGyro", 0)
-		self.setValue("kalmanYawRAngle", 0)
+		self.setValue("dcmRollPFactor", self.DEFAULT_DCM_ROLL_P_FACTOR)
+		self.setValue("dcmRollIFactor", self.DEFAULT_DCM_ROLL_I_FACTOR)
+		self.setValue("dcmPitchPFactor", self.DEFAULT_DCM_PITCH_P_FACTOR)
+		self.setValue("dcmPitchIFactor", 0)
+		self.setValue("dcmYawPFactor", 0)
+		self.setValue("dcmYawIFactor", 0)
 
 	def restoreFactorySettings(self):
 		self._setDefaults()
@@ -129,15 +123,12 @@ class _BoardSettings():
 		self.setValue("pidYawIFactor", 0)
 		self.setValue("pidYawDFactor", 0)
 		self.setValue("pidYawILimit", 0)
-		self.setValue("kalmanRollQAngle", self.DEFAULT_KALMAN_ROLL_QAngle)
-		self.setValue("kalmanRollQGyro", self.DEFAULT_KALMAN_ROLL_QGyro)
-		self.setValue("kalmanRollRAngle", self.DEFAULT_KALMAN_ROLL_RAngle)
-		self.setValue("kalmanPitchQAngle", 0)
-		self.setValue("kalmanPitchQGyro", 0)
-		self.setValue("kalmanPitchRAngle", 0)
-		self.setValue("kalmanYawQAngle", 0)
-		self.setValue("kalmanYawQGyro", 0)
-		self.setValue("kalmanYawRAngle", 0)
+		self.setValue("dcmRollPFactor", self.DEFAULT_DCM_ROLL_P_FACTOR)
+		self.setValue("dcmRollIFactor", self.DEFAULT_DCM_ROLL_I_FACTOR)
+		self.setValue("dcmPitchPFactor", self.DEFAULT_DCM_PITCH_P_FACTOR)
+		self.setValue("dcmPitchIFactor", 0)
+		self.setValue("dcmYawPFactor", 0)
+		self.setValue("dcmYawIFactor", 0)
 
 	def updateFromMessage(self, message, timestamp):
 		if message is None:
@@ -151,6 +142,7 @@ class _BoardSettings():
 		for field in self.dataFields:
 			if field.name == "pidRollPFactor":
 				field.value = message.pidRollPFactor
+				print message.pidRollPFactor
 			elif field.name == "pidRollIFactor":
 				field.value = message.pidRollIFactor
 			elif field.name == "pidRollDFactor":
@@ -173,24 +165,18 @@ class _BoardSettings():
 				field.value = message.pidYawDFactor
 			elif field.name == "pidYawILimit":
 				field.value = message.pidYawILimit
-			elif field.name == "kalmanRollQAngle":
-				field.value = message.kalmanRollQAngle
-			elif field.name == "kalmanRollQGyro":
-				field.value = message.kalmanRollQGyro
-			elif field.name == "kalmanRollRAngle":
-				field.value = message.kalmanRollRAngle
-			elif field.name == "kalmanPitchQAngle":
-				field.value = message.kalmanPitchQAngle
-			elif field.name == "kalmanPitchQGyro":
-				field.value = message.kalmanPitchQGyro
-			elif field.name == "kalmanPitchRAngle":
-				field.value = message.kalmanPitchRAngle
-			elif field.name == "kalmanYawQAngle":
-				field.value = message.kalmanYawQAngle
-			elif field.name == "kalmanYawQGyro":
-				field.value = message.kalmanYawQGyro
-			elif field.name == "kalmanYawRAngle":
-				field.value = message.kalmanYawRAngle
+			elif field.name == "dcmRollPFactor":
+				field.value = message.dcmRollPFactor
+			elif field.name == "dcmRollIFactor":
+				field.value = message.dcmRollIFactor
+			elif field.name == "dcmPitchPFactor":
+				field.value = message.dcmPitchPFactor
+			elif field.name == "dcmPitchIFactor":
+				field.value = message.dcmPitchIFactor
+			elif field.name == "dcmYawPFactor":
+				field.value = message.dcmYawPFactor
+			elif field.name == "dcmYawIFactor":
+				field.value = message.dcmYawIFactor
 
 		#self.printStatus()
 	
@@ -305,86 +291,59 @@ class _BoardSettings():
 	    return locals()
 	pidYawILimit = property(**pidYawILimit())
 
-	def kalmanRollQAngle():
-	    doc = "The Kalman roll Q-Angle property."
+	def dcmRollPFactor():
+	    doc = "The DCM roll P-Factor property."
 	    def fget(self):
-	        return self.getValue("kalmanRollQAngle")
+	        return self.getValue("dcmRollPFactor")
 	    def fset(self, value):
-	        self.setValue("kalmanRollQAngle", value)
+	        self.setValue("dcmRollPFactor", value)
 	    return locals()
-	kalmanRollQAngle = property(**kalmanRollQAngle())
+	dcmRollPFactor = property(**dcmRollPFactor())
 
-	def kalmanRollQGyro():
-	    doc = "The Kalman roll Q-Angle property."
+	def dcmRollIFactor():
+	    doc = "The DCM roll I-Factor property."
 	    def fget(self):
-	        return self.getValue("kalmanRollQGyro")
+	        return self.getValue("dcmRollIFactor")
 	    def fset(self, value):
-	        self.setValue("kalmanRollQGyro", value)
+	        self.setValue("dcmRollIFactor", value)
 	    return locals()
-	kalmanRollQGyro = property(**kalmanRollQGyro())
+	dcmRollIFactor = property(**dcmRollIFactor())
 
-	def kalmanRollRAngle():
-	    doc = "The Kalman roll Q-Angle property."
+	def dcmPitchPFactor():
+	    doc = "The DCM pitch P-Factor property."
 	    def fget(self):
-	        return self.getValue("kalmanRollRAngle")
+	        return self.getValue("dcmPitchPFactor")
 	    def fset(self, value):
-	        self.setValue("kalmanRollRAngle", value)
+	        self.setValue("dcmPitchPFactor", value)
 	    return locals()
-	kalmanRollRAngle = property(**kalmanRollRAngle())
+	dcmPitchPFactor = property(**dcmPitchPFactor())
 
-	def kalmanPitchQAngle():
-	    doc = "The Kalman pitch Q-Angle property."
+	def dcmPitchIFactor():
+	    doc = "The DCM pitch I-Factor property."
 	    def fget(self):
-	        return self.getValue("kalmanPitchQAngle")
+	        return self.getValue("dcmPitchIFactor")
 	    def fset(self, value):
-	        self.setValue("kalmanPitchQAngle", value)
+	        self.setValue("dcmPitchIFactor", value)
 	    return locals()
-	kalmanPitchQAngle = property(**kalmanPitchQAngle())
+	dcmPitchIFactor = property(**dcmPitchIFactor())
 
-	def kalmanPitchQGyro():
-	    doc = "The Kalman pitch Q-Angle property."
+	def dcmYawPFactor():
+	    doc = "The DCM yaaw P-Factor property."
 	    def fget(self):
-	        return self.getValue("kalmanPitchQGyro")
+	        return self.getValue("dcmYawPFactor")
 	    def fset(self, value):
-	        self.setValue("kalmanPitchQGyro", value)
+	        self.setValue("dcmYawPFactor", value)
 	    return locals()
-	kalmanPitchQGyro = property(**kalmanPitchQGyro())
+	dcmYawPFactor = property(**dcmYawPFactor())
 
-	def kalmanPitchRAngle():
-	    doc = "The Kalman pitch Q-Angle property."
+	def dcmYawIFactor():
+	    doc = "The DCM yaw I-Factor property."
 	    def fget(self):
-	        return self.getValue("kalmanPitchRAngle")
+	        return self.getValue("dcmYawIFactor")
 	    def fset(self, value):
-	        self.setValue("kalmanPitchRAngle", value)
+	        self.setValue("dcmYawIFactor", value)
 	    return locals()
-	kalmanPitchRAngle = property(**kalmanPitchRAngle())
-
-	def kalmanYawQAngle():
-	    doc = "The Kalman yaw Q-Angle property."
-	    def fget(self):
-	        return self.getValue("kalmanYawQAngle")
-	    def fset(self, value):
-	        self.setValue("kalmanYawQAngle", value)
-	    return locals()
-	kalmanYawQAngle = property(**kalmanYawQAngle())
-
-	def kalmanYawQGyro():
-	    doc = "The Kalman yaw Q-Angle property."
-	    def fget(self):
-	        return self.getValue("kalmanYawQGyro")
-	    def fset(self, value):
-	        self.setValue("kalmanYawQGyro", value)
-	    return locals()
-	kalmanYawQGyro = property(**kalmanYawQGyro())
-
-	def kalmanYawRAngle():
-	    doc = "The Kalman yaw Q-Angle property."
-	    def fget(self):
-	        return self.getValue("kalmanYawRAngle")
-	    def fset(self, value):
-	        self.setValue("kalmanYawRAngle", value)
-	    return locals()
-	kalmanYawRAngle = property(**kalmanYawRAngle())
+	dcmYawIFactor = property(**dcmYawIFactor())
 
 	def printSettings(self):
 		"""
@@ -396,15 +355,15 @@ class _BoardSettings():
 		self._logger.info("PID Roll I-Factor: %s" % self.pidRollIFactor)
 		self._logger.info("PID Roll D-Factor: %s" % self.pidRollDFactor)
 		self._logger.info("PID Roll I-Limit: %s" % self.pidRollILimit)
-		self._logger.info("Kalman Roll Q-Angle: %s" % self.kalmanRollQAngle)
-		self._logger.info("Kalman Roll Q-Gyro: %s" % self.kalmanRollQGyro)
-		self._logger.info("Kalman Roll R-Angle: %s" % self.kalmanRollRAngle)
+		self._logger.info("Kalman Roll Q-Angle: %s" % self.dcmRollPFactor)
+		self._logger.info("Kalman Roll Q-Gyro: %s" % self.dcmRollIFactor)
+		self._logger.info("Kalman Roll R-Angle: %s" % self.dcmPitchPFactor)
 		self._logger.info("--------------")
 
 
-def BoardSettings():
+def FmuSettings():
 	"""Singleton instance for the board settings"""
-	global boardSettings
-	if not boardSettings:
-		boardSettings = _BoardSettings()
-	return boardSettings
+	global fmuSettings
+	if not fmuSettings:
+		fmuSettings = _FmuSettings()
+	return fmuSettings
