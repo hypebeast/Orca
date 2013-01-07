@@ -123,7 +123,7 @@ class InfoPanel(QtGui.QWidget):
 		height = size.height()
 
 		# Draw the background
-		qp.setBrush(QtGui.QColor(168, 168, 168))
+		qp.setBrush(QtGui.QColor("#878486"))
 		qp.drawRect(1, 1, width, height)
 
 		# Draw frame
