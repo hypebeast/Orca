@@ -420,7 +420,7 @@ class StabilizationPage(QtGui.QWidget):
 		self.fmuController.setPIDPitchCoefficients(self.spbPitchKp.value(),
 												self.spbPitchKi.value(),
 												self.spbPitchKd.value(),
-												self.spbPitchILimit.value())
+												self.spbILimitPitch.value())
 
 		# PID Yaw settings
 		self.fmuController.setPIDYawCoefficients(self.spbYawKp.value(),
