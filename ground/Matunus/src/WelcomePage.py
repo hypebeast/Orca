@@ -21,7 +21,7 @@ __author__ = 'Sebastian Ruml'
 import os
 
 try:
-    from PyQt4 import QtGui, QtSvg, QtCore
+    from PyQt4 import QtGui
     from PyQt4 import QtDeclarative
     from PyQt4.QtCore import QUrl
 except ImportError:
