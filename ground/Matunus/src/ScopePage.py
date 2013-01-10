@@ -28,9 +28,10 @@ except ImportError:
 
 
 import defs
-from ScopeWidget import ScopeWidget
+#from ScopeWidget import ScopeWidget
 from logger import Logger
 from ScopeExportDialog import ScopeExportDialog
+from ScopeWidget2 import ScopeWidget2
 
 
 class ScopePage(QtGui.QWidget):
@@ -107,9 +108,9 @@ class ScopePage(QtGui.QWidget):
         palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor(255, 0, 0))
 
         # Label for the headers
-        label1 = QtGui.QLabel("Data Fields")
+        label1 = QtGui.QLabel("Data Objects")
         label1.setStyleSheet("QLabel { font: bold; color: #FFFFFF; }")
-        label2 = QtGui.QLabel("Data Fields")
+        label2 = QtGui.QLabel("Data Objects")
         label2.setStyleSheet("QLabel { font: bold; color: #FFFFFF; }")
 
         # Header 1
@@ -133,7 +134,7 @@ class ScopePage(QtGui.QWidget):
         mainLayout.addWidget(header)
 
         # Scope 1
-        self.scope1 = ScopeWidget(self._fmuManager, self.dataObjects[0])
+        self.scope1 = ScopeWidget2(self._fmuManager, self.dataObjects[0])
         mainLayout.addWidget(self.scope1)
         self._scopes.append(self.scope1)
 
@@ -158,13 +159,13 @@ class ScopePage(QtGui.QWidget):
         mainLayout.addWidget(header)
         
         # Scope 2
-        self.scope2 = ScopeWidget(self._fmuManager, self.dataObjects[0])
+        self.scope2 = ScopeWidget2(self._fmuManager, self.dataObjects[0])
         mainLayout.addWidget(self.scope2)
         self._scopes.append(self.scope2)
 
         # Control box
         groupBox = QtGui.QGroupBox("Scope Control")
-        groupBox.setMinimumHeight(40)
+        groupBox.setMinimumHeight(50)
         layout = QtGui.QHBoxLayout()
         groupBox.setLayout(layout)
         self.startButton = QtGui.QPushButton("Start")

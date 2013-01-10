@@ -16,172 +16,155 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
-import time
-import sys
+import time, sys
 
 try:
-    from PyQt4 import QtCore, Qt
+    from PyQt4 import QtCore, QtGui
 except ImportError:
     print "No PyQt found!"
     sys.exit(2)
 
-try:
-	import PyQt4.Qwt5 as Qwt 
-except:
-	print "No PyQwt found!"
-	import sys
-	sys.exit(2)
+import pyqtgraph as pg
 
-from PlotData import PlotData
+from PlotCurve import PlotCurve
 
 
-class ScopeWidget(Qwt.QwtPlot):
-	"""
-	Widget that contains one scope.
-	"""
+class ScopeWidget2(QtGui.QWidget):
+	"""Scope widget based on pyqtgraph"""
 	def __init__(self, fmuManager, dataFields):
-		"""
-		Constructor
+		super(ScopeWidget2, self).__init__()
 
-		Params:
-
-		- boardController: The board controller object
-		- dataFields: Tumple with the names of the data fields which should be scoped
-		"""
-		Qwt.QwtPlot.__init__(self)
-
-		if dataFields is None or fmuManager is None:
+		if not dataFields and not fmuManager:
 			raise Exception, 'No FMU manager or data field specified!'
 
 		self._fmuManager = fmuManager
 		self._fmuManager.board_status_updated.connect(self._on_status_updated)
 		self.boardStatus = self._fmuManager.boardStatus
 		self.plotCurves = list()
+		self.plotWidget = pg.PlotWidget()
+		self.plotItem = self.plotWidget.getPlotItem()
+		self.legend = None
+		self.legendEnabled = False
+		self.curveButtons = list()
+		self.curveColorsButton = ['#FF0000', '#00FF00', '#0000FF',
+									'#00FFFF', '#FF00FF', '#FFFF00',
+									'#997B59', '#808080']
+		self.curveColors = ['r', 'g', 'b', 'c', 'm', 'y', '997B59', '808080']
+		
+		# Signal mapper for the curve buttons
+		self.signalMapper = QtCore.QSignalMapper(self)
+		QtCore.QObject.connect(self.signalMapper,
+			QtCore.SIGNAL("mapped(int)"),
+			self._onCurveButtonToggled);
 		
 		# This timer updates the plot curves
 		self.updateTimer = QtCore.QTimer()
 		QtCore.QObject.connect(self.updateTimer, QtCore.SIGNAL('timeout()'), self._on_timer)
 		self._updateInterval = 0.25
 		self._scopeLength = 60 # Scope length in seconds
-
-		# Basic plot setup
-		self.setCanvasBackground(Qt.Qt.black)
-		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (seconds)')
-		self.setAxisScale(Qwt.QwtPlot.xBottom, 0, self._scopeLength+5, 1)
-		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Values')
-		self.setAxisScale(Qwt.QwtPlot.yLeft, 0, 250, 50)
-		
-		# Insert legend		
-		self._legend = Qwt.QwtLegend()
-		self.insertLegend(self._legend, Qwt.QwtPlot.BottomLegend)
-
-		# Grid
-		grid = Qwt.QwtPlotGrid()
-		grid.setPen(Qt.QPen(Qt.Qt.gray, 1, Qt.Qt.DotLine))
-		grid.attach(self)
-
 		self._isRunning = False
 		self._startTime = 0
 
-		# Assign data fields
+		# Data fields
 		self.dataFields = dataFields
 
-		# Init zoom
-		self._initZoomer()
+		# Initialize the UI
+		self._initUi()
 
-		# Init all plot curves
-		self._init_plots()
+		# Initialize the plot and all curves
+		self._initPlot()
 
-	def _initZoomer(self):
-		"""Initialize zooming
-        """
-		self.zoomer = Qwt.QwtPlotZoomer(Qwt.QwtPlot.xBottom,
-                                        Qwt.QwtPlot.yLeft,
-                                        Qwt.QwtPicker.DragSelection,
-                                        Qwt.QwtPicker.AlwaysOff,
-                                        self.canvas())
-		self.zoomer.setRubberBandPen(Qt.QPen(Qt.Qt.white))
+	def _initUi(self):
+		self.mainLayout = QtGui.QVBoxLayout()
+		self.setLayout(self.mainLayout)
+		self.mainLayout.addWidget(self.plotWidget)
 
-	def setZoomerMousePattern(self, index):
-		"""Set the mouse zoomer pattern.
-		"""
+		self.curveButtonsLayout = QtGui.QHBoxLayout()
+		self.curveButtonsLayout.setSpacing(10)
+		self.mainLayout.addLayout(self.curveButtonsLayout)
 
-		if index == 0:
-			pattern = [
-                Qwt.QwtEventPattern.MousePattern(Qt.Qt.LeftButton,
-                                                 Qt.Qt.NoModifier),
-                Qwt.QwtEventPattern.MousePattern(Qt.Qt.MidButton,
-                                                 Qt.Qt.NoModifier),
-                Qwt.QwtEventPattern.MousePattern(Qt.Qt.RightButton,
-                                                 Qt.Qt.NoModifier),
-                Qwt.QwtEventPattern.MousePattern(Qt.Qt.LeftButton,
-                                                 Qt.Qt.ShiftModifier),
-                Qwt.QwtEventPattern.MousePattern(Qt.Qt.MidButton,
-                                                 Qt.Qt.ShiftModifier),
-                Qwt.QwtEventPattern.MousePattern(Qt.Qt.RightButton,
-                                                 Qt.Qt.ShiftModifier),
-                ]
-			self.zoomer.setMousePattern(pattern)
-		elif index in (1, 2, 3):
-			self.zoomer.initMousePattern(index)
-		else:
-			raise ValueError, 'index must be in (0, 1, 2, 3)'
+	def _initPlot(self):
+		# Set axis titles
+		self.plotWidget.setLabel('left', 'Value', units='V')
+		self.plotWidget.setLabel('bottom', 'Time', units='s')		
 
-	def start(self):
-		"""
-		Starts plotting.
-		"""
-		self._init_plots()
-		self._startTime = time.clock()
-		self.updateTimer.start(self._updateInterval * 1000.0)
-		self._isRunning = True
+		# Set initial scale/range for x- and y-axis
+		self.plotWidget.setRange(xRange=(0,self._scopeLength+5), yRange=(0,100))
 
-	def stop(self):
-		"""
-		Stops plotting.
-		"""
-		self._startTime = 0
-		self.updateTimer.stop()
-		self._isRunning = False
+		# Disable autorange for the y-axis
+		self.plotWidget.disableAutoRange(axis=pg.ViewBox.YAxis)
 
-	def setDataFields(self, dataFields):
-		if self._isRunning:
-			return
-
-		self.dataFields = dataFields
-		self._init_plots()
-
-	def _init_plots(self):
-		"""
-		Initializes all plots.
-		"""
-		colors = [Qt.Qt.red, Qt.Qt.green, Qt.Qt.blue, Qt.Qt.cyan, Qt.Qt.magenta,
-				  Qt.Qt.yellow, '#997B59', Qt.Qt.gray]
-		self.plotCurves = list()
 		# Remove all attached curves from the plot
-		self.detachItems()
+		plot = self.plotWidget.getPlotItem()
+		for curve in self.plotCurves:
+			plot.removeItem(curve.plotDataItem)
+
+		if self.legend is not None and self.legendEnabled:
+			plot.removeItem(self.legend)
+
+		# Create legend
+		if self.legendEnabled:
+			self.legend = pg.LegendItem((100,60), offset=(70,30))
+			self.legend.setParentItem(self.plotWidget.getPlotItem())
+
+		# Initialize all curves
+		self.plotCurves = list()
 		fields = self.dataFields['fields']
 		names = self.dataFields['fieldNames']
 		colorIndex = 0
 		# Add for every data field one plot curve
 		for i in range(0, len(fields)):
-			curve = PlotData(self, fields[i], names[i])
+			curve = PlotCurve(self, fields[i], names[i])
 			# Set color
-			curve.setCurveColor(colors[colorIndex])
+			curve.setCurveColor(self.curveColors[colorIndex])
+			# Add item to legend
+			if self.legendEnabled:
+				self.legend.addItem(curve.plotDataItem, names[i])
 			# Set the max number of data points
-			curve.setXAxisSize(self._scopeLength/self._updateInterval)
+			curve.setMaxDataSize(self._scopeLength/self._updateInterval)
+			# Add curve to the plot
+			self.plotWidget.addItem(curve.plotDataItem)
+			# Save the curve for later
 			self.plotCurves.append(curve)
 			colorIndex += 1
-			if colorIndex >= len(colors):
+			if colorIndex >= len(self.curveColors):
 				colorIndex = 0
 
-		# Legend
-		for curve in self.plotCurves:
-			self._legend.find(curve.curve).setItemMode(Qwt.QwtLegend.CheckableItem)
-			self._legend.find(curve.curve).setChecked(True)
+		# Create buttons for dis/enable individual curves
+		self._createCurveButtons()
 
-		self.legendChecked.connect(self._onLegendChecked)
+	def _createCurveButtons(self):
+		# Remove all buttons from the layout if any
+		for i in xrange(0, len(self.curveButtons)):
+			b = self.curveButtonsLayout.takeAt(0)
+			self.curveButtons.pop(0)
+			b.widget().deleteLater()
+
+		# Add buttons			
+		i = 0
+		for curve in self.plotCurves:
+			button = QtGui.QPushButton(curve.dataName)
+			button.setCheckable(True)
+			button.setChecked(True)
+			button.setStyleSheet("QPushButton {color: %s; font-weight: bold;}" % (self.curveColorsButton[i]))
+			QtCore.QObject.connect(button, QtCore.SIGNAL('clicked()'),
+				self.signalMapper,
+				QtCore.SLOT("map()"))
+			self.signalMapper.setMapping(button, i)
+			self.curveButtons.append(button)
+			self.curveButtonsLayout.addWidget(button)
+			i = i + 1
+
+	def _onCurveButtonToggled(self, nr):
+		button = self.curveButtons[nr]
+		curve = self.plotCurves[nr]
+
+		if button.isChecked():
+			# Button is checked, show the curve
+			self.plotWidget.addItem(curve.plotDataItem)
+		else:
+			# Button is not checked, hide the curve
+			self.plotWidget.removeItem(curve.plotDataItem)
 
 	def _on_timer(self):
 		"""
@@ -214,21 +197,17 @@ class ScopeWidget(Qwt.QwtPlot):
 				if val < min_yVal:
 					min_yVal = val
 
-			# X-Axis
-			self.setAxisScale(Qwt.QwtPlot.xBottom, self.plotCurves[0].xData[0],
-				max(self._scopeLength, self.plotCurves[0].xData[-1]), 1)
-			# Y-Axis
-			self.setAxisScale(Qwt.QwtPlot.yLeft, min_yVal,
-				max_yVal, int((max_yVal - min_yVal) / 20))
+
+			# Set the ranges for the x- and y-axis
+			self.plotWidget.setRange(xRange=(self.plotCurves[0].xData[0],
+				max(self._scopeLength, self.plotCurves[0].xData[-1])),
+				yRange=(min_yVal, max_yVal))
 
 		# Draw every curve
 		for curve in self.plotCurves:
 			if not curve:
 				continue
 			curve.drawCurve()
-
-		# Replot everything
-		self.replot()
 
 	def _on_status_updated(self):
 		"""Updates the plot data. Called when the board status was updated."""
@@ -237,6 +216,26 @@ class ScopeWidget(Qwt.QwtPlot):
 			for curve in self.plotCurves:
 				curve.updateData(self.boardStatus, timestamp)
 
-	def _onLegendChecked(self, plotItem, on):
-		if on: plotItem.show()
-		else: plotItem.hide()
+	def start(self):
+		"""
+		Starts plotting.
+		"""
+		self._initPlot()
+		self._startTime = time.clock()
+		self.updateTimer.start(self._updateInterval * 1000.0)
+		self._isRunning = True
+
+	def stop(self):
+		"""
+		Stops plotting.
+		"""
+		self._startTime = 0
+		self.updateTimer.stop()
+		self._isRunning = False
+
+	def setDataFields(self, dataFields):
+		if self._isRunning:
+			return
+
+		self.dataFields = dataFields
+		self._initPlot()

@@ -12,3 +12,4 @@ documents
 bib
 build
 dist
+*.user

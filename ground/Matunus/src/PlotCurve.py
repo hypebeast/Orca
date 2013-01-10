@@ -25,78 +25,56 @@ except:
 	import sys
 	sys.exit(2)
 
-try:
-	import PyQt4.Qwt5 as Qwt 
-except:
-	print "No PyQwt found!"
-	import sys
-	sys.exit(2)
+import pyqtgraph as pg
+import numpy as np
 
-
-class PlotData:
-	"""
-	This class represents one plot curve and it's data.
-	"""
+class PlotCurve():
 	def __init__(self, plot, field, fieldName):
 		if not plot or not field or not fieldName:
 			raise Exception, 'Argument exception!'
 
+		self.plotDataItem = pg.PlotDataItem(name=fieldName)
 		self.plot = plot
-		# Data field name
+		# Data field
 		self.dataField = field
 		# Human readable data field name
 		self.dataName = fieldName
 		self.data = list()
 		self.xData = list()	
 		self.yData = list()
+		self.curveColor = 'r'
 
 		# This is the power to which each value must be raised
 		self.scalePower = 0
 		self.yMinimum = 0
 		self.yMaximum = 0
-		self.xAxisSize = 120 # Max number of data points
-		self.curve = Qwt.QwtPlotCurve(fieldName)
-		self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
-		pen = QtGui.QPen(QtGui.QColor('limegreen'))
-		pen.setWidth(1)
-		self.curve.setPen(pen)
-		self.curve.setStyle(Qwt.QwtPlotCurve.Lines)
-		self.curve.attach(self.plot)
+		self.maxDataSize = 120 # Max number of data points
 
 		self._enabled = True
-		
+
 	def drawCurve(self):
 		"""Sets new data to the curve"""
-		self.curve.setData(self.xData, self.yData)
+		self.plotDataItem.setData(x=self.xData, y=self.yData)
 
 	def updateData(self, boardStatus, timestamp):
 		"""Updates the curve with new data. Is called when new data was received."""
 		self.data.append((timestamp, boardStatus.getValue(self.dataField)))
 
 		# Limit max size of data
-		if len(self.data) > self.xAxisSize:
+		if len(self.data) > self.maxDataSize:
 			self.data.pop(0)
 
 		# Set new data
-		self.xData = [float(s[0]) for s in self.data]
-		self.yData = [float(s[1]) for s in self.data]
+		self.xData = [float(s[0]) for s in self.data] # Time points
+		self.yData = [float(s[1]) for s in self.data] # Value points
 
 	def setCurveColor(self, color):
-		pen = QtGui.QPen(QtGui.QColor(color))
-		pen.setWidth(2)
-		self.curve.setPen(pen)
+		if not color:
+			return
 
-	def setXAxisSize(self, size):
-		"""Sets the size (number of points) of the X axis."""
-		self.xAxisSize = size
+		self.curveColor = color
+		self.plotDataItem.setPen(color=color, width=1)
 
-
-class PlotTestData:
-	def __init__(self):
-		pass
-
-	def getData(self):
-		data = list()
-		for i in range(0, 100):
-			data.append(dict(timestamp=i*2, value=i*4))
-		return data
+	def setMaxDataSize(self, size):
+		"""Sets the maximum size (number of data points) of the X axis."""
+		self.maxDataSize = size
