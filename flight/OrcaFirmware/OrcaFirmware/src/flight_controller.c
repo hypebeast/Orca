@@ -150,20 +150,22 @@ int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController)
 	{
 		/* Use the throttle RC input as the main EDF speed */
 		flightController->leftEdfSetPoint = FLIGHT_CONTROLLER_EDF_OFFSET + flightController->rcServoIn->servo3;
-	
-		/* Reduce and add the roll PID output to the EDF speed */
-		if(actuatingRoll>0)
-		{
-			flightController->leftEdfSetPoint -= (uint16_t)actuatingRoll;
-			//flightController->leftEdfSetPoint -= (uint16_t)(actuatingRoll *
+		
+		#ifdef FLIGHT_CONTROLLER_USE_STABILIZATION
+			/* Reduce and add the roll PID output to the EDF speed */
+			if(actuatingRoll>0)
+			{
+				flightController->leftEdfSetPoint -= (uint16_t)actuatingRoll;
+				//flightController->leftEdfSetPoint -= (uint16_t)(actuatingRoll *
+					//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+			}
+			else
+			{
+				flightController->leftEdfSetPoint += (uint16_t)(-1*actuatingRoll);
+				//flightController->leftEdfSetPoint += (uint16_t)(-1*actuatingRoll *
 				//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
-		}
-		else
-		{
-			flightController->leftEdfSetPoint += (uint16_t)(-1*actuatingRoll);
-			//flightController->leftEdfSetPoint += (uint16_t)(-1*actuatingRoll *
-			//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
-		}
+			}
+		#endif
 	}
 	else
 		flightController->leftEdfSetPoint = FLIGHT_CONTROLLER_SERVO_LOWER_PULSE_WIDTH;		
@@ -188,19 +190,21 @@ int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController)
 		/* Use the throttle RC input as the main EDF speed */
 		flightController->rightEdfSetPoint = FLIGHT_CONTROLLER_EDF_OFFSET + flightController->rcServoIn->servo3;
 	
-		/* Reduce and add the roll PID output to the EDF speed */
-		if(actuatingRoll<0)
-		{
-			flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll);
-			//flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll *
-				//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
-		}
-		else
-		{
-			flightController->rightEdfSetPoint += (uint16_t)(actuatingRoll);
-			//flightController->rightEdfSetPoint += (uint16_t)(actuatingRoll *
-			//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));		
-		}
+		#ifdef FLIGHT_CONTROLLER_USE_STABILIZATION
+			/* Reduce and add the roll PID output to the EDF speed */
+			if(actuatingRoll<0)
+			{
+				flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll);
+				//flightController->rightEdfSetPoint -= (uint16_t)(-1*actuatingRoll *
+					//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));
+			}
+			else
+			{
+				flightController->rightEdfSetPoint += (uint16_t)(actuatingRoll);
+				//flightController->rightEdfSetPoint += (uint16_t)(actuatingRoll *
+				//(FLIGHT_CONTROLLER_AILERON_DELTA_VALUE_CONF/FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF));		
+			}
+		#endif
 	}
 	else
 		flightController->rightEdfSetPoint = FLIGHT_CONTROLLER_SERVO_LOWER_PULSE_WIDTH;	
@@ -218,24 +222,18 @@ int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController)
 ***************************************************************************/
 int flight_controller_calc_left_servo(FLIGHT_CONTROLLER_t *flightController)
 {
-	
-	if(flightController->rcServoIn->servo1 >= FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
-	{	
-		flightController->leftServoSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH -
-												(flightController->rcServoIn->servo1 - 
-												FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH) * FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
-	}												
-	else
-	{
-		flightController->leftServoSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH +
-												(FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH -
-												flightController->rcServoIn->servo1) * FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
-	}
+	/* Elevator Control */
+	flightController->leftServoSetPoint = (uint16_t)(FLIGHT_CONTROLLER_RUDDER_MIDDLE_PULSE_WIDTH_CONF -
+											(((float)flightController->rcServoIn->servo1-FLIGHT_CONTROLLER_ELEVATOR_MIDDLE_PULSE_WIDTH_CONF)/
+											(90.0/FLIGHT_CONTROLLER_ELEVATOR_MAX_ANGLE_CONF)));
 	
 	/* Rudder Control */
-	flightController->leftServoSetPoint += (flightController->rcServoIn->servo4 -
-		FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_RUDDER_FACTOR;
-
+	flightController->leftServoSetPoint += (uint16_t)((((float)flightController->rcServoIn->servo4-FLIGHT_CONTROLLER_RUDDER_MIDDLE_PULSE_WIDTH_CONF)/
+											(90.0/FLIGHT_CONTROLLER_RUDDER_MAX_ANGLE_CONF)));
+											
+	/* Limit the servo output. This should never happen during a normal flight! Otherwise limit the MAX_ANGLE_CONF!
+	 * Note: The servo ouput is a sum of rudder and elevator control! */
+	constrain(flightController->leftServoSetPoint,FLIGHT_CONTROLLER_MIN_SERVO_OUTPUT,FLIGHT_CONTROLLER_MAX_SERVO_OUTPUT);
 	
 	return SYSTEM_INFO_TRUE;	
 }
@@ -251,24 +249,20 @@ int flight_controller_calc_left_servo(FLIGHT_CONTROLLER_t *flightController)
 int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController)
 {
 	
-	if(flightController->rcServoIn->servo1 >= FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)
-	{	
-		flightController->rightServoSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH +
-												(flightController->rcServoIn->servo1 -
-													FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
-	}												
-	else
-	{
-		flightController->rightServoSetPoint = FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH -
-												(FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH -
-													flightController->rcServoIn->servo1)*FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR;
-	}
+	/* Elevator Control */
+	flightController->rightServoSetPoint = (uint16_t)(FLIGHT_CONTROLLER_RUDDER_MIDDLE_PULSE_WIDTH_CONF -
+											(((float)flightController->rcServoIn->servo1-FLIGHT_CONTROLLER_ELEVATOR_MIDDLE_PULSE_WIDTH_CONF)/
+											(90.0/FLIGHT_CONTROLLER_ELEVATOR_MAX_ANGLE_CONF)));
 	
 	/* Rudder Control */
-	flightController->rightServoSetPoint += (flightController->rcServoIn->servo4 -
-		FLIGHT_CONTROLLER_SERVO_MIDDLE_PULSE_WIDTH)*FLIGHT_CONTROLLER_RUDDER_FACTOR;
+	flightController->rightServoSetPoint -= (uint16_t)((((float)flightController->rcServoIn->servo4-FLIGHT_CONTROLLER_RUDDER_MIDDLE_PULSE_WIDTH_CONF)/
+											(90.0/FLIGHT_CONTROLLER_RUDDER_MAX_ANGLE_CONF)));
+											
+	/* Limit the servo output. This should never happen during a normal flight! Otherwise limit the MAX_ANGLE_CONF!
+	 * Note: The servo ouput is a sum of rudder and elevator control! */
+	constrain(flightController->rightServoSetPoint,FLIGHT_CONTROLLER_MIN_SERVO_OUTPUT,FLIGHT_CONTROLLER_MAX_SERVO_OUTPUT);
 	
-	return SYSTEM_INFO_TRUE;	
+	return SYSTEM_INFO_TRUE;		
 }
 
 /**************************************************************************
@@ -287,16 +281,18 @@ int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 	{
 		/* Proportionalwe Anteil vom RC Aileron  */
 		flightController->rearEdfSetPoint = (uint16_t)((float)(flightController->rcServoIn->servo3)*FLIGHT_CONTROLLER_PITCH_PROPORTIONAL_RC_AILERON);
-				
+		
+		#ifdef FLIGHT_CONTROLLER_USE_STABILIZATION		
 		/* Reduce and add the pitch PID output to the rear EDF speed */
-		if(actuatingPitch<0)
-		{
-			flightController->rearEdfSetPoint -= (uint16_t)(-1*actuatingPitch);
-		}
-		else
-		{
-			flightController->rearEdfSetPoint += (uint16_t)(actuatingPitch);
-		}	
+			if(actuatingPitch<0)
+			{
+				flightController->rearEdfSetPoint -= (uint16_t)(-1*actuatingPitch);
+			}
+			else
+			{
+				flightController->rearEdfSetPoint += (uint16_t)(actuatingPitch);
+			}
+		#endif	
 	}
 			
 	return SYSTEM_INFO_TRUE;	
