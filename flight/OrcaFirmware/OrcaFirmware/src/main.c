@@ -223,7 +223,7 @@ void system_timer(uint32_t time)
 			/* Do the kalman filter */
 			filter_task(motionProcessingUnit.time);
 		}
-		MS5611_altimeter_task(10);
+		//MS5611_altimeter_task(10);
 		ulFcTickCounter = 0;
 
 	}

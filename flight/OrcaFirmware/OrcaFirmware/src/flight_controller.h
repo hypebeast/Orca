@@ -19,6 +19,7 @@
 #define FLIGHT_CONTROLLER_MODE_RC		(0x01<<0)		/*!< brief External RC controlled */
 #define FLIGHT_CONTROLLER_MODE_AUTOMATIC (0x01<<1)		/*!< brief Automatic mode */
 
+//#define FLIGHT_CONTROLLER_USE_STABILIZATION				
 //---------------------------------------------------------------------
 //	Factory Settings for the PID Controller
 //  Edit this settings for different configurations
@@ -60,11 +61,11 @@
 //---------------------------------------------------------------------
 //	Servo Definitions
 //---------------------------------------------------------------------
-#define FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR			1.7f	/*!< brief Aussteuerweg für Servo links und rechts durch Elevator */
+#define FLIGHT_CONTROLLER_SERVO_MAX_WAY_FACTOR			0.5f	/*!< brief Aussteuerweg für Servo links und rechts durch Elevator */
 #define FLIGHT_CONTROLLER_RUDDER_FACTOR					1.0f	/*!< brief Factor für die Rudder Addition für Servo links und rechts */
 
 //---------------------------------------------------------------------
-//	Supported Flight Controller Modes
+//	RC Input Definitons
 //---------------------------------------------------------------------
 #define FLIGHT_CONTROLLER_ROLL_MAX_ANGLE_CONF				20.0f	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
 #define FLIGHT_CONTROLLER_AILERON_MIN_VALUE_CONF			1130	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
@@ -73,10 +74,21 @@
 
 #define FLIGHT_CONTROLLER_PITCH_MAX_ANGLE_CONF				10.0f	/*!< brief Maximaler Pitch Winkel über die Fernsteuerung */
 #define FLIGHT_CONTROLLER_PITCH_PROPORTIONAL_RC_AILERON		0.85f	/*!< brief Maximaler Pitch Winkel über die Fernsteuerung */
+
+#define FLIGHT_CONTROLLER_ELEVATOR_MAX_ANGLE_CONF			20.0f	/*!< brief Maximaler Servo Winkel über Rudder von der Fernsteuerung */
 #define FLIGHT_CONTROLLER_ELEVATOR_MIN_VALUE_CONF			1128	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
 #define FLIGHT_CONTROLLER_ELEVATOR_MAX_VALUE_CONF			1944	/*!< brief Maximaler Roll Winkel über die Fernsteuerung */
 #define FLIGHT_CONTROLLER_ELEVATOR_DELTA_VALUE_CONF			(FLIGHT_CONTROLLER_ELEVATOR_MAX_VALUE_CONF-FLIGHT_CONTROLLER_ELEVATOR_MIN_VALUE_CONF)
+#define FLIGHT_CONTROLLER_ELEVATOR_MIDDLE_PULSE_WIDTH_CONF	1536.0
 
+#define FLIGHT_CONTROLLER_RUDDER_MAX_ANGLE_CONF				45.0f	/*!< brief Maximaler Servo Winkel über Rudder von der Fernsteuerung */
+#define FLIGHT_CONTROLLER_RUDDER_MIN_VALUE_CONF				1126.0	/*!< brief Minimaler PWM Wert für Rudder von der Fernsteuerung */
+#define FLIGHT_CONTROLLER_RUDDER_MAX_VALUE_CONF				1942.0	/*!< brief Maximaler PWM Wert für Rudder von der Fernsteuerung */
+#define FLIGHT_CONTROLLER_RUDDER_DELTA_VALUE_CONF			(FLIGHT_CONTROLLER_RUDDER_MAX_VALUE_CONF-FLIGHT_CONTROLLER_RUDDER_MIN_VALUE_CONF)
+#define FLIGHT_CONTROLLER_RUDDER_MIDDLE_PULSE_WIDTH_CONF	1536.0
+
+#define FLIGHT_CONTROLLER_MAX_SERVO_OUTPUT					1800	/*!< brief The upper limit servo ouput for the EDF swivel mechanism */
+#define FLIGHT_CONTROLLER_MIN_SERVO_OUTPUT					1200	/*!< brief The lower limit servo ouput for the EDF swivel mechanism */
 /*! Flight Controller Struct */
 typedef struct FLIGHT_CONTROLLER {
 	volatile uint16_t mode;					/*!< brief Selected flight controller mode */	
@@ -88,6 +100,9 @@ typedef struct FLIGHT_CONTROLLER {
 	uint16_t rearEdfSetPoint;				/*!< brief Setpoint for the rear EDF */
 }FLIGHT_CONTROLLER_t;
 
+#ifndef constrain
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+#endif
 
 void flight_controller_init(BOARD_CONFIG_t *board,ORCA_FLASH_SETTINGS_t *settings, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController);

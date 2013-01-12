@@ -76,7 +76,9 @@ typedef struct FILTER_DATA{
 #define PI 3.14159265358979f
 #define ToRad(x) (x*0.01745329252)  // *pi/180
 #define ToDeg(x) (x*57.2957795131)  // *180/pi
+#ifndef constrain
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+#endif
 
 
 #ifdef FILTER_USE_DCM
