@@ -44,11 +44,19 @@ Rectangle {
         id: buttonsLayout
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width
+        y: (parent.height) * 0.3
 
         Row {
             property real availableWidth: welcomecontainer.width
-            x: (availableWidth-width)/2
+            x: (availableWidth-width) * 0.3
             spacing: 16
+
+            // Logo image
+            Image {
+                source: "src/qml/welcomepage/images/welcome-logo.png"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: -2 //it looks better aligned to icons grid
+            }
 
             Grid {
                 id: buttons

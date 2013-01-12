@@ -24,5 +24,5 @@ class Servo(object):
 	This class represents an servo. It's used to control and retrieve
 	the status of a servo.
 	"""
-    def __init__(self):
-        pass
+	def __init__(self):
+		pass
