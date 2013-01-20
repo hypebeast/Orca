@@ -31,7 +31,7 @@ import defs
 #from ScopeWidget import ScopeWidget
 from logger import Logger
 from ScopeExportDialog import ScopeExportDialog
-from ScopeWidget2 import ScopeWidget2
+from ScopeWidget import ScopeWidget
 
 
 class ScopePage(QtGui.QWidget):
@@ -134,7 +134,7 @@ class ScopePage(QtGui.QWidget):
         mainLayout.addWidget(header)
 
         # Scope 1
-        self.scope1 = ScopeWidget2(self._fmuManager, self.dataObjects[0])
+        self.scope1 = ScopeWidget(self._fmuManager, self.dataObjects[0])
         mainLayout.addWidget(self.scope1)
         self._scopes.append(self.scope1)
 
@@ -159,7 +159,7 @@ class ScopePage(QtGui.QWidget):
         mainLayout.addWidget(header)
         
         # Scope 2
-        self.scope2 = ScopeWidget2(self._fmuManager, self.dataObjects[0])
+        self.scope2 = ScopeWidget(self._fmuManager, self.dataObjects[0])
         mainLayout.addWidget(self.scope2)
         self._scopes.append(self.scope2)
 
@@ -221,7 +221,6 @@ class ScopePage(QtGui.QWidget):
             return
 
         f = open(fileName, 'w')
-
         with f:
             dataFields = None
             curves = None
