@@ -21,22 +21,17 @@ __author__ = 'Sebastian Ruml'
 
 import os
 
-# This is only needed for Python v2 but is harmless for Python v3.
-#import sip
-#sip.setapi('QVariant', 2)
 
-from PyQt4 import QtGui, QtSvg, QtCore
-
-#try:
-#    from PyQt4 import QtGui, QtSvg, QtCore
-#except ImportError:
-#    print "No PyQt found!"
-#    import sys
-#    sys.exit(2)
+try:
+    from PyQt4 import QtGui, QtSvg, QtCore
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
 
 import defs
 
-from LinearDialGadget import LinearDialGadget
+from gadgets.airspeed.airspeed_gadget import AirspeedGadget
 
 
 class FlightDisplay(QtGui.QWidget):
@@ -48,8 +43,8 @@ class FlightDisplay(QtGui.QWidget):
         self._createUi()
 
     def _createUi(self):
-        self.view = QtGui.QGraphicsView()
-        self.scene = QtGui.QGraphicsScene()
+        #self.view = QtGui.QGraphicsView()
+        #self.scene = QtGui.QGraphicsScene()
 
         #self.view.setRenderHint(QtGui.QPainter.Antialiasing)
         #self.view.setTransformationAnchor(QtGui.QGraphicsView.AnchorUnderMouse)
@@ -64,8 +59,9 @@ class FlightDisplay(QtGui.QWidget):
         mainLayout = QtGui.QVBoxLayout()
 
         layout = QtGui.QHBoxLayout()
-        self.vertBar = LinearDialGadget()
-        layout.addWidget(self.vertBar)
+        #self.vertBar = LinearDialGadget()
+        self.airspeedGadget = AirspeedGadget()
+        layout.addWidget(self.airspeedGadget)
         layout.addStretch()
         mainLayout.addLayout(layout)
 
@@ -84,7 +80,7 @@ class FlightDisplay(QtGui.QWidget):
         height = size.height()
 
         # Draw the background
-        qp.setBrush(QtGui.QColor(128, 128, 128))
+        qp.setBrush(QtGui.QColor("#646464"))
         qp.drawRect(0, 0, width, height)
 
     def resizeEvent(self, event):

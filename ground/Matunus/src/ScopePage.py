@@ -80,7 +80,7 @@ class ScopePage(QtGui.QWidget):
                                 'fields': ("setRollAngle", "pidRollActuating", "dcmOutputRoll"),
                                 'fieldNames': ("Set Value", " Actuating Value", "Actual Value")})
         self.dataObjects.append({'groupName': "PID Pitch",
-                                'fields': ("setPitchAngle", "pidPitchActuating", "dcmPitchRoll"),
+                                'fields': ("setPitchAngle", "pidPitchActuating", "dcmOutputPitch"),
                                 'fieldNames': ("Set Value", " Actuating Value", "Actual Value")})
         self.dataObjects.append({'groupName': "PID Yaw",
                                 'fields': ("setYawAngle", "pidYawActuating", "dcmOutputYaw"),
