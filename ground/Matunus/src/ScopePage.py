@@ -31,7 +31,7 @@ import defs
 #from ScopeWidget import ScopeWidget
 from logger import Logger
 from ScopeExportDialog import ScopeExportDialog
-from ScopeWidget2 import ScopeWidget2
+from ScopeWidget import ScopeWidget2
 
 
 class ScopePage(QtGui.QWidget):

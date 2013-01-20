@@ -428,7 +428,7 @@ float filter_kalman_get_roll_rangle(void)
 		Vector_Cross_Product(&errorRollPitch[0],&Accel_Vector[0],&DCM_Matrix[2][0]); //adjust the ground of reference
 		Vector_Scale(&Omega_P[0],&errorRollPitch[0],filterdata->Kp_rollPitch*Accel_weight);
   
-		Vector_Scale(&Scaled_Omega_I[0],&errorRollPitch[0],filterdata->Kp_rollPitch*Accel_weight);
+		Vector_Scale(&Scaled_Omega_I[0],&errorRollPitch[0],filterdata->Ki_rollPitch*Accel_weight);
 		Vector_Add(Omega_I,Omega_I,Scaled_Omega_I);     
   
 	  /*********** YAW ***************/
