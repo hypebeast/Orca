@@ -104,7 +104,9 @@ typedef struct FLIGHT_CONTROLLER {
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 #endif
 
-void flight_controller_init(BOARD_CONFIG_t *board,ORCA_FLASH_SETTINGS_t *settings, SERVO_IN_t *servo, FILTER_DATA_t *filter, FLIGHT_CONTROLLER_t *flightController);
+void flight_controller_init(BOARD_CONFIG_t *board,ORCA_FLASH_SETTINGS_t *settings,
+								SERVO_IN_t *servo, FILTER_DATA_t *filter,
+								FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_left_edf(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_left_servo(FLIGHT_CONTROLLER_t *flightController);
 int flight_controller_calc_right_edf(FLIGHT_CONTROLLER_t *flightController);
