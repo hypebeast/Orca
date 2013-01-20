@@ -275,15 +275,18 @@ int flight_controller_calc_right_servo(FLIGHT_CONTROLLER_t *flightController)
 ***************************************************************************/
 int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 {
-	flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_EDF_REAR_OFFSET;
+	/* Minimum PWM Output */
+	flightController->rearEdfSetPoint = FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET;
 
+	/* Only control the EDF if we get enough throttle from the RC */
 	if(flightController->rcServoIn->servo3 >= FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET)
 	{
 		/* Proportionalwe Anteil vom RC Aileron  */
-		flightController->rearEdfSetPoint = (uint16_t)((float)(flightController->rcServoIn->servo3)*FLIGHT_CONTROLLER_PITCH_PROPORTIONAL_RC_AILERON);
+		//flightController->rearEdfSetPoint = (uint16_t)((float)(flightController->rcServoIn->servo3)*FLIGHT_CONTROLLER_PITCH_PROPORTIONAL_RC_AILERON);
 		
+		flightController->rearEdfSetPoint += 370;
 		#ifdef FLIGHT_CONTROLLER_USE_STABILIZATION		
-		/* Reduce and add the pitch PID output to the rear EDF speed */
+		/* Reduce and add the pitch PID output to the rear EDF speed */		
 			if(actuatingPitch<0)
 			{
 				flightController->rearEdfSetPoint -= (uint16_t)(-1*actuatingPitch);
@@ -294,6 +297,9 @@ int flight_controller_calc_rear_edf(FLIGHT_CONTROLLER_t *flightController)
 			}
 		#endif	
 	}
+	
+	/* Limit the EDF output*/
+	constrain(flightController->rearEdfSetPoint,FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET,FLIGHT_CONTROLLER_MAX_SERVO_OUTPUT);
 			
 	return SYSTEM_INFO_TRUE;	
 }

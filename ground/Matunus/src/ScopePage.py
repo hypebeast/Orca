@@ -28,7 +28,6 @@ except ImportError:
 
 
 import defs
-#from ScopeWidget import ScopeWidget
 from logger import Logger
 from ScopeExportDialog import ScopeExportDialog
 from ScopeWidget import ScopeWidget

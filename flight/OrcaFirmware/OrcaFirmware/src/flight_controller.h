@@ -19,7 +19,7 @@
 #define FLIGHT_CONTROLLER_MODE_RC		(0x01<<0)		/*!< brief External RC controlled */
 #define FLIGHT_CONTROLLER_MODE_AUTOMATIC (0x01<<1)		/*!< brief Automatic mode */
 
-//#define FLIGHT_CONTROLLER_USE_STABILIZATION				
+#define FLIGHT_CONTROLLER_USE_STABILIZATION				
 //---------------------------------------------------------------------
 //	Factory Settings for the PID Controller
 //  Edit this settings for different configurations
@@ -56,7 +56,7 @@
 //	Rear EDF Definitions
 //---------------------------------------------------------------------
 #define FLIGHT_CONTROLLER_EDF_REAR_OFFSET				FLIGHT_CONTROLLER_SERVO_LOWER_PULSE_WIDTH		/*!< brief Additions-Offset für rear EDF */
-#define FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET			1260
+#define FLIGHT_CONTROLLER_EDF_REAR_START_OFFSET			1200
 
 //---------------------------------------------------------------------
 //	Servo Definitions

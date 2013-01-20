@@ -10,7 +10,7 @@ Matunus is the Ground Control Station (GCS) for the Orca. It's used for the conf
 
 The following libraries are needed in order ro run Matunus:
 
-* Python v2.6.x (http://www.python.org/getit/releases/2.6/, http://www.python.org/ftp/python/2.6.2/python-2.6.2.msi)
+* Python v2.7.x
 * PyQT v4.8+ (http://www.riverbankcomputing.com/software/pyqt/download)
 * pyqtgraph 0.9.4 (http://www.pyqtgraph.org)
 * NumPy (http://www.scipy.org/Download)
@@ -33,7 +33,7 @@ Make sure that you have all dependencies installed. See the section 'Requirement
 
 To run Matunus, type the following in your command line:
 	
-	$ pyton matunus.py
+	$ python matunus.py
 
 Note: If you have more than one Python version installed use the start.cmd (Windows) script and point to your Python 2.6.x binary.
 
