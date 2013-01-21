@@ -29,10 +29,10 @@ import pyqtgraph as pg
 from PlotCurve import PlotCurve
 
 
-class ScopeWidget2(QtGui.QWidget):
+class ScopeWidget(QtGui.QWidget):
 	"""Scope widget based on pyqtgraph"""
 	def __init__(self, fmuManager, dataFields):
-		super(ScopeWidget2, self).__init__()
+		super(ScopeWidget, self).__init__()
 
 		if not dataFields and not fmuManager:
 			raise Exception, 'No FMU manager or data field specified!'
