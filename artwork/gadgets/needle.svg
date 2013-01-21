@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg3204"
+   version="1.1"
+   inkscape:version="0.48.1 "
+   sodipodi:docname="needle.svg">
+  <defs
+     id="defs3206">
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4910"
+       id="linearGradient4955"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-30.188726,0.58809245)"
+       x1="549.67114"
+       y1="344.3187"
+       x2="638.66071"
+       y2="344.3187" />
+    <linearGradient
+       id="linearGradient4910">
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="0"
+         id="stop4912" />
+      <stop
+         style="stop-color:#333333;stop-opacity:0.5;"
+         offset="1"
+         id="stop4914" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4922"
+       id="radialGradient4957"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.20154893,-30.188726,275.50973)"
+       cx="590.44135"
+       cy="344.3187"
+       fx="590.44135"
+       fy="344.3187"
+       r="36.185604" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4922">
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:1;"
+         offset="0"
+         id="stop4924" />
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:0;"
+         offset="1"
+         id="stop4926" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.5506212"
+     inkscape:cx="434.5716"
+     inkscape:cy="507.46483"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1138"
+     inkscape:window-x="-8"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata3209">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g4950"
+       transform="matrix(0.88058586,0,0,1,-68.350636,183.71601)"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\needle.png"
+       inkscape:export-xdpi="114.31"
+       inkscape:export-ydpi="114.31">
+      <path
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0"
+         id="path4908"
+         d="m 607.99297,344.9068 -68.1863,8.87134 -19.98388,-8.73272 19.47502,-9.00995 z"
+         style="fill:url(#linearGradient4955);fill-opacity:1;stroke:#000000;stroke-width:0.95799148px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         style="fill:url(#radialGradient4957);fill-opacity:1;stroke:none"
+         d="m 596.43822,344.9068 -56.05631,7.29317 -16.3149,-6.38153 15.89656,-8.20481 z"
+         id="path4918"
+         inkscape:connector-curvature="0" />
+      <path
+         sodipodi:nodetypes="ccc"
+         inkscape:connector-curvature="0"
+         id="path4932"
+         d="m 539.28038,336.0661 6.9031,8.84448 -5.72692,8.79828"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>

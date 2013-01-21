@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.1 "
+   sodipodi:docname="airspeed-gadget.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4922">
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:1;"
+         offset="0"
+         id="stop4924" />
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:0;"
+         offset="1"
+         id="stop4926" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4910">
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="0"
+         id="stop4912" />
+      <stop
+         style="stop-color:#333333;stop-opacity:0.5;"
+         offset="1"
+         id="stop4914" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4910"
+       id="linearGradient4955"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-30.188726,0.58809245)"
+       x1="549.67113"
+       y1="344.31871"
+       x2="638.6607"
+       y2="344.31871" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4922"
+       id="radialGradient4957"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.20154893,-30.188726,275.50973)"
+       cx="590.44135"
+       cy="344.3187"
+       fx="590.44135"
+       fy="344.3187"
+       r="36.185604" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.5506212"
+     inkscape:cx="365.3345"
+     inkscape:cy="666.59868"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1680"
+     inkscape:window-height="988"
+     inkscape:window-x="-8"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid4463" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#1a1a1a;fill-opacity:1;fill-rule:nonzero;stroke:#000000"
+       id="rect2985"
+       width="213.14218"
+       height="213.14218"
+       x="264.65997"
+       y="279.59549"
+       ry="16.920055"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <rect
+       style="fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.97405535000000021"
+       id="rect2991"
+       width="207.61229"
+       height="207.61229"
+       x="267.42493"
+       y="282.36044"
+       ry="16.481071"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#1a1a1a;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path2995"
+       sodipodi:cx="100.76272"
+       sodipodi:cy="467.73639"
+       sodipodi:rx="73.993675"
+       sodipodi:ry="73.993675"
+       d="m 174.75639,467.73639 a 73.993675,73.993675 0 1 1 -147.987347,0 73.993675,73.993675 0 1 1 147.987347,0 z"
+       transform="matrix(1.2915453,0,0,1.2915453,241.09146,-217.93615)"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <path
+       transform="matrix(0.09824367,0,0,0.09824367,450.18459,249.83625)"
+       d="m 174.75639,467.73639 a 73.993675,73.993675 0 1 1 -147.987347,0 73.993675,73.993675 0 1 1 147.987347,0 z"
+       sodipodi:ry="73.993675"
+       sodipodi:rx="73.993675"
+       sodipodi:cy="467.73639"
+       sodipodi:cx="100.76272"
+       id="path2997"
+       style="fill:#1a1a1a;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10.17877293;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       sodipodi:type="arc" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:10.17877292999999900;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3767"
+       sodipodi:cx="100.76272"
+       sodipodi:cy="467.73639"
+       sodipodi:rx="73.993675"
+       sodipodi:ry="73.993675"
+       d="m 174.75639,467.73639 a 73.993675,73.993675 0 1 1 -147.987347,0 73.993675,73.993675 0 1 1 147.987347,0 z"
+       transform="matrix(0.06311706,0,0,0.06311706,453.72404,266.26624)" />
+    <path
+       style="fill:#b3b3b3;stroke:#999999;stroke-width:0.85255444;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 460.08389,293.34437 0,4.88804"
+       id="path3769"
+       inkscape:connector-curvature="0" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path3771"
+       d="m 457.63987,295.78839 4.88804,0"
+       style="fill:#b3b3b3;stroke:#999999;stroke-width:0.85255444;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 371.23108,465.97194 0,13.25846"
+       id="path3773"
+       inkscape:connector-curvature="0"
+       inkscape:tile-cx="371.28577"
+       inkscape:tile-cy="386.27305"
+       inkscape:tile-w="0"
+       inkscape:tile-h="13.25846"
+       inkscape:tile-x0="371.23108"
+       inkscape:tile-y0="465.97194"
+       inkscape:transform-center-y="86.328125"
+       inkscape:transform-center-x="0.0546875"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#path3773"
+       xlink:href="#path3773"
+       transform="matrix(-1,0,0,-1,742.57154,772.54609)"
+       id="use4749"
+       inkscape:transform-center-x="-0.0546925"
+       inkscape:transform-center-y="-86.328125"
+       width="744.09448"
+       height="1052.3622"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <g
+       id="g4805"
+       transform="translate(-174,-3)"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25">
+      <path
+         transform="matrix(0.09824367,0,0,0.09824367,446.18459,252.83625)"
+         d="m 174.75639,467.73639 c 0,40.86558 -33.12809,73.99367 -73.99367,73.99367 -40.86558,0 -73.993677,-33.12809 -73.993677,-73.99367 0,-40.86558 33.128097,-73.99368 73.993677,-73.99368 40.86558,0 73.99367,33.1281 73.99367,73.99368 z"
+         sodipodi:ry="73.993675"
+         sodipodi:rx="73.993675"
+         sodipodi:cy="467.73639"
+         sodipodi:cx="100.76272"
+         id="path4807"
+         style="fill:#1a1a1a;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10.17877293;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         sodipodi:type="arc" />
+      <path
+         sodipodi:type="arc"
+         style="fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10.17877293;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path4809"
+         sodipodi:cx="100.76272"
+         sodipodi:cy="467.73639"
+         sodipodi:rx="73.993675"
+         sodipodi:ry="73.993675"
+         d="m 174.75639,467.73639 c 0,40.86558 -33.12809,73.99367 -73.99367,73.99367 -40.86558,0 -73.993677,-33.12809 -73.993677,-73.99367 0,-40.86558 33.128097,-73.99368 73.993677,-73.99368 40.86558,0 73.99367,33.1281 73.99367,73.99368 z"
+         transform="matrix(0.06311706,0,0,0.06311706,449.72404,269.26624)" />
+      <path
+         style="fill:#b3b3b3;stroke:#999999;stroke-width:0.85255444;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="m 456.08389,296.34437 0,4.88804"
+         id="path4811"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4813"
+         d="m 453.63987,298.78839 4.88804,0"
+         style="fill:#b3b3b3;stroke:#999999;stroke-width:0.85255444;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       transform="translate(-174,177.75)"
+       id="g4815"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25">
+      <path
+         sodipodi:type="arc"
+         style="fill:#1a1a1a;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10.17877293;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path4817"
+         sodipodi:cx="100.76272"
+         sodipodi:cy="467.73639"
+         sodipodi:rx="73.993675"
+         sodipodi:ry="73.993675"
+         d="m 174.75639,467.73639 c 0,40.86558 -33.12809,73.99367 -73.99367,73.99367 -40.86558,0 -73.993677,-33.12809 -73.993677,-73.99367 0,-40.86558 33.128097,-73.99368 73.993677,-73.99368 40.86558,0 73.99367,33.1281 73.99367,73.99368 z"
+         transform="matrix(0.09824367,0,0,0.09824367,446.18459,252.83625)" />
+      <path
+         transform="matrix(0.06311706,0,0,0.06311706,449.72404,269.26624)"
+         d="m 174.75639,467.73639 c 0,40.86558 -33.12809,73.99367 -73.99367,73.99367 -40.86558,0 -73.993677,-33.12809 -73.993677,-73.99367 0,-40.86558 33.128097,-73.99368 73.993677,-73.99368 40.86558,0 73.99367,33.1281 73.99367,73.99368 z"
+         sodipodi:ry="73.993675"
+         sodipodi:rx="73.993675"
+         sodipodi:cy="467.73639"
+         sodipodi:cx="100.76272"
+         id="path4819"
+         style="fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10.17877293;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         sodipodi:type="arc" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4821"
+         d="m 456.08389,296.34437 0,4.88804"
+         style="fill:#b3b3b3;stroke:#999999;stroke-width:0.85255444;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         style="fill:#b3b3b3;stroke:#999999;stroke-width:0.85255444;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="m 453.63987,298.78839 4.88804,0"
+         id="path4823"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="g4825"
+       transform="translate(4,177.75)"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25">
+      <path
+         transform="matrix(0.09824367,0,0,0.09824367,446.18459,252.83625)"
+         d="m 174.75639,467.73639 c 0,40.86558 -33.12809,73.99367 -73.99367,73.99367 -40.86558,0 -73.993677,-33.12809 -73.993677,-73.99367 0,-40.86558 33.128097,-73.99368 73.993677,-73.99368 40.86558,0 73.99367,33.1281 73.99367,73.99368 z"
+         sodipodi:ry="73.993675"
+         sodipodi:rx="73.993675"
+         sodipodi:cy="467.73639"
+         sodipodi:cx="100.76272"
+         id="path4827"
+         style="fill:#1a1a1a;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10.17877293;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         sodipodi:type="arc" />
+      <path
+         sodipodi:type="arc"
+         style="fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10.17877293;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path4829"
+         sodipodi:cx="100.76272"
+         sodipodi:cy="467.73639"
+         sodipodi:rx="73.993675"
+         sodipodi:ry="73.993675"
+         d="m 174.75639,467.73639 c 0,40.86558 -33.12809,73.99367 -73.99367,73.99367 -40.86558,0 -73.993677,-33.12809 -73.993677,-73.99367 0,-40.86558 33.128097,-73.99368 73.993677,-73.99368 40.86558,0 73.99367,33.1281 73.99367,73.99368 z"
+         transform="matrix(0.06311706,0,0,0.06311706,449.72404,269.26624)" />
+      <path
+         style="fill:#b3b3b3;stroke:#999999;stroke-width:0.85255444;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="m 456.08389,296.34437 0,4.88804"
+         id="path4831"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4833"
+         d="m 453.63987,298.78839 4.88804,0"
+         style="fill:#b3b3b3;stroke:#999999;stroke-width:0.85255444;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="326.02161"
+       y="452.57669"
+       id="text4837"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         sodipodi:role="line"
+         id="tspan4839"
+         x="326.02161"
+         y="452.57669">10</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4841"
+       y="444.12112"
+       x="386.59619"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         y="444.12112"
+         x="386.59619"
+         id="tspan4843"
+         sodipodi:role="line">Airspeed</tspan><tspan
+         y="456.62112"
+         x="386.59619"
+         sodipodi:role="line"
+         id="tspan4845">in km/h</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4847"
+       y="425.40826"
+       x="304.67484"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         y="425.40826"
+         x="304.67484"
+         id="tspan4849"
+         sodipodi:role="line">20</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="293.6254"
+       y="389.69931"
+       id="text4851"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         sodipodi:role="line"
+         id="tspan4853"
+         x="293.6254"
+         y="389.69931">30</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4855"
+       y="351.36264"
+       x="303.90262"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         y="351.36264"
+         x="303.90262"
+         id="tspan4857"
+         sodipodi:role="line">40</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="328.17984"
+       y="326.53098"
+       id="text4859"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         sodipodi:role="line"
+         id="tspan4861"
+         x="328.17984"
+         y="326.53098">50</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4863"
+       y="315.69931"
+       x="365.81067"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         y="315.69931"
+         x="365.81067"
+         id="tspan4865"
+         sodipodi:role="line">60</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4871"
+       y="351.63986"
+       x="422.51651"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         y="351.63986"
+         x="422.51651"
+         id="tspan4873"
+         sodipodi:role="line">100</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="432.85318"
+       y="389.86044"
+       id="text4875"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         sodipodi:role="line"
+         id="tspan4877"
+         x="432.85318"
+         y="389.86044">120</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4879"
+       y="428.8082"
+       x="422.14041"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         y="428.8082"
+         x="422.14041"
+         id="tspan4881"
+         sodipodi:role="line">140</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4883"
+       y="463.8439"
+       x="368.48694"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         y="463.8439"
+         x="368.48694"
+         id="tspan4885"
+         sodipodi:role="line">0</tspan></text>
+    <path
+       style="fill:#008000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d="m 366.24399,293.24529 c -49.14753,2.49109 -88.25,43.13938 -88.25,92.90625 0,50.20007 39.78135,91.09676 89.53125,92.9375 -0.94102,-2.79251 -1.09375,-4.92779 -1.09375,-7.65625 -45.02589,-2.38289 -80.78125,-39.66162 -80.78125,-85.28125 0,-45.61963 35.75536,-82.90022 80.78125,-85.28125 l 0,-7.125 c 0,-0.16747 0.0265,-0.33373 0.0312,-0.5 -0.0729,0.004 -0.14585,-0.004 -0.21875,0 z"
+       id="path4903"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="csccscsccc"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#path3773"
+       xlink:href="#path3773"
+       transform="matrix(0.8660254,0.5,-0.5,0.8660254,242.87938,-133.89211)"
+       id="use4739"
+       inkscape:transform-center-x="43.211428"
+       inkscape:transform-center-y="74.735002"
+       width="744.09448"
+       height="1052.3622"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#path3773"
+       xlink:href="#path3773"
+       transform="matrix(0.5,0.8660254,-0.8660254,0.5,520.16515,-128.40638)"
+       id="use4741"
+       inkscape:transform-center-x="74.789695"
+       inkscape:transform-center-y="43.116705"
+       width="744.09448"
+       height="1052.3622"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <path
+       inkscape:tile-y0="471.17287"
+       inkscape:tile-x0="371.23108"
+       inkscape:tile-h="8.52035"
+       inkscape:tile-w="0"
+       inkscape:tile-cy="475.43304"
+       inkscape:tile-cx="371.23108"
+       inkscape:connector-curvature="0"
+       id="path4465"
+       d="m 277.98888,386.16659 13.4629,0"
+       style="fill:none;stroke:#ffffff;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#path3773"
+       xlink:href="#path3773"
+       transform="matrix(-0.5,0.8660254,-0.8660254,-0.5,891.45092,257.86666)"
+       id="use4745"
+       inkscape:transform-center-x="74.735005"
+       inkscape:transform-center-y="-43.211425"
+       width="744.09448"
+       height="1052.3622"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#path3773"
+       xlink:href="#path3773"
+       transform="matrix(-0.8660254,0.5,-0.5,-0.8660254,885.9652,535.15243)"
+       id="use4747"
+       inkscape:transform-center-x="43.116697"
+       inkscape:transform-center-y="-74.789692"
+       width="744.09448"
+       height="1052.3622"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <path
+       transform="matrix(0.19963707,0,0,0.19963707,326.76419,326.11402)"
+       d="m 300.52038,300.80869 a 77.781746,77.781746 0 1 1 -155.56349,0 77.781746,77.781746 0 1 1 155.56349,0 z"
+       sodipodi:ry="77.781746"
+       sodipodi:rx="77.781746"
+       sodipodi:cy="300.80869"
+       sodipodi:cx="222.73863"
+       id="path4835"
+       style="fill:#b3b3b3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       sodipodi:type="arc"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <path
+       style="fill:#ff0000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d="M 374.78125 293.25 C 375.72227 296.04251 375.875 298.17779 375.875 300.90625 C 420.90089 303.28914 456.65625 340.56787 456.65625 386.1875 C 456.65625 401.06667 452.84453 415.03532 446.15625 427.21875 L 452.75 431.125 C 460.12237 417.79896 464.3125 402.4922 464.3125 386.1875 C 464.3125 335.98743 424.53115 295.09074 374.78125 293.25 z "
+       id="path3068"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420"
+       inkscape:export-ydpi="420" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#path3773"
+       xlink:href="#path3773"
+       transform="matrix(0.5,-0.8660254,0.8660254,0.5,-148.87939,514.67943)"
+       id="use4757"
+       inkscape:transform-center-x="-74.735"
+       inkscape:transform-center-y="43.211425"
+       width="744.09448"
+       height="1052.3622"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#path3773"
+       xlink:href="#path3773"
+       transform="matrix(0,-1,1,0,-14.987277,757.55881)"
+       id="use4755"
+       inkscape:transform-center-x="-86.328125"
+       inkscape:transform-center-y="0.054685"
+       width="744.09448"
+       height="1052.3622"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#path3773"
+       xlink:href="#path3773"
+       transform="matrix(-0.8660254,-0.5,0.5,-0.8660254,499.69215,906.4382)"
+       id="use4751"
+       inkscape:transform-center-x="-43.211423"
+       inkscape:transform-center-y="-74.735002"
+       width="744.09448"
+       height="1052.3622"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="405.1304"
+       y="326.53098"
+       id="text4867"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25"><tspan
+         sodipodi:role="line"
+         id="tspan4869"
+         x="405.1304"
+         y="326.53098">80</tspan></text>
+    <use
+       x="0"
+       y="0"
+       inkscape:tiled-clone-of="#path3773"
+       xlink:href="#path3773"
+       transform="matrix(-0.5,-0.8660254,0.8660254,-0.5,222.40638,900.95247)"
+       id="use4753"
+       inkscape:transform-center-x="-74.78969"
+       inkscape:transform-center-y="-43.116705"
+       width="744.09448"
+       height="1052.3622"
+       inkscape:export-filename="C:\Users\sruml\Development\Orca\Orca\ground\Matunus\src\gadgets\airspeed\images\background.png"
+       inkscape:export-xdpi="420.25"
+       inkscape:export-ydpi="420.25" />
+  </g>
+</svg>
