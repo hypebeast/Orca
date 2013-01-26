@@ -20,8 +20,8 @@
 //---------------------------------------------------------------------
 //	DCM Settings
 //---------------------------------------------------------------------
-#define FILTER_KP_ROLLPITCH				0.02		/*!< brief Startup KP setting for roll and pitch calculation */
-#define FILTER_KI_ROLLPITCH				0.00002		/*!< brief Startup KI setting for roll and pitch calculation */
+#define FILTER_KP_ROLLPITCH				0.15100		/*!< brief Startup KP setting for roll and pitch calculation */
+#define FILTER_KI_ROLLPITCH				0.00100		/*!< brief Startup KI setting for roll and pitch calculation */
 #define FILTER_KP_YAW					1.2			/*!< brief Startup KP setting for yaw calculation */
 #define FILTER_KI_YAW					0.00002		/*!< brief Startup KI setting for yaw calculation */
 
