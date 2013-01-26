@@ -419,7 +419,7 @@ float filter_kalman_get_roll_rangle(void)
 		//***** Roll and Pitch ***************
 		/* Calculate the magnitude of the accelerometer vector */
 		Accel_magnitude = sqrt(Accel_Vector[0]*Accel_Vector[0] + Accel_Vector[1]*Accel_Vector[1] + Accel_Vector[2]*Accel_Vector[2]);
-		Accel_magnitude = Accel_magnitude / 4096; // Scale to gravity.
+		//Accel_magnitude = Accel_magnitude/4096; // Scale to gravity.
   
 		/* Dynamic weighting of accelerometer info (reliability filter)
 		* Weight for accelerometer info (<0.5G = 0.0, 1G = 1.0 , >1.5G = 0.0) */
@@ -492,12 +492,12 @@ float filter_kalman_get_roll_rangle(void)
 	***************************************************************************/
 	static void filter_dcm_matrix_update(void)
 	{  
-		Gyro_Vector[0] = ToRad(filterdata->xGyr);	//+
-		Gyro_Vector[1] = -ToRad(filterdata->yGyr);	//-
-		Gyro_Vector[2] = -ToRad(filterdata->zGyr);	//-
-		Accel_Vector[0] = -filterdata->xAcc/4096;	//-
-		Accel_Vector[1] = -filterdata->yAcc/4096;	//-
-		Accel_Vector[2] = -filterdata->zAcc/4096;	//- 
+		Gyro_Vector[0] = -ToRad(filterdata->xGyr);	//+ //+
+		Gyro_Vector[1] = -ToRad(filterdata->yGyr);	//- //+
+		Gyro_Vector[2] = -ToRad(filterdata->zGyr);	//- //+
+		Accel_Vector[0] = filterdata->xAcc;	//-
+		Accel_Vector[1] = filterdata->yAcc;	//-
+		Accel_Vector[2] = -filterdata->zAcc;	//- 
   
 		Vector_Add(&Omega[0], &Gyro_Vector[0], &Omega_I[0]);  //adding proportional term
 		Vector_Add(&Omega_Vector[0], &Omega[0], &Omega_P[0]); //adding Integrator term
@@ -555,6 +555,61 @@ void filter_dcm_update_roll_constants(float p_factor, float i_factor)
 {
 	filterdata->Kp_rollPitch = p_factor;
 	filterdata->Ki_rollPitch  = i_factor;
+	
+	Omega_Vector[0] = 0;
+	Omega_Vector[1] = 0;
+	Omega_Vector[2] = 0;
+		
+	Omega_P[0] = 0;
+	Omega_P[1] = 0;
+	Omega_P[2] = 0;
+		
+	Omega_I[0] = 0;
+	Omega_I[1] = 0;
+	Omega_I[2] = 0;
+	
+	Omega[0] = 0;
+	Omega[1] = 0;
+	Omega[2] = 0;
+				
+	errorRollPitch[0] = 0;
+	errorRollPitch[1] = 0;
+	errorRollPitch[2] = 0;
+	
+	errorYaw[0] = 0;
+	errorYaw[1] = 0;
+	errorYaw[2] = 0;
+
+	DCM_Matrix[0][0]= 1.0f;
+	DCM_Matrix[0][1]= 0.0f;
+	DCM_Matrix[0][2]= 0.0f;
+	DCM_Matrix[1][0]= 0.0f;
+	DCM_Matrix[1][1]= 1.0f;
+	DCM_Matrix[1][2]= 0.0f;
+	DCM_Matrix[2][0]= 0.0f;
+	DCM_Matrix[2][1]= 0.0f;
+	DCM_Matrix[2][2]= 1.0f;
+	
+	Update_Matrix[0][0]= 0.0f;
+	Update_Matrix[0][1]= 1.0f;
+	Update_Matrix[0][2]= 2.0f;
+	Update_Matrix[1][0]= 3.0f;
+	Update_Matrix[1][1]= 4.0f;
+	Update_Matrix[1][2]= 5.0f;
+	Update_Matrix[2][0]= 6.0f;
+	Update_Matrix[2][1]= 7.0f;
+	Update_Matrix[2][2]= 8.0f;
+		
+	Temporary_Matrix[0][0]= 0.0f;
+	Temporary_Matrix[0][1]= 0.0f;
+	Temporary_Matrix[0][2]= 0.0f;
+	Temporary_Matrix[1][0]= 0.0f;
+	Temporary_Matrix[1][1]= 0.0f;
+	Temporary_Matrix[1][2]= 0.0f;
+	Temporary_Matrix[2][0]= 0.0f;
+	Temporary_Matrix[2][1]= 0.0f;
+	Temporary_Matrix[2][2]= 0.0f;
+
 }
 
 /**************************************************************************
@@ -567,8 +622,8 @@ void filter_dcm_update_roll_constants(float p_factor, float i_factor)
 ***************************************************************************/
 void filter_dcm_update_pitch_constants(float p_factor, float i_factor)
 {
-	filterdata->Kp_rollPitch = p_factor;
-	filterdata->Ki_rollPitch  = i_factor;
+	//filterdata->Kp_rollPitch = p_factor;
+	//filterdata->Ki_rollPitch  = i_factor;
 }
 
 /**************************************************************************
@@ -671,7 +726,7 @@ float filter_get_acc_roll(void)
 
 /**************************************************************************
 * \brief Filter Get Acc Pitch
-*	Returns the calculated roll angle from the acceleration measurements. \n
+*	Returns the calculated pitch angle from the acceleration measurements. \n
 *
 * \param ---
 *
@@ -680,7 +735,7 @@ float filter_get_acc_roll(void)
 float filter_get_acc_pitch(void)
 {
 	//TODO
-	return 0;
+	return  ToDeg(-asin(Accel_Vector[0]));
 }
 
 /**************************************************************************
