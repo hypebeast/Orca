@@ -1,5 +1,5 @@
 /**************************************************************************
- * \file gps.c
+ * \file gps.h
  *
  * \brief This file contains functions for handling the Fastrax UP501 GPS
  *        module.
@@ -94,11 +94,6 @@ typedef struct STRUCT_GPS {
 } gps_data_t;
 
 
-/**************************************************************************
-* \brief Initializes the GPS subsystem. Must be called during system startup.
-*
-* \param gps_data		Pointer to a gps_data_t structure.
-**************************************************************************/
 void gps_init(gps_data_t* gps_data);
 
 #endif /* GPS_H_ */

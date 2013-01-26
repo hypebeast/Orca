@@ -40,12 +40,12 @@
 BOARD_CONFIG_t boardConfig;  						/*!< \brief board module */
 SERVO_IN_t servoInput;								/*!< \brief servo input module */
 FLIGHT_CONTROLLER_t flightController;				/*!< \brief flight controller module */
-//VOLTAGE_SENSOR_t voltageSensor;						/*!< \brief voltage Sensor module */
+//VOLTAGE_SENSOR_t voltageSensor;					/*!< \brief voltage Sensor module */
 MOTION_PROCESSING_UNIT_t motionProcessingUnit;		/*!< \brief motion processing unit module */
 FILTER_DATA_t orcafilter;							/*!< \brief filter module */
 ORCA_FLASH_SETTINGS_t orcaSettings;					/*!< \brief orca settings module */
 AIR_PRESSURE_SENSOR_t orcaAirPressureSensor;		/*!< \brief Variometer data */
-gps_data_t gpsData;									/*!< \brief GPS data */
+gps_data_t gpsData;									/*!< \brief Global GPS data object */
 
 
 unsigned long ulFcTickCounter = 0;			/*!< \brief Flight Controller system tick counter */

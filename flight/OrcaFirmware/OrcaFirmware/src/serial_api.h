@@ -62,56 +62,13 @@ typedef struct serial_api_packet {
 } SERIAL_API_PACKET_t;
 
 
-/**************************************************************************
-* \brief This function initializes the serial interface.
-**************************************************************************/
 void serial_api_init(void);
-
-/**************************************************************************
-* \brief Main worker method for the serial API.
-**************************************************************************/
 void serial_api_task(void);
-
-/**************************************************************************
-* \brief Writes the given packet to the serial connection.
-*
-* \param data		Pointer to the data
-* \param length		Length of the data in bytes
-**************************************************************************/
 void write_packet(uint8_t *data, uint16_t length);
-
-/**************************************************************************
-* \brief Writes a debug message to the serial line. The debug message contains
-*        five integer (16 bit) values.
-*
-* \param val1		First value
-* \param val2		Second value
-* \param val3		Third value
-* \param val4		Fourth value
-* \param val5		Fifth value
-**************************************************************************/
 void write_debug_message_int(uint16_t val1, uint16_t val2, uint16_t val3,
 								uint16_t val4, uint16_t val5);
-
-/**************************************************************************
-* \brief Writes a debug message to the serial line. The debug message contains
-*        five float values.
-*
-* \param val1		First value
-* \param val2		Second value
-* \param val3		Third value
-* \param val4		Fourth value
-* \param val5		Fifth value
-**************************************************************************/
 void write_debug_message_float(float val1, float val2, float val3, float val4,
 								float val5);
-
-/**************************************************************************
-* \brief Writes a debug message to the serial line. The message is a string.
-*
-* \param message			String to write to the serial line.
-* \param message_length		The length of the message.
-**************************************************************************/
 void write_debug_message_string(char* message, uint8_t message_length);
 
 #endif /* SERIALAPI_H_ */

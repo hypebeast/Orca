@@ -63,6 +63,12 @@ Rectangle {
                 columns: 3
                 spacing: 4
                 anchors.verticalCenter: parent.verticalCenter
+
+                WelcomePageButton {
+                    baseIconName: "flightdata"
+                    label: "Flight Data"
+                    onClicked: welcomePlugin.openPage("Flight data")
+                }
             }
 
         }

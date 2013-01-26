@@ -39,12 +39,13 @@ uint8_t rmc_state;
 static void process_received_nmea_byte(void);
 
 /**************************************************************************
-* \brief Decodes GGA NMEA messages.
+* \brief Decodes a GGA NMEA message.
 *
 * Input:
 * $GPGGA,114019.489,5048.9524,N,00511.8268,E,1,08,01.4,57.9,M,45.6,M,,*52
 * where lat/long can be a variable number of digits: from xxx.y over xxx.yyyy to xxxxx.yyyy
 * where height can be a variable number of digits: from x.y to xxxxx.y
+*
 * Output:
 * gps_latitude_degrees[3],gps_longitude_degrees[3], where [0]*100 + [1]*10 + [2] = decimal degrees
 * gps_latitude_minutes[2],gps_longitude_minutes[2], where [0]*10 + [1] = decimal minutes

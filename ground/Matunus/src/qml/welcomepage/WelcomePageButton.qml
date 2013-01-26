@@ -12,11 +12,11 @@ Item {
     signal clicked
 
     // Main icon
-//    Image {
-//        id: icon
-//        source: "Images/" + baseIconName
-//        anchors.centerIn: parent
-//    }
+    Image {
+        id: icon
+        source: "src/qml/welcomepage/images/orca-abstract.png"
+        anchors.centerIn: parent
+    }
 
     Text {
         id: labelText
