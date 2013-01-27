@@ -340,6 +340,21 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\orca.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_link.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_link.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_object_manager.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_object_manager.h">
+      <SubType>compile</SubType>
+    </Compile>
     <None Include="src\asf\common\boards\board.h">
       <SubType>compile</SubType>
     </None>

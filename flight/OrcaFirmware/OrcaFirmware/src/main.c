@@ -5,7 +5,7 @@
  *
  */
 
-/*
+/**
  * Include header files for all drivers that have been imported from
  * Atmel Software Framework (ASF).
  */
@@ -17,6 +17,7 @@
 #include <delay.h>
 #include <rtc.h>
 
+#include "orca.h"
 #include "system_info.h"
 #include "user_board.h"
 #include "serial_api.h"
@@ -121,7 +122,12 @@ void orca_init(void)
 	{
 		serial_flash_init_settings(&orcaSettings);
 	}
-		
+	
+	/* Initialize the VTOL object manager */
+	vtol_init();
+	
+	/* TODO: Initialize all VTOL objects*/
+	
 	/* servo in subsystem init */
 	servo_in_init(&boardConfig, &servoInput);
 	
