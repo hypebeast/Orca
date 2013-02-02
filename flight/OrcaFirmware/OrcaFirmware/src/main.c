@@ -32,6 +32,7 @@
 #include "filters.h"
 #include "MS5611.h"
 #include "gps.h"
+#include "telemetry.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -59,7 +60,7 @@ unsigned long ulUiTickCounter = 0;			/*!< \brief User Interface system tick coun
  */
 int main (void)
 {
-	/* Initialize all basic board functions */
+	/* Initialize all basic board functions and all modules. */
 	orca_init();
 	
 	user_interface_stat_led_pattern(USER_INTERFACE_LED_BLINKING);
@@ -117,7 +118,7 @@ void orca_init(void)
 	/* Board Init */
 	orca_board_init(&boardConfig);
 	
-	/* Initialize serial flash and get settings */
+	/* Initialize serial flash and read settings */
 	if(serial_flash_init())
 	{
 		serial_flash_init_settings(&orcaSettings);
@@ -127,6 +128,10 @@ void orca_init(void)
 	vtol_init();
 	
 	/* TODO: Initialize all VTOL objects*/
+	//vtol_objects_initialize_all();
+	
+	/* Initialize the telemetry module */
+	//telemetry_init();
 	
 	/* servo in subsystem init */
 	servo_in_init(&boardConfig, &servoInput);
@@ -162,7 +167,6 @@ void orca_init(void)
 		filter_kalman_init(&orcafilter, orcaSettings.Q_angle, orcaSettings.Q_gyro, orcaSettings.R_angle);
 	#endif // FILTER_USE_DCM
 
-	
 	/* Enables all interrupt levels, with vectors located in the application section and fixed priority scheduling */
 	pmic_init();
 

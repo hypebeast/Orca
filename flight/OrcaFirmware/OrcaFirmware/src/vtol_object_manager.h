@@ -28,12 +28,18 @@ typedef enum {
 
 /***************************************************************************
  * \brief The metadata of a VTOL object.
+ *
+ *  Flags
+ *  -----
+ *  Bit 1: TODO
+ *  Bit 2: TODO
+ *  Bit 3: TODO
  **************************************************************************/
 typedef struct {
 	uint8_t flags; /** Defines flags for update and logging modes */
-	uint8_t telemetryUpdatePeriod; /** Update period used by the telemetry module */
-	uint8_t gcsTelemetryUpdatePeriod; /** Update period used by the GCS */
-	uint8_t loggingUpdatePeriod; /** Update period used by the logging module */
+	uint16_t telemetryUpdatePeriod; /** Update period used by the telemetry module */
+	uint16_t gcsTelemetryUpdatePeriod; /** Update period used by the GCS */
+	uint16_t loggingUpdatePeriod; /** Update period used by the logging module */
 } __attribute__((packed)) VTOLObjMetaData;
 
 /***************************************************************************
@@ -100,7 +106,7 @@ struct VTOLObjectData {
 **************************************************************************/
 struct VTOLObjectSingle {
 	struct VTOLObjectData vtol_object;
-	//uint8_t instance[];
+	//uint8_t instance[]; // If we would use dynamic allocation of memory, we can use this field for the object data
 } __attribute__((packed));
 
 /**************************************************************************
@@ -114,10 +120,11 @@ typedef struct STRUCT_VTOL_OBJ_LIST {
 /***************************************************************************
  * Callback used to initialize the object fields to their default values.
  **************************************************************************/
-typedef void (*VTOLObjInitializeCallback)(VTOLObjHandle obj_handle, uint16_t instId);
+typedef void (*VTOLObjInitializeCallback)(VTOLObjHandle obj_handle);
 
 uint8_t vtol_init(void);
-uint8_t vtol_obj_register(VTOLObjHandle obj);
+uint8_t vtol_obj_register(VTOLObjHandle obj, uint16_t id, uint8_t isSingle,
+			uint8_t isSettings, uint16_t numBytes, VTOLObjInitializeCallback initCb);
 VTOLObjHandle vtol_obj_get_by_id(uint16_t id);
 uint16_t vtol_obj_get_id(VTOLObjHandle obj);
 uint16_t vtol_obj_get_num_bytes(VTOLObjHandle obj);
@@ -129,14 +136,17 @@ uint16_t vtol_save(VTOLObjHandle obj);
 uint16_t vtol_load(VTOLObjHandle obj);
 uint16_t vtol_delete(VTOLObjHandle obj);
 uint16_t vtol_save_settings(void);
-uint16_t vtol_save_settings(void);
+uint16_t vtol_load_settings(void);
 uint16_t vtol_delete_settings(void);
 uint16_t vtol_set_data(VTOLObjHandle obj, const uint8_t* dataIn);
-uint16_t vtol_set_data_field(VTOLObjHandle obj, const uint8_t* dataIn, uint16_t offset, uint16_t size);
+uint16_t vtol_set_data_field(VTOLObjHandle obj, const void* dataIn, uint16_t offset, uint16_t size);
 uint16_t vtol_get_data(VTOLObjHandle obj, void* dataOut);
 uint16_t vtol_get_data_field(VTOLObjHandle obj, void* dataOut, uint16_t offset, uint16_t size);
 VTOLObjAccessType vtol_get_access(const VTOLObjMetaData* dataOut);
 void vtol_set_access(VTOLObjMetaData* dataOut, VTOLObjAccessType type);
 void vtol_object_updated(VTOLObjHandle obj);
+void vtol_get_metadata(VTOLObjHandle obj, struct VTOLObjectMeta* dataOut);
+void vtol_set_metadata(VTOLObjHandle obj, const struct VTOLObjectMeta* dataIn);
+
 
 #endif /* VTOL_OBJECT_MANAGER_H_ */

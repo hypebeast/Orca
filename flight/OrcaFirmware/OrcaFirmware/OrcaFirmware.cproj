@@ -343,6 +343,12 @@
     <Compile Include="src\orca.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\telemetry.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\telemetry.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\vtol_link.c">
       <SubType>compile</SubType>
     </Compile>
