@@ -1,0 +1,12 @@
+<xml>
+    <object name="Accels" singleinstance="true" settings="false">
+        <description>Values from the acceleration sensor.</description>
+    	<field name="x" units="m/s^2" type="FLOAT32"/>
+    	<field name="y" units="m/s^2" type="FLOAT32"/>
+    	<field name="z" units="m/s^2" type="FLOAT32"/>
+    	<access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs updatemode="manual" period="0"/>
+        <telemetryflight updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

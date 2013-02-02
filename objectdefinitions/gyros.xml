@@ -1,0 +1,11 @@
+<xml>
+    <object name="Gyros" singleinstance="true" settings="false">
+        <description>Values from the gyroscope sensor.</description>
+        <field name="x" units="deg/s" type="FLOAT32" elements="1"/>
+        <field name="y" units="deg/s" type="FLOAT32" elements="1"/>
+        <field name="z" units="deg/s" type="FLOAT32" elements="1"/>
+        <telemetrygcs updatemode="manual" period="0"/>
+        <telemetryflight updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>
