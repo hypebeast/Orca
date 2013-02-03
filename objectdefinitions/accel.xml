@@ -1,8 +1,0 @@
-<xml>
-    <object name="Accel" singleinstance="true" settings="false">
-        <description>Raw values from the acceleration sensor.</description>
-    	<field name="x" units="m/s^2" type="FLOAT32"/>
-    	<field name="y" units="m/s^2" type="FLOAT32"/>
-    	<field name="z" units="m/s^2" type="FLOAT32"/>
-    </object>
-</xml>

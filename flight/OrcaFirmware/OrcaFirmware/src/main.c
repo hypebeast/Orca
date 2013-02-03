@@ -80,6 +80,9 @@ int main (void)
 		// Process incoming API messages from the USB USART
 		serial_api_task();
 		
+		// Telemetry module. Process incoming VTOL objects
+		//telemetry_rx_task();
+		
 		// Flight controller
 		flight_controller_task(&flightController);
 	}

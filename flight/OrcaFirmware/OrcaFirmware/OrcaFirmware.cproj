@@ -340,6 +340,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\eventdispatcher.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\eventdispatcher.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\orca.h">
       <SubType>compile</SubType>
     </Compile>

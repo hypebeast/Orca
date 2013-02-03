@@ -23,7 +23,7 @@
 
 /**
  * The definition of the used algorithm.
- *****************************************************************************/
+ */
 #define CRC_ALGO_TABLE_DRIVEN 1
 
 
@@ -31,7 +31,7 @@
  * The type of the CRC values.
  *
  * This type must be big enough to contain at least 8 bits.
- *****************************************************************************/
+ */
 typedef uint8_t crc_t;
 
 
@@ -39,7 +39,7 @@ typedef uint8_t crc_t;
  * Calculate the initial crc value.
  *
  * \return     The initial crc value.
- *****************************************************************************/
+ */
 static inline crc_t crc_init(void)
 {
     return 0x00;
@@ -53,7 +53,7 @@ static inline crc_t crc_init(void)
  * \param data     Pointer to a buffer of \a data_len bytes.
  * \param data_len Number of bytes in the \a data buffer.
  * \return         The updated crc value.
- *****************************************************************************/
+ */
 crc_t crc_update(crc_t crc, const unsigned char *data, size_t data_len);
 
 
@@ -62,7 +62,7 @@ crc_t crc_update(crc_t crc, const unsigned char *data, size_t data_len);
  *
  * \param crc  The current crc value.
  * \return     The final crc value.
- *****************************************************************************/
+ */
 static inline crc_t crc_finalize(crc_t crc)
 {
     return crc ^ 0x00;

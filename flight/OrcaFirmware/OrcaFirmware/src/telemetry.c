@@ -11,16 +11,23 @@
 #include "usart.h"
 #include "vtol_link.h"
 
+//////////////////////////////////////////////////////////////////////////
 // Private variables
+//////////////////////////////////////////////////////////////////////////
 
 static USART_data_t telemetry_usart_data;
 static VTOLLinkConnectionData_t vtolLinkConnection;
 
+//////////////////////////////////////////////////////////////////////////
 // Private functions
+//////////////////////////////////////////////////////////////////////////
 
 static uint8_t transmit_data(uint8_t * data, int32_t length);
-
-// TODO
+//static void registerObject(VTOLObjHandle obj);
+//static void updateObject(VTOLObjHandle obj);
+//static void addObject(VTOLObjHandle obj);
+//static void setUpdatePeriod(VTOLObjHandle obj, uint32_t updatePeriodMs);
+//static void processObjEvent();
 
 
 /************************************************************************
@@ -54,10 +61,10 @@ uint8_t telemetry_init(void)
 	
 	// Initialize connection data
 	vtolLinkConnection.rx_packet_length = 0;
-	vtolLinkConnection.rx_state = VTOLTALK_STATE_INIT;
+	vtolLinkConnection.rx_state = VTOLLINK_STATE_SYNC;
 	vtolLinkConnection.outputStream = &transmit_data;
-	memset(&vtolLinkConnection.rx_buffer, 0, VTOL_MAX_PACKET_LENGTH);
-	memset(&vtolLinkConnection.tx_buffer, 0, VTOL_MAX_PACKET_LENGTH);
+	memset(&vtolLinkConnection.rx_buffer, 0, VTOL_LINK_MAX_PAYLOAD_LENGTH);
+	memset(&vtolLinkConnection.tx_buffer, 0, VTOL_LINK_MAX_PAYLOAD_LENGTH);
 	memset(&vtolLinkConnection.stats, 0, sizeof(VTOLLinkStats_t));
 	
 	// Initialize VTOL link
@@ -77,15 +84,31 @@ uint8_t telemetry_init(void)
 ************************************************************************/
 void telemetry_rx_task(void)
 {
-	// TODO
+	uint8_t received_byte;
+	
+	while (USART_RXBufferData_Available(&telemetry_usart_data))
+	{
+		received_byte = USART_RXBuffer_GetByte(&telemetry_usart_data);
+		
+		VTOLLinkConnection connection = (VTOLLinkConnection)&vtolLinkConnection;
+		vtol_link_process_input_stream(connection, received_byte);
+	}
 }
 
 /************************************************************************
-* \brief Transmit data buffer to the modem or UCB.
+* \brief Transmit data buffer to the modem or USB.
 ************************************************************************/
 static uint8_t transmit_data(uint8_t * data, int32_t length)
 {
-	// TODO
+	int i = 0;
+	while (i < length)
+	{
+		bool byteToBuffer = USART_TXBuffer_PutByte(&telemetry_usart_data, data[i]);
+		if (byteToBuffer)
+			i++;
+	}
+	
+	return i;
 }
 
 /*! \brief Receive complete interrupt service routine.

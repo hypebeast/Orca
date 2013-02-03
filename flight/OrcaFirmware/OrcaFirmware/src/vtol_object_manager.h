@@ -95,10 +95,10 @@ struct VTOLObjectMeta {
 * \brief Shared data structure for all data-carrying VTOLObjects.
 **************************************************************************/
 struct VTOLObjectData {
-	struct VTOLObjectBase base;
-	uint16_t id;
-	struct VTOLObjectMeta metaObj;
-	uint16_t instance_size;
+	struct VTOLObjectBase base; /** Base VTOL object header */
+	uint16_t id; /** Object id */
+	struct VTOLObjectMeta metaObj; /** Meta data */
+	uint16_t instance_size; /** Instance size. Size of the object without the object header. */
 } __attribute__((packed));
 
 /**************************************************************************
@@ -106,13 +106,15 @@ struct VTOLObjectData {
 **************************************************************************/
 struct VTOLObjectSingle {
 	struct VTOLObjectData vtol_object;
-	//uint8_t instance[]; // If we would use dynamic allocation of memory, we can use this field for the object data
+	// If we would use dynamic allocation of memory,
+	// we can use this field for the data object.
+	//uint8_t instance[];
 } __attribute__((packed));
 
 /**************************************************************************
 * \brief VTOL object list data structure.
 **************************************************************************/
-typedef struct STRUCT_VTOL_OBJ_LIST {
+typedef struct {
 	VTOLObjHandle vtolo_list[MAX_NUMBER_OF_VTOL_OBJECTS]; /** Pointers to the VTOL objects*/
 	uint8_t index; /** Index of the last inserted object */
 } VTOLObjectList_t;
@@ -130,10 +132,10 @@ uint16_t vtol_obj_get_id(VTOLObjHandle obj);
 uint16_t vtol_obj_get_num_bytes(VTOLObjHandle obj);
 uint16_t vtol_create_instance(VTOLObjHandle obj, VTOLObjInitializeCallback initCb);
 bool vtol_is_settings(VTOLObjHandle obj);
-uint16_t vtol_unpack(VTOLObjHandle obj, const uint8_t* dataIn);
+uint16_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn);
 uint16_t vtol_pack(VTOLObjHandle obj, void* dataOut);
-uint16_t vtol_save(VTOLObjHandle obj);
-uint16_t vtol_load(VTOLObjHandle obj);
+uint16_t vtol_save(VTOLObjHandle obj, uint8_t instId);
+uint16_t vtol_load(VTOLObjHandle obj, uint8_t instId);
 uint16_t vtol_delete(VTOLObjHandle obj);
 uint16_t vtol_save_settings(void);
 uint16_t vtol_load_settings(void);
@@ -147,6 +149,7 @@ void vtol_set_access(VTOLObjMetaData* dataOut, VTOLObjAccessType type);
 void vtol_object_updated(VTOLObjHandle obj);
 void vtol_get_metadata(VTOLObjHandle obj, struct VTOLObjectMeta* dataOut);
 void vtol_set_metadata(VTOLObjHandle obj, const struct VTOLObjectMeta* dataIn);
+bool vtol_is_meta_object(VTOLObjHandle obj);
 
 
 #endif /* VTOL_OBJECT_MANAGER_H_ */

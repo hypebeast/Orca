@@ -144,11 +144,29 @@ bool vtol_is_settings(VTOLObjHandle obj)
 *        instance of multi instance data VTOLO.
 *
 * \param obj	VTOL object.
+* \param instId Instance ID. Not yet used!
 * \param iniCb	Callback function that's called after object is initialized.
 **************************************************************************/
-uint16_t vtol_unpack(VTOLObjHandle obj, const uint8_t* dataIn)
+uint16_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn)
 {
-	return 0;
+	uint8_t ret = 0;
+	
+	if (vtol_is_meta_object(obj))
+	{
+		// TODO: Handle meta objects
+	}
+	else
+	{
+		// Cast handle to object
+		struct VTOLObjectData* vtol = (struct VTOLObjectData*)obj;
+		
+		// Set the data
+		memcpy(vtol + sizeof(struct VTOLObjectData), dataIn, vtol->instance_size);
+	}
+	
+	// TODO: Fire event
+	
+	return ret;
 }
 
 /**************************************************************************
@@ -219,7 +237,7 @@ uint16_t vtol_set_data_field(VTOLObjHandle obj, const void* dataIn, uint16_t off
 	// TODO: Check if it's a read only object
 	
 	// Set data
-	memcpy(obj + offset, dataIn, size);
+	memcpy(data + offset, dataIn, size);
 	
 	// TODO: Fire event
 	
@@ -249,4 +267,76 @@ uint16_t vtol_get_data(VTOLObjHandle obj, void* dataOut)
 uint16_t vtol_get_data_field(VTOLObjHandle obj, void* dataOut, uint16_t offset, uint16_t size)
 {
 	
+}
+
+/**************************************************************************
+* \brief Checks if the object is a meta object.
+*
+* \param obj	VTOL object handle.
+* \return True (1) if the object is a meta object; otherwise false (0).
+**************************************************************************/
+bool vtol_is_meta_object(VTOLObjHandle obj)
+{
+	// Get the common object header
+	struct VTOLObjectBase* vtol_base = (struct VTOLObjectBase*)obj;
+	return vtol_base->flags.isMeta;
+}
+
+/**************************************************************************
+* \brief Save the data of the specified VTOL object to the file system (Flash).
+*
+* \param obj	VTOL object handle.
+* \param instId	Instance ID. Not yet used!
+* \return 0	if success; otherwise -1.
+**************************************************************************/
+uint16_t vtol_save(VTOLObjHandle obj, uint8_t instId)
+{
+	// TODO
+	return 0;
+}
+
+/**************************************************************************
+* \brief Load a VTOL object from the file system (Flash).
+*
+* \param obj	VTOL object handle.
+* \param instId	Instance ID. Not yet used!
+* \return 0	if success; otherwise -1.
+**************************************************************************/
+uint16_t vtol_load(VTOLObjHandle obj, uint8_t instId)
+{
+	// TODO
+	return 0;
+}
+
+/**************************************************************************
+* \brief Save all settings objects to the file system (Flash).
+*
+* \return 0	if success; otherwise -1.
+**************************************************************************/
+uint16_t vtol_save_settings(void)
+{
+	// TODO
+	return 0;
+}
+
+/**************************************************************************
+* \brief Load all settings objects from the file system (Flash).
+*
+* \return 0	if success; otherwise -1.
+**************************************************************************/
+uint16_t vtol_load_settings(void)
+{
+	// TODO
+	return 0;
+}
+
+/**************************************************************************
+* \brief Delete all settings objects from the file system (Flash).
+*
+* \return 0	if success; otherwise -1.
+**************************************************************************/
+uint16_t vtol_delete_settings(void)
+{
+	// TODO
+	return 0;
 }
