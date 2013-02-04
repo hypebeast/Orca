@@ -14,8 +14,22 @@
 #define SET_BITS(var, shift, value, mask) var = (var & ~(mask << shift)) | (value << shift);
 
 
+//////////////////////////////////////////////////////////////////////////
 // Private variables
+//////////////////////////////////////////////////////////////////////////
+
 static VTOLObjectList_t vtolo_list;
+
+/* Pointer to the instance data of an VTOL object */
+typedef void* ObjectInstanceHandle;
+
+
+//////////////////////////////////////////////////////////////////////////
+// Private functions
+//////////////////////////////////////////////////////////////////////////
+
+static ObjectInstanceHandle getObjectInstance(struct VTOLObjectData *obj, uint16_t instId);
+
 
 /**************************************************************************
 * \brief Initializes the VTOL object subsystem. Must be called during system
@@ -160,8 +174,13 @@ uint16_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn)
 		// Cast handle to object
 		struct VTOLObjectData* vtol = (struct VTOLObjectData*)obj;
 		
+		// TODO: Add support for multi instances
+		
+		// Get handle to object instance data
+		ObjectInstanceHandle instance = getObjectInstance(vtol);
+		
 		// Set the data
-		memcpy(vtol + sizeof(struct VTOLObjectData), dataIn, vtol->instance_size);
+		memcpy(instance, dataIn, vtol->instance_size);
 	}
 	
 	// TODO: Fire event
@@ -170,14 +189,26 @@ uint16_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn)
 }
 
 /**************************************************************************
-* \brief Creates an instance of the VTOL object. Used for creating a new
-*        instance of multi instance data VTOLO.
+* \brief Pack an object to an byte array.
 *
-* \param obj	VTOL object.
-* \param iniCb	Callback function that's called after object is initialized.
+* \param obj		The VTOL object handle.
+* \param dataOut	Data buffer (byte array).
+* \return 0			Success
+* \return -1		Error
 **************************************************************************/
 uint16_t vtol_pack(VTOLObjHandle obj, void* dataOut)
 {
+	// Cast handle to object
+	struct VTOLObjectData* vtol_obj = (struct VTOLObjectData*)obj;
+	
+	// TODO: Add support for multi instances
+	
+	// Get handle to object instance data
+	ObjectInstanceHandle instance = getObjectInstance(vtol_obj);
+	
+	// Pack data
+	memcpy(dataOut, instance, vtol_obj->instance_size);
+	
 	return 0;
 }
 
@@ -190,7 +221,7 @@ uint16_t vtol_pack(VTOLObjHandle obj, void* dataOut)
 **************************************************************************/
 void vtol_get_metadata(VTOLObjHandle obj, struct VTOLObjectMeta* dataOut)
 {
-	
+	// TODO
 }
 
 /**************************************************************************
@@ -339,4 +370,14 @@ uint16_t vtol_delete_settings(void)
 {
 	// TODO
 	return 0;
+}
+
+/**************************************************************************
+* \brief Returns a handle to the object data.
+*
+* \return Instance handle
+**************************************************************************/
+static ObjectInstanceHandle getObjectInstance(struct VTOLObjectData *obj, uint16_t instId)
+{
+	return ((ObjectInstanceHandle)(obj+sizeof(struct VTOLObjectData)));
 }

@@ -28,7 +28,7 @@ static uint8_t receiveObject(VTOLLinkConnectionData_t *connection, uint8_t type,
 ************************************************************************/
 uint8_t vtol_link_init()
 {
-	// TODO
+	// Nothing todo here, yet.
 	return 0;
 }
 

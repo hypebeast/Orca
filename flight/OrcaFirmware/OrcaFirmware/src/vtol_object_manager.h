@@ -103,11 +103,12 @@ struct VTOLObjectData {
 
 /**************************************************************************
 * \brief Augmented type for single instance data VTOL objects.
+* \note This type is not yet used!		
 **************************************************************************/
 struct VTOLObjectSingle {
 	struct VTOLObjectData vtol_object;
 	// If we would use dynamic allocation of memory,
-	// we can use this field for the data object.
+	// we would use this field for the data object.
 	//uint8_t instance[];
 } __attribute__((packed));
 
