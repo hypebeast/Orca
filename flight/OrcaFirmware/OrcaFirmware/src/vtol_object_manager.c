@@ -28,7 +28,7 @@ typedef void* ObjectInstanceHandle;
 // Private functions
 //////////////////////////////////////////////////////////////////////////
 
-static ObjectInstanceHandle getObjectInstance(struct VTOLObjectData *obj, uint16_t instId);
+static ObjectInstanceHandle getObjectInstance(struct VTOLObjectData *obj);
 
 
 /**************************************************************************
@@ -377,7 +377,7 @@ uint16_t vtol_delete_settings(void)
 *
 * \return Instance handle
 **************************************************************************/
-static ObjectInstanceHandle getObjectInstance(struct VTOLObjectData *obj, uint16_t instId)
+static ObjectInstanceHandle getObjectInstance(struct VTOLObjectData *obj)
 {
 	return ((ObjectInstanceHandle)(obj+sizeof(struct VTOLObjectData)));
 }
