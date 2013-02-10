@@ -1,0 +1,14 @@
+<xml>
+    <object name="FlightTelemetryStats" singleinstance="true" settings="false">
+        <description>Telemetry statistics from the Orca flight management unit.</description>
+        <!-- <field name="Status" units="" type="ENUM" options="Disconnected,Connected"/> -->
+        <field name="TxDataRate" units="bytes/sec" type="FLOAT32"/>
+        <field name="RxDataRate" units="bytes/sec" type="FLOAT32"/>
+        <field name="TxFailures" units="count" type="UINT32"/>
+        <field name="RxFailures" units="count" type="UINT32"/>
+        <access gcs="readonly" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="5000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

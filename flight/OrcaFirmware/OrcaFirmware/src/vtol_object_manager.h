@@ -12,7 +12,7 @@
 #define VTOL_OBJECT_MANAGER_H_
 
 // Defines
-#define MAX_NUMBER_OF_VTOL_OBJECTS 100
+#define NUMBER_OF_VTOL_OBJECTS 100
 
 /** VTOL object handle type definition. */
 typedef void* VTOLObjHandle;
@@ -66,10 +66,15 @@ typedef enum {
  * \brief Event message. This struct is send each time an event is generated.
  **************************************************************************/
 typedef struct {
-	VTOLObjHandle obj;
-	uint16_t instId;
-	VTOLObjEventType event;
+	VTOLObjHandle obj; /** Object handle */
+	uint16_t instId; /** Instance id */
+	VTOLObjEventType event; /** Event type */
 } VTOLObjEvent;
+
+/***************************************************************************
+ * \brief Event callback, this function is called when an event is invoked.
+ **************************************************************************/
+typedef void (*VTOLObjEventCallback)(VTOLObjEvent* ev);
 
 /**************************************************************************
 * \brief VTOL object base type.
@@ -116,7 +121,7 @@ struct VTOLObjectSingle {
 * \brief VTOL object list data structure.
 **************************************************************************/
 typedef struct {
-	VTOLObjHandle vtolo_list[MAX_NUMBER_OF_VTOL_OBJECTS]; /** Pointers to the VTOL objects*/
+	VTOLObjHandle vtolo_list[NUMBER_OF_VTOL_OBJECTS]; /** Pointers to the VTOL objects*/
 	uint8_t index; /** Index of the last inserted object */
 } VTOLObjectList_t;
 
@@ -151,6 +156,7 @@ void vtol_object_updated(VTOLObjHandle obj);
 void vtol_get_metadata(VTOLObjHandle obj, struct VTOLObjectMeta* dataOut);
 void vtol_set_metadata(VTOLObjHandle obj, const struct VTOLObjectMeta* dataIn);
 bool vtol_is_meta_object(VTOLObjHandle obj);
+void vtol_obj_iterate(void (*iterator)(VTOLObjHandle obj));
 
 
 #endif /* VTOL_OBJECT_MANAGER_H_ */

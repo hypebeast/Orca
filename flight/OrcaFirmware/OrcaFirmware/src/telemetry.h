@@ -30,7 +30,6 @@
 //////////////////////////////////////////////////////////////////////////
 
 uint8_t telemetry_init(void);
-void telemetry_rx_task(void);
-
+void telemetry_task(void);
 
 #endif /* TELEMETRY_H_ */

@@ -23,11 +23,14 @@ static VTOLLinkConnectionData_t vtolLinkConnection;
 //////////////////////////////////////////////////////////////////////////
 
 static uint8_t transmit_data(uint8_t * data, int32_t length);
+static void telemetry_rx_task(void);
+static void telemetry_tx_task(void);
+static void register_object(VTOLObjHandle obj);
+static void process_obj_event(void);
 //static void registerObject(VTOLObjHandle obj);
 //static void updateObject(VTOLObjHandle obj);
 //static void addObject(VTOLObjHandle obj);
 //static void setUpdatePeriod(VTOLObjHandle obj, uint32_t updatePeriodMs);
-//static void processObjEvent();
 
 
 /************************************************************************
@@ -39,6 +42,8 @@ uint8_t telemetry_init(void)
 {
 	// Enable the system clock for the serial interface
 	sysclk_enable_peripheral_clock(TELEMETRY_USART_INTERFACE);
+	
+	// TODO: Load telemetry settings from VTOL settings object.
 	
 	// Use USARTE0 and initialize buffers
 	USART_InterruptDriver_Initialize(&telemetry_usart_data, TELEMETRY_USART_INTERFACE,
@@ -71,6 +76,8 @@ uint8_t telemetry_init(void)
 	uint8_t res = vtol_link_init();
 	if (res < 0)
 		return -1;
+		
+	// TODO: Register objects for telemetry updates
 	
 	// Enable both RX and TX
 	USART_Rx_Enable(telemetry_usart_data.usart);
@@ -80,9 +87,18 @@ uint8_t telemetry_init(void)
 }
 
 /************************************************************************
+* \brief Main telemetry task.
+************************************************************************/
+void telemetry_task(void)
+{
+	telemetry_rx_task();
+	telemetry_tx_task();
+}
+
+/************************************************************************
 * \brief Telemetry RX task.
 ************************************************************************/
-void telemetry_rx_task(void)
+static void telemetry_rx_task(void)
 {
 	uint8_t received_byte;
 	
@@ -93,6 +109,15 @@ void telemetry_rx_task(void)
 		VTOLLinkConnection connection = (VTOLLinkConnection)&vtolLinkConnection;
 		vtol_link_process_input_stream(connection, received_byte);
 	}
+}
+
+/************************************************************************
+* \brief Telemetry RX task.
+************************************************************************/
+static void telemetry_tx_task(void)
+{
+	// TODO: Wait for events and sends objects
+	// If event -> process_obj_event();
 }
 
 /************************************************************************

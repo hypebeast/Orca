@@ -1,0 +1,15 @@
+<xml>
+    <object name="FlightBatteryState" singleinstance="true" settings="false">
+        <description>Battery status information.</description>
+        <field name="Voltage" units="V" type="FLOAT32" defaultvalue="0.0"/>
+        <field name="Current" units="A" type="FLOAT32" defaultvalue="0.0"/>
+        <field name="PeakCurrent" units="A" type="FLOAT32" defaultvalue="0.0"/>
+        <field name="AvgCurrent" units="A" type="FLOAT32" defaultvalue="0.0"/>
+        <field name="ConsumedEnergy" units="mAh" type="FLOAT32" defaultvalue="0.0"/>
+    	<field name="EstimatedFlightTime" units="s" type="FLOAT32" defaultvalue="0.0"/>
+        <access gcs="readonly" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

@@ -278,7 +278,8 @@ class FmuCodeGenerator
         initfields = []
         obj.each_element("field") do |field|
           if field.attributes()['defaultvalue'] != nil
-            data = "data.#{field.attributes()['name']} = #{field.attributes()['defaultvalue']}"
+            dataname = field.attributes()['name'].downcase
+            data = "data->#{dataname} = #{field.attributes()['defaultvalue']};"
             initfields.push(data)
           end
         end
@@ -437,7 +438,7 @@ class FmuCodeGenerator
     ##
     # Add source folder to the compiler include flag (debug and release)
     ##
-    
+
     debugFound = false
     releaseFound = false
 

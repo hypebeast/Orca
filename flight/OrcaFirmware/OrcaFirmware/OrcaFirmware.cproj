@@ -703,7 +703,7 @@
     <Compile Include='src\vtol_objects\vtol_object_init.c'>
       <SubType>compile</SubType>
     </Compile>
-  </ItemGroup>
+  <Compile Include='src\vtol_objects\actutatorcommand_object.h'><SubType>compile</SubType></Compile><Compile Include='src\vtol_objects\actutatorcommand_object.c'><SubType>compile</SubType></Compile><Compile Include='src\vtol_objects\flightbatterystate_object.h'><SubType>compile</SubType></Compile><Compile Include='src\vtol_objects\flightbatterystate_object.c'><SubType>compile</SubType></Compile><Compile Include='src\vtol_objects\flighttelemetrystats_object.h'><SubType>compile</SubType></Compile><Compile Include='src\vtol_objects\flighttelemetrystats_object.c'><SubType>compile</SubType></Compile><Compile Include='src\vtol_objects\manualcontrolcommand_object.h'><SubType>compile</SubType></Compile><Compile Include='src\vtol_objects\manualcontrolcommand_object.c'><SubType>compile</SubType></Compile></ItemGroup>
   <ItemGroup>
     <Folder Include='src\'/>
     <Folder Include='src\asf\'/>

@@ -1,0 +1,6 @@
+<xml>
+    <object name="SystemStats" singleinstance="true" settings="false">
+        <description>System status.</description>
+        <field name="FlightTime" units="ms" type="INT32" elements="1"/>
+    </object>
+</xml>

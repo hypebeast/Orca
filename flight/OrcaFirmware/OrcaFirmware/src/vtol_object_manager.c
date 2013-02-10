@@ -93,7 +93,7 @@ uint8_t vtol_obj_register(VTOLObjHandle obj, uint16_t id, uint8_t isSingle,
 **************************************************************************/
 VTOLObjHandle vtol_obj_get_by_id(uint16_t id)
 {
-	for (int i = 0; i < MAX_NUMBER_OF_VTOL_OBJECTS; i++)
+	for (int i = 0; i < NUMBER_OF_VTOL_OBJECTS; i++)
 	{
 		struct VTOLObjectData* obj = (struct VTOLObjectData*)vtolo_list.vtolo_list[i];
 		if (obj->id == id)
@@ -370,6 +370,22 @@ uint16_t vtol_delete_settings(void)
 {
 	// TODO
 	return 0;
+}
+
+/**************************************************************************
+* \brief Iterates over all available VTOL objects and calls the given function
+*        for every object
+*
+* \param iterator	This function will be called for every object. The VTOL
+*                   object will passed as a parameter.
+* \return 0	if success; otherwise -1.
+**************************************************************************/
+void vtol_obj_iterate(void (*iterator)(VTOLObjHandle obj))
+{
+	for (int i = 0; i < NUMBER_OF_VTOL_OBJECTS; i++)
+	{
+		(*iterator)((VTOLObjHandle)vtolo_list.vtolo_list[i]);
+	}
 }
 
 /**************************************************************************
