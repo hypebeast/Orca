@@ -17,6 +17,7 @@
 /* Orca libraries */
 #include "vtol_object_manager.h"
 #include "vtol_link.h"
+#include "vtol_object_init.h"
 
 
 #endif /* ORCA_H_ */

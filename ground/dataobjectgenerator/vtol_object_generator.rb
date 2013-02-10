@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby 
 
-# Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
+# Copyright (C) 2012 - 2013 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
-# This file is part of the Matunus project (part of the orcacopter project)
+# This file is part of the Orca project (https://github.com/hypebeast/Orca/)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@
 #   Sebastian Ruml
 #
 # == Copyright
-#   Copyright (c) 2012 Sebastian Ruml. Licensed under the MIT License:
+#   Copyright (c) 2012 - 2013 Sebastian Ruml. Licensed under the MIT License:
 #   http://www.opensource.org/licenses/mit-license.php
 
 
@@ -51,8 +51,11 @@ require 'rexml/document'
 require 'erb'
 
 
+# File and path definitions
 BASE_TEMPLATE_DIR = File.join(File.dirname(__FILE__), "templates")
 OBJECT_DEFINITON_FILES_DIR = File.join("..", "..", "objectdefinitions")
+PROJECT_ROOT_FOLDER = File.join("..", "..")
+FMU_VS_PROJECT_FILE = File.join(PROJECT_ROOT_FOLDER, "flight", "OrcaFirmware", "OrcaFirmware", "OrcaFirmware.cproj")
 
 
 class App
@@ -70,6 +73,7 @@ class App
     @options.outputDir = ""
     @options.fmuOnly = false
     @options.gcsOnly = false
+    @options.modifyFMUProject = true
   end
 
   # Parse options, check arguments, then process the command
@@ -81,7 +85,7 @@ class App
       GcsCodeGenerator.new(@options.outputDir)   
 
       # Create VTOL objects for the FMU
-      FmuCodeGenerator.new(@options.outputDir)
+      FmuCodeGenerator.new(@options.outputDir, @options.modifyFMUProject)
     else
       exit 0
     end
@@ -97,11 +101,12 @@ class App
       opts.on('-V', '--verbose', "Run verbosely")       { @options.verbose = true }  
       opts.on('-q', '--quiet', "Run quietly")           { @options.quiet = true }
       opts.on('-h', '--help', "Show this message")      { puts opts; exit 0 }
-      opts.on('-o dir', '--out dir', String, "Output directory for the generated code") do |dir|
+      opts.on('-o dir', '--out dir', String, "Output directory for the generated code. Can be used for testing. No project files will be modified!") do |dir|
         @options.outputDir = dir
       end
       opts.on('-f', '--fmu', 'Generate code only for the FMU') { @options.fmuOnly = true }
       opts.on('-g', '--gcs', 'Generate code only for the ground control station') { @options.gcsOnly = true }
+      opts.on('--exclude-vsproj', 'If specified the FMU project will not be modified') {@options.modifyFMUProject = false}
 
       opts.parse!(@arguments) rescue return false
       
@@ -114,6 +119,7 @@ class App
       @options.verbose = false if @options.quiet
       @options.fmuOnly = false if @options.gcsOnly
       @options.gcsOnly = false if @options.fmuOnly
+      @options.modifyFMUProject = false if @options.outputDir != ""
     end
     
     # True if required arguments were provided
@@ -132,18 +138,15 @@ class App
 
 end
 
-# This function reads all specification files and generates for every VTOL
-# object an ID.
-def processVTOLSpecifications(directory) 
-  # TODO
-end 
 
+# Generates code for the FMU
 class FmuCodeGenerator
+  TARGET_FOLDER = "vtol_objects"
 
-  def initialize(outputDir="")
+  def initialize(outputDir="", modifyFMUProject)
     if outputDir == ""
       # Use the default output directory
-      @outputDir = File.join("..", "..", "flight", "OrcaFirmware", "OrcaFirmware", "src", "vtol_objects")
+      @outputDir = File.join("..", "..", "flight", "OrcaFirmware", "OrcaFirmware", "src", TARGET_FOLDER)
     else
       @outputDir = outputDir
     end
@@ -163,7 +166,9 @@ class FmuCodeGenerator
                       vtolObjectsInitTemplateCFile => "vtol_object_init.c"
                       }
 
+    @generated_files = []
     @header_files = []
+    @code_files = []
     @object_init_functions = []
 
     # Type sizes (in bytes)
@@ -190,7 +195,7 @@ class FmuCodeGenerator
 
     @FIELDTYPE_FLOAT = "FLOAT32"
 
-    puts "Generating code for FMU..."
+    puts "Generating FMU code..."
 
     # Find all object definition files
     specFiles = findSpecificationFiles(OBJECT_DEFINITON_FILES_DIR)
@@ -199,7 +204,17 @@ class FmuCodeGenerator
     # Generate object initialization code
     generateObjectInitFiles(specFiles)
 
-    puts "Generating Done."
+    # FIXME: Quick hack!
+    modifyFMUProject = true
+
+    # Modify the Visual Studio project file
+    if modifyFMUProject
+      puts "Adding generated code to Visual Studio..."
+      modifyVisualStudioProject()
+    end
+
+    # Done
+    puts "FMU code generation done!"
   end
 
   # This function finds all object definition files and returns it
@@ -208,6 +223,8 @@ class FmuCodeGenerator
     return Dir.glob(pattern)
   end
 
+  # This function generates all VTOL object files. For every VTOL object
+  # definition file
   def generateObjectFiles(specFiles)
     obj_id = 1
 
@@ -236,7 +253,7 @@ class FmuCodeGenerator
         datafields = []
         obj.each_element("field") do |field|
           data = {
-            'name' => field.attributes()['name'],
+            'name' => field.attributes()['name'].downcase,
             'type' => @typeMappings[field.attributes()['type']]
           }
           datafields.push(data)
@@ -326,6 +343,7 @@ class FmuCodeGenerator
           erb = ERB.new(File.open(template).read)
           new_code = erb.result(binding)
           puts "Creating #{filename}"
+          @generated_files.push(filename)
           outputFileName = File.join(@outputDir, "#{filename}")
           File.open(outputFileName, "w").write(new_code)
           puts "Done"
@@ -343,6 +361,7 @@ class FmuCodeGenerator
       erb = ERB.new(File.open(template).read)
       new_code = erb.result(binding)
       puts "Creating #{filename}"
+      @generated_files.push(filename)
       outputFileName = File.join(@outputDir, "#{filename}")
       File.open(outputFileName, "w").write(new_code)
       puts "Done"
@@ -350,12 +369,125 @@ class FmuCodeGenerator
   end
 
   # This function adds all genreated FMU code to the Visual Studio project
-  def addGeneratedCodeToVisualStudioProject(files)
-    # TODO
+  def modifyVisualStudioProject()
+    doc = REXML::Document.new(File.open(FMU_VS_PROJECT_FILE))
+
+    ##
+    # Add the folder that contains the generated source code to the Visual
+    # Studio project file
+    ##
+
+    folder_exists = false
+    source_folder = "src\\" + TARGET_FOLDER + "\\"
+    doc.root.elements.each("ItemGroup/Folder") { |element|
+      if element.attributes["Include"] == source_folder
+        folder_exists = true
+      end
+    }
+
+    # Add new source folder if not already added
+    if !folder_exists
+      puts "Adding folder"
+
+      # Find parent element
+      doc.root.elements.each("ItemGroup") { |element|
+        element.elements.each { |subelement|
+          if subelement.to_s.include? "Folder"
+            folderElt = element.add_element("Folder")           
+            folderElt.attributes["Include"] = source_folder
+            break
+          end
+        }
+      }
+    end
+
+    ##
+    # Add all generated source files to the ItemGroup element
+    ##
+
+    generated_files = @generated_files
+    generated_files.each do |genFile|
+      include_name = "src\\" + TARGET_FOLDER + "\\" + genFile
+      # Check if the file is already added to the project
+      found = false
+      doc.root.elements.each("ItemGroup/Compile") { |element|
+        if element.attributes["Include"] == include_name
+          found = true
+          break
+        end
+      }
+
+      if !found
+        # Find parent element
+        doc.root.elements.each("ItemGroup") { |element|
+          element.elements.each { |subelement|
+            # Add file
+            if subelement.to_s.include? "Compile"
+              compElt = element.add_element("Compile")  
+              compElt.attributes["Include"] = source_folder + genFile
+              subTypeElt = compElt.add_element("SubType")
+              subTypeElt.text = "compile"
+              break
+            end
+          }
+        }
+      end
+    end
+
+    ##
+    # Add source folder to the compiler include flag (debug and release)
+    ##
+    
+    debugFound = false
+    releaseFound = false
+
+    # Find PropertyGroup for debug avrgcc include paths
+    doc.root.elements.each("PropertyGroup") { |element|
+      # Check for debug configuration
+      if element.attributes['Condition'].to_s.include? "Debug"
+        # Check if folder is already included
+        element.elements.each("ToolchainSettings/AvrGcc/avrgcc.compiler.directories.IncludePaths/ListValues/Value") { |valueElement|
+          if valueElement.to_s.include? "vtol_objects"
+            debugFound = true
+            break
+          end
+        }
+
+        # If not found add it to the project file
+        if !debugFound
+          includeElt = element.elements["ToolchainSettings/AvrGcc/avrgcc.compiler.directories.IncludePaths/ListValues"].add_element("Value")
+          includeElt.text = "../src/" + TARGET_FOLDER
+        end
+      end
+      
+      # Check for Release configuration
+      if element.attributes['Condition'].to_s.include? "Release"
+        # Check if folder is already included
+        element.elements.each("ToolchainSettings/AvrGcc/avrgcc.compiler.directories.IncludePaths/ListValues/Value") { |valueElement|
+          if valueElement.to_s.include? "vtol_objects"
+            releaseFound = true
+            break
+          end
+        }
+
+        # If not found add it to the project file
+        if !releaseFound
+          includeElt = element.elements["ToolchainSettings/AvrGcc/avrgcc.compiler.directories.IncludePaths/ListValues"].add_element("Value")
+          includeElt.text = "../src/" + TARGET_FOLDER
+        end
+      end
+    }
+
+    # Write the new xml document
+    File.open(FMU_VS_PROJECT_FILE, "w") do |file|
+      file<<doc.to_s
+    end
   end
 
 end
 
+
+# Code generator for the Ground Control Stations
 class GcsCodeGenerator
 
   # Initializes an instance of this class

@@ -107,7 +107,7 @@ struct VTOLObjectData {
 **************************************************************************/
 struct VTOLObjectSingle {
 	struct VTOLObjectData vtol_object;
-	// If we would use dynamic allocation of memory,
+	// If we would use dynamic memory allocation,
 	// we would use this field for the data object.
 	//uint8_t instance[];
 } __attribute__((packed));

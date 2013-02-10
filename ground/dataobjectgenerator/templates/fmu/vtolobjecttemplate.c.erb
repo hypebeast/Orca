@@ -72,7 +72,7 @@ uint8_t <%= objnamelc %>_initialize(void)
 void <%= objnamelc %>_set_defaults(VTOLObjHandle obj)
 {
 	<%= objnamecp %>Data_t* data = &<%= objnamelc %>_data;
-	UAVObjMetadata metadata;
+	VTOLObjMetaData metadata;
 
 	// Initialize object fields to their default values
 	<% initfields.each do |field| %>
@@ -91,7 +91,7 @@ void <%= objnamelc %>_set_defaults(VTOLObjHandle obj)
 /**************************************************************************
 * \brief Returns the object handle.
 **************************************************************************/
-VTOLObjectHandle <%= objnamelc %>_handle(void)
+VTOLObjHandle <%= objnamelc %>_handle(void)
 {
 	return handle;
 }

@@ -157,7 +157,7 @@ static VTOLLinkRxState vtol_link_process_input_byte(VTOLLinkConnection conn, uin
 			}
 			
 			// Check if lengths match
-			if (connection->obj_length != connection->rx_packet_size)
+			if ((connection->obj_length + VTOL_LINK_HEADER_LENGTH) != connection->rx_packet_size)
 			{
 				connection->stats.rxErrors++;
 				connection->rx_state = VTOLLINK_STATE_ERROR;

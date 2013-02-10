@@ -130,13 +130,13 @@ void orca_init(void)
 	/* Initialize the VTOL object manager */
 	vtol_init();
 	
-	/* TODO: Initialize all VTOL objects*/
-	//vtol_objects_initialize_all();
+	/* Initialize all VTOL objects*/
+	vtol_objects_initialize_all();
 	
 	/* Initialize the telemetry module */
-	//telemetry_init();
+	telemetry_init();
 	
-	/* servo in subsystem init */
+	/* servo in subsystem initialization */
 	servo_in_init(&boardConfig, &servoInput);
 	
 	/* Initialize the servo output subsystem */
