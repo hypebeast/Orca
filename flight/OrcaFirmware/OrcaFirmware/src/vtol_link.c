@@ -99,7 +99,8 @@ static VTOLLinkRxState vtol_link_process_input_byte(VTOLLinkConnection conn, uin
 		case VTOLLINK_STATE_TYPE:
 			if (rxByte != VTOL_LINK_MESSAGE_TYPE_OBJECT ||
 				rxByte != VTOL_LINK_MESSAGE_TYPE_OBJECT_REQUEST ||
-				rxByte != VTOL_LINK_MESSAGE_TYPE_OBJECT_ACK)
+				rxByte != VTOL_LINK_MESSAGE_TYPE_OBJECT_ACK ||
+				rxByte != VTOL_LINK_MESSAGE_TYPE_ACK)
 			{
 				connection->rx_state = VTOLLINK_STATE_ERROR;
 				break;
@@ -247,11 +248,12 @@ static uint8_t receiveObject(VTOLLinkConnectionData_t *connection, uint8_t type,
 			break;
 			
 		case VTOL_LINK_MESSAGE_TYPE_OBJECT_ACK:
-			// TODO
+			vtol_unpack(obj, 0, data);
+			sendObject(connection, obj, 0, VTOL_LINK_MESSAGE_TYPE_ACK);
 			break;
 		
 		case VTOL_LINK_MESSAGE_TYPE_OBJECT_REQUEST:
-			// TODO
+			// TODO: Send requested VTOL object
 			break;
 			
 		default:
@@ -277,13 +279,11 @@ static uint8_t objectTransaction(VTOLLinkConnectionData_t *connection, VTOLObjHa
 	if (type == VTOL_LINK_MESSAGE_TYPE_OBJECT_ACK ||
 		type == VTOL_LINK_MESSAGE_TYPE_OBJECT_REQUEST)
 	{
-		// TODO: Not yet implemented!
-		return 0;
+		return sendObject(connection, obj, instId, type);
 	}
 	else if (type == VTOL_LINK_MESSAGE_TYPE_OBJECT)
 	{
-		sendObject(connection, obj, instId, VTOL_LINK_MESSAGE_TYPE_OBJECT);
-		return 0;
+		return sendObject(connection, obj, instId, VTOL_LINK_MESSAGE_TYPE_OBJECT);
 	}
 	else
 	{
@@ -315,8 +315,7 @@ static uint8_t sendObject(VTOLLinkConnectionData_t *connection, VTOLObjHandle ob
 	}
 	else if (type == VTOL_LINK_MESSAGE_TYPE_ACK)
 	{
-		// TODO
-		return 0;
+		return sendSingleObject(connection, obj, VTOL_LINK_MESSAGE_TYPE_ACK);
 	}
 	else
 	{
@@ -379,6 +378,7 @@ static uint8_t sendSingleObject(VTOLLinkConnectionData_t *connection,
 	connection->tx_buffer[2] = (uint8_t)(length & 0xFF);
 	connection->tx_buffer[3] = (uint8_t)((length >> 8) & 0xFF);
 	
+	// Checksum
 	// TODO: Calculate checksum
 	connection->tx_buffer[data_offset+length] = 0xEE;
 	

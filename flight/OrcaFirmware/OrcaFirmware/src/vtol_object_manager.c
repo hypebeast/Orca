@@ -10,8 +10,20 @@
 #include <string.h>
 #include "orca.h"
 
+
+//////////////////////////////////////////////////////////////////////////
+// Defines and Macros
+//////////////////////////////////////////////////////////////////////////
+
+// Defines
+#define MetaNumBytes sizeof(VTOLObjMetaData)
+
 // Macros
 #define SET_BITS(var, shift, value, mask) var = (var & ~(mask << shift)) | (value << shift);
+
+// Macros for metadata objects
+#define MetaObjectPtr(obj) ((struct VTOLObjectMeta*) &((obj)->metaObj))
+#define MetaDataPtr(obj) ((VTOLObjMetaData*) &((obj)->metaObj.instance))
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -130,7 +142,7 @@ uint16_t vtol_obj_get_num_bytes(VTOLObjHandle obj)
 
 /**************************************************************************
 * \brief Creates an instance of the VTOL object. Used for creating a new
-*        instance of multi instance data VTOLO.
+*        instance of multi instance data VTOLOs.
 *
 * \param obj	VTOL object.
 * \param iniCb	Callback function that's called after object is initialized.
@@ -144,8 +156,8 @@ uint16_t vtol_create_instance(VTOLObjHandle obj, VTOLObjInitializeCallback initC
 * \brief Returns if the VTOL object is a settings object.
 *
 * \param obj		The VTOL object handler.
-* \returns TRUE		If the VTOL object a settings object.
-* \returns FALSE	If the VTOL object is not a settings object.
+* \return TRUE		If the VTOL object a settings object.
+* \return FALSE		If the VTOL object is not a settings object.
 **************************************************************************/
 bool vtol_is_settings(VTOLObjHandle obj)
 {
@@ -154,12 +166,66 @@ bool vtol_is_settings(VTOLObjHandle obj)
 }
 
 /**************************************************************************
-* \brief Creates an instance of the VTOL object. Used for creating a new
-*        instance of multi instance data VTOLO.
+* \brief Returns if the VTOL object is read only object.
 *
-* \param obj	VTOL object.
-* \param instId Instance ID. Not yet used!
-* \param iniCb	Callback function that's called after object is initialized.
+* \param obj		The VTOL object handler.
+* \return TRUE		If the VTOL object is read only.
+* \return FALSE		If the VTOL object is not read only.
+**************************************************************************/
+bool vtol_read_only(VTOLObjHandle obj)
+{
+	// Get metadata
+	VTOLObjMetaData *metadata = MetaDataPtr((struct VTOLObjectData*)obj);
+	
+	return (vtol_get_access(metadata) == ACCESS_READONLY)
+}
+
+/**************************************************************************
+* \brief Returns if the object is a metadata object.
+*
+* \param metadata	VTOL object handle.
+* \return			True, if it's a metadata object; otherwise false.
+**************************************************************************/
+bool vtol_is_meta_object(VTOLObjHandle obj)
+{
+	// Recover base object header
+	struct VTOLObjectBase* header = (struct VTOLObjectBase*)obj;
+	return (header->flags.isMeta);
+}
+
+/**************************************************************************
+* \brief Returns the access type of the given VTOL object.
+*
+* \param metadata	Metadata.
+* \return			The access type.
+**************************************************************************/
+VTOLObjAccessType vtol_get_access(const VTOLObjMetaData* metadata)
+{
+	return (metadata->flags >> VTOLOBJ_ACCESS_SHIFT) & 1;
+}
+
+/**************************************************************************
+* \brief Checks if the object is a meta object.
+*
+* \param obj	VTOL object handle.
+* \return True (1) if the object is a meta object; otherwise false (0).
+**************************************************************************/
+bool vtol_is_meta_object(VTOLObjHandle obj)
+{
+	// Get the common object header
+	struct VTOLObjectBase* vtol_base = (struct VTOLObjectBase*)obj;
+	return vtol_base->flags.isMeta;
+}
+
+/**************************************************************************
+* \brief Unpacks an VTOL object
+*
+* \param obj	VTOL object handler.
+* \param instId Instance ID. Not yet used! Only single instance objects are
+				supported!
+* \param dataIn	Data buffer.
+* \return 0 Success
+* \return -1 Error
 **************************************************************************/
 uint16_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn)
 {
@@ -213,43 +279,70 @@ uint16_t vtol_pack(VTOLObjHandle obj, void* dataOut)
 }
 
 /**************************************************************************
-* \brief Creates an instance of the VTOL object. Used for creating a new
-*        instance of multi instance data VTOLO.
+* \brief Unpacks the metadata object from the given VTOL object.
 *
-* \param obj	VTOL object.
-* \param iniCb	Callback function that's called after object is initialized.
+* \param obj		VTOL object handle.
+* \param dataOut	Data buffer for the metadata object.
 **************************************************************************/
 void vtol_get_metadata(VTOLObjHandle obj, struct VTOLObjectMeta* dataOut)
 {
-	// TODO
+	// Cast to object info
+	struct VTOLObjectData* vtol_obj = (struct VTOLObjectData*) obj;
+	// Copy data
+	memcpy(dataOut, MetaObjectPtr(vtol_obj), MetaNumBytes);
 }
 
 /**************************************************************************
-* \brief Creates an instance of the VTOL object. Used for creating a new
-*        instance of multi instance data VTOLO.
+* \brief Sets the metadata for the given VTOL object.
 *
-* \param obj	VTOL object.
-* \param iniCb	Callback function that's called after object is initialized.
+* \param obj	VTOL object handle.
+* \param dataIn	Data buffer with the metadata object.
 **************************************************************************/
 void vtol_set_metadata(VTOLObjHandle obj, const struct VTOLObjectMeta* dataIn)
 {
-	
+	// Cast to object info
+	struct VTOLObjectData* vtol_obj = (struct VTOLObjectData*) obj;
+	// Copy data
+	memcpy(MetaObjectPtr(vtol_obj), dataIn, MetaNumBytes);
 }
 
 /**************************************************************************
-* \brief Creates an instance of the VTOL object. Used for creating a new
-*        instance of multi instance data VTOLO.
+* \brief Set the data of a VTOL object.
 *
-* \param obj	VTOL object.
+* \param obj	VTOL object handle.
 * \param iniCb	Callback function that's called after object is initialized.
+* \return 0		Success
+* \return -1	Error
 **************************************************************************/
 uint16_t vtol_set_data(VTOLObjHandle obj, const uint8_t* dataIn)
 {
+	// TODO: Handle Metadata object
+	
+	struct VTOLObjectData *vtol_obj;
+	ObjectInstanceHandle instanceHandle;
+	
+	// Cast to object info
+	vtol_obj = (struct VTOLObjectData*)obj;
+	
+	// Check access level
+	if (vtol_read_only(obj))
+		return -1;
+	
+	// Get instance
+	instanceHandle = getObjectInstance(vtol_obj);
+	if (instanceHandle == NULL)
+		return -1;
+	
+	// Set data
+	memcpy(instanceHandle, dataIn, vtol_obj->instance_size);
+	
+	// TODO: Fire event
+	
 	return 0;	
 }
 
 /**************************************************************************
-* \brief Set the data of a specific object instance.
+* \brief Set a data field of a VTOL object
 *
 * \param obj	The VTOL object handle.
 * \param dataIn	The input data.
@@ -265,7 +358,9 @@ uint16_t vtol_set_data_field(VTOLObjHandle obj, const void* dataIn, uint16_t off
 	// Cast to object info
 	data = (struct VTOLObjectData *)obj;
 	
-	// TODO: Check if it's a read only object
+	// Check if it's a read only object
+	if (vtol_read_only(obj))
+		return -1;
 	
 	// Set data
 	memcpy(data + offset, dataIn, size);
@@ -284,33 +379,64 @@ uint16_t vtol_set_data_field(VTOLObjHandle obj, const void* dataIn, uint16_t off
 **************************************************************************/
 uint16_t vtol_get_data(VTOLObjHandle obj, void* dataOut)
 {
-	// TODO: I don't know if we need this function.
+	if (vtol_is_meta_object(obj))
+	{
+		// Set data
+		memcpy(dataOut, MetaDataPtr((struct VTOLObjectData*) obj), MetaNumBytes);
+	}
+	else
+	{
+		struct VTOLObjectData *vtol_obj = (struct VTOLObjectData*)obj;
+		ObjectInstanceHandle instanceHandle = getObjectInstance(vtol_obj);
+		if (instanceHandle == NULL)
+			return -1;
+			
+		// Set data
+		memcpy(dataOut, instanceHandle, vtol_obj->instance_size);
+	}
+	
 	return 0;
 }
 
 /**************************************************************************
-* \brief Creates an instance of the VTOL object. Used for creating a new
-*        instance of multi instance data VTOLO.
+* \brief Get the data of a VTOL object.
 *
-* \param obj	VTOL object.
-* \param iniCb	Callback function that's called after object is initialized.
+* \param obj		VTOL object handle.
+* \param dataOut	Data buffer.
+* \param offset		The offset for the data field.
+* \param size		Data size.
+* \return 0			Success
+* \return -1		Error
 **************************************************************************/
 uint16_t vtol_get_data_field(VTOLObjHandle obj, void* dataOut, uint16_t offset, uint16_t size)
 {
+	// Check for meta data object
+	if (vtol_is_meta_object(obj))
+	{
+		// Check for overrun
+		if (size + offset > MetaNumBytes)
+			return -1;
+		
+		// Set data
+		memcpy(dataOut, MetaDataPtr((struct VTOLObjectData*)obj) + offset, size);
+	}
+	else
+	{
+		struct VTOLObjectData *vtol_obj = (struct VTOLObjectData*)obj;
+		
+		ObjectInstanceHandle instanceHandle = getObjectInstance(vtol_obj);	
+		if (instanceHandle == NULL)
+			return -1;
+			
+		// Check for overrun
+		if (size + offset > vtol_obj->instance_size)
+			return -1;
+			
+		// Set data
+		memcpy(dataOut, instanceHandle + offset, size);
+	}
 	
-}
-
-/**************************************************************************
-* \brief Checks if the object is a meta object.
-*
-* \param obj	VTOL object handle.
-* \return True (1) if the object is a meta object; otherwise false (0).
-**************************************************************************/
-bool vtol_is_meta_object(VTOLObjHandle obj)
-{
-	// Get the common object header
-	struct VTOLObjectBase* vtol_base = (struct VTOLObjectBase*)obj;
-	return vtol_base->flags.isMeta;
+	return 0;
 }
 
 /**************************************************************************
@@ -378,7 +504,6 @@ uint16_t vtol_delete_settings(void)
 *
 * \param iterator	This function will be called for every object. The VTOL
 *                   object will passed as a parameter.
-* \return 0	if success; otherwise -1.
 **************************************************************************/
 void vtol_obj_iterate(void (*iterator)(VTOLObjHandle obj))
 {

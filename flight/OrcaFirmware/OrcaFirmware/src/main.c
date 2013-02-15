@@ -80,7 +80,7 @@ int main (void)
 		// Process incoming API messages from the USB USART
 		//serial_api_task();
 		
-		// Telemetry module. Process incoming VTOL objects
+		// Telemetry module.
 		telemetry_task();
 		
 		// Flight controller
@@ -142,11 +142,11 @@ void orca_init(void)
 	/* Initialize the servo output subsystem */
 	servo_init();
 	
-	/* flight controller subsystem init */
+	/* flight controller subsystem initialization */
 	flight_controller_init(&boardConfig, &orcaSettings, &servoInput, &orcafilter, &flightController);
 
 	/* Initialize the serial interface */
-	serial_api_init();
+	//serial_api_init();
 	
 	/* Initializes the GPS subsystem */
 	gps_init(&gpsData);

@@ -22,11 +22,11 @@
 // Public defines
 //////////////////////////////////////////////////////////////////////////
 
-#define VTOL_LINK_MAX_PAYLOAD_LENGTH 2^8-1
-#define VTOL_LINK_MAX_MESSAGE_LENGTH (1+1+2+2+1+VTOL_LINK_MAX_PAYLOAD_LENGTH+1)
-#define VTOL_LINK_HEADER_LENGTH 7
-#define VTOL_LINK_START_BYTE 0x8D
-#define VTOL_LINK_CHECKSUM_LENGTH 1
+#define VTOL_LINK_MAX_PAYLOAD_LENGTH 2^8-1	/** Max payload length */
+#define VTOL_LINK_MAX_MESSAGE_LENGTH (1+1+2+2+1+VTOL_LINK_MAX_PAYLOAD_LENGTH+1) /** Max message length */
+#define VTOL_LINK_HEADER_LENGTH 7	/** Length of the message header */
+#define VTOL_LINK_START_BYTE 0x8D	/** Start byte */
+#define VTOL_LINK_CHECKSUM_LENGTH 1	/** Checksum length */
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -51,6 +51,9 @@ typedef enum {
 	VTOLLINK_STATE_ERROR 
 } VTOLLinkRxState;
 
+/************************************************************************
+* \brief VTOL message type
+************************************************************************/
 typedef enum {
 	VTOL_LINK_MESSAGE_TYPE_OBJECT = 0x20,
 	VTOL_LINK_MESSAGE_TYPE_OBJECT_REQUEST = 0x21,

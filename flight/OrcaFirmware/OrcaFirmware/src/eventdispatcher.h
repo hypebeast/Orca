@@ -11,6 +11,8 @@
 #ifndef EVENTDISPATCHER_H_
 #define EVENTDISPATCHER_H_
 
+#include <stdio.h>
+
 
 uint8_t event_dispatcher_init(void);
 uint8_t event_dispatcher_task(void);

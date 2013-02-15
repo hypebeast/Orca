@@ -73,4 +73,18 @@ Rectangle {
 
         }
     }
+
+    Text {
+        id: text1
+        x: 37
+        y: 373
+        width: 271
+        height: 45
+        color: "#ffffff"
+        text: qsTr("Flight Display")
+        font.family: "Moire ExtraBold"
+        style: Text.Normal
+        font.bold: true
+        font.pixelSize: 36
+    }
 }

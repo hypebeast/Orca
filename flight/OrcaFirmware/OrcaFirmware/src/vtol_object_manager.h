@@ -14,6 +14,17 @@
 // Defines
 #define NUMBER_OF_VTOL_OBJECTS 100
 
+/*
+ * Shifts and masks used to read/write metadata flags.
+ */
+#define VTOLOBJ_ACCESS_SHIFT 0
+#define VTOLOBJ_GCS_ACCESS_SHIFT 1
+#define VTOLOBJ_TELEMETRY_ACKED_SHIFT 2
+#define VTOLOBJ_GCS_TELEMETRY_ACKED_SHIFT 3
+#define VTOLOBJ_TELEMETRY_UPDATE_MODE_SHIFT 4
+#define VTOLOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT 6
+#define VTOLOBJ_UPDATE_MODE_MASK 0x3
+
 /** VTOL object handle type definition. */
 typedef void* VTOLObjHandle;
 
@@ -31,12 +42,16 @@ typedef enum {
  *
  *  Flags
  *  -----
- *  Bit 1: TODO
- *  Bit 2: TODO
- *  Bit 3: TODO
+ *  Bit 0:		access					Defines the access level for the local transactions (readonly=1 and readwrite=0).
+ *  Bit 1:		gcsAccess				Defines the access level for the local GCS transactions (readonly=1 and readwrite=0). Not used in the FMU s/w.
+ *  Bit 2:		telemetryAcked			Defines if an ack is required for the transaction of this object (1: acked, 0: not acked)
+ *  Bit 3:		gcsTelemetryAcked		Defines if an ack is required for the transaction of this object (1: acked, 0: not acked)
+ *  Bit 4-5:	telemetryUpdateMode		Update mode used by the telemetry module (VTOLObjUpdateMode)
+ *  Bit 6-7:	gcsTelemetryUpdateMode	Update mode used by the GCS telemetry module (VTOLObjUpdateMode)
+ *  Bit 8:		Not used!
  **************************************************************************/
 typedef struct {
-	uint8_t flags; /** Defines flags for update and logging modes */
+	uint8_t flags; /** Defines flags for update, access and logging modes */
 	uint16_t telemetryUpdatePeriod; /** Update period used by the telemetry module */
 	uint16_t gcsTelemetryUpdatePeriod; /** Update period used by the GCS */
 	uint16_t loggingUpdatePeriod; /** Update period used by the logging module */
@@ -138,6 +153,10 @@ uint16_t vtol_obj_get_id(VTOLObjHandle obj);
 uint16_t vtol_obj_get_num_bytes(VTOLObjHandle obj);
 uint16_t vtol_create_instance(VTOLObjHandle obj, VTOLObjInitializeCallback initCb);
 bool vtol_is_settings(VTOLObjHandle obj);
+bool vtol_read_only(VTOLObjHandle obj);
+bool vtol_is_meta_object(VTOLObjHandle obj);
+bool vtol_is_meta_object(VTOLObjHandle obj);
+VTOLObjAccessType vtol_get_access(const VTOLObjMetaData* metadata);
 uint16_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn);
 uint16_t vtol_pack(VTOLObjHandle obj, void* dataOut);
 uint16_t vtol_save(VTOLObjHandle obj, uint8_t instId);
@@ -155,7 +174,6 @@ void vtol_set_access(VTOLObjMetaData* dataOut, VTOLObjAccessType type);
 void vtol_object_updated(VTOLObjHandle obj);
 void vtol_get_metadata(VTOLObjHandle obj, struct VTOLObjectMeta* dataOut);
 void vtol_set_metadata(VTOLObjHandle obj, const struct VTOLObjectMeta* dataIn);
-bool vtol_is_meta_object(VTOLObjHandle obj);
 void vtol_obj_iterate(void (*iterator)(VTOLObjHandle obj));
 
 

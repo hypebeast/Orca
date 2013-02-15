@@ -43,8 +43,6 @@ uint8_t telemetry_init(void)
 	// Enable the system clock for the serial interface
 	sysclk_enable_peripheral_clock(TELEMETRY_USART_INTERFACE);
 	
-	// TODO: Load telemetry settings from VTOL settings object.
-	
 	// Use USARTE0 and initialize buffers
 	USART_InterruptDriver_Initialize(&telemetry_usart_data, TELEMETRY_USART_INTERFACE,
 										USART_DREINTLVL_HI_gc);
@@ -77,7 +75,7 @@ uint8_t telemetry_init(void)
 	if (res < 0)
 		return -1;
 		
-	// TODO: Register objects for telemetry updates
+	// TODO: Register VTOL objects for telemetry updates (eventdispatcher)
 	
 	// Enable both RX and TX
 	USART_Rx_Enable(telemetry_usart_data.usart);
@@ -142,10 +140,10 @@ static uint8_t transmit_data(uint8_t * data, int32_t length)
  *  Calls the common receive complete handler with pointer to the correct USART
  *  as argument.
  */
-//ISR(USARTE0_RXC_vect)
-//{
-	//USART_RXComplete(&USART_data);
-//}
+ISR(USARTE0_RXC_vect)
+{
+	USART_RXComplete(&telemetry_usart_data);
+}
 
 /*! \brief Data register empty  interrupt service routine.
  *
@@ -153,7 +151,7 @@ static uint8_t transmit_data(uint8_t * data, int32_t length)
  *  Calls the common data register empty complete handler with pointer to the
  *  correct USART as argument.
  */
-//ISR(USARTE0_DRE_vect)
-//{
-	//USART_DataRegEmpty(&USART_data);
-//}
+ISR(USARTE0_DRE_vect)
+{
+	USART_DataRegEmpty(&telemetry_usart_data);
+}

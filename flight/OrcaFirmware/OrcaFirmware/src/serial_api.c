@@ -947,10 +947,10 @@ void serial_api_init(void)
  *  Calls the common receive complete handler with pointer to the correct USART
  *  as argument.
  */
-ISR(USARTE0_RXC_vect)
-{
-	USART_RXComplete(&USART_data);
-}
+//ISR(USARTE0_RXC_vect)
+//{
+	//USART_RXComplete(&USART_data);
+//}
 
 /*! \brief Data register empty  interrupt service routine.
  *
@@ -958,7 +958,7 @@ ISR(USARTE0_RXC_vect)
  *  Calls the common data register empty complete handler with pointer to the
  *  correct USART as argument.
  */
-ISR(USARTE0_DRE_vect)
-{
-	USART_DataRegEmpty(&USART_data);
-}
+//ISR(USARTE0_DRE_vect)
+//{
+	//USART_DataRegEmpty(&USART_data);
+//}
