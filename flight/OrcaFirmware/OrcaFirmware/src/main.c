@@ -83,6 +83,9 @@ int main (void)
 		// Telemetry module.
 		telemetry_task();
 		
+		// Event dispatcher
+		event_dispatcher_task();
+		
 		// Flight controller
 		flight_controller_task(&flightController);
 	}
@@ -118,7 +121,7 @@ void orca_init(void)
 	/* Initialize delay functions */
 	delay_init(sysclk_get_cpu_hz());
 	
-	/* Board Init */
+	/* Board initialization */
 	orca_board_init(&boardConfig);
 	
 	/* Initialize serial flash and read settings */
@@ -126,6 +129,9 @@ void orca_init(void)
 	{
 		serial_flash_init_settings(&orcaSettings);
 	}
+	
+	/* Start system clock */
+	system_time_init();
 	
 	/* Initialize the VTOL object manager */
 	vtol_init();
@@ -135,6 +141,9 @@ void orca_init(void)
 	
 	/* Initialize the telemetry module */
 	telemetry_init();
+	
+	/* Initialize the event dispatcher */
+	event_dispatcher_init();
 	
 	/* servo in subsystem initialization */
 	servo_in_init(&boardConfig, &servoInput);
@@ -238,7 +247,6 @@ void system_timer(uint32_t time)
 		}
 		//MS5611_altimeter_task(10);
 		ulFcTickCounter = 0;
-
 	}
 			
 	/* Call the voltage sensor every 500 ms */

@@ -29,7 +29,7 @@
 // Functions
 //////////////////////////////////////////////////////////////////////////
 
-uint8_t telemetry_init(void);
-void telemetry_task(void);
+uint8_t telemetry_init();
+void telemetry_task();
 
 #endif /* TELEMETRY_H_ */

@@ -1,1 +1,3 @@
+# Electrical Hardware
+
 This directory contains all files related to the PCB design and electrical hardware.

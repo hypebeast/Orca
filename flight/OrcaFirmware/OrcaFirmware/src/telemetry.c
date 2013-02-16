@@ -7,29 +7,35 @@
  * Author: Sebastian Ruml <sebastian.ruml@gmail.com>
  **************************************************************************/
 
-#include "telemetry.h"
-#include "usart.h"
-#include "vtol_link.h"
+#include "orca.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Private variables
 //////////////////////////////////////////////////////////////////////////
 
+/** USART data */
 static USART_data_t telemetry_usart_data;
+/** VTOL link connection data */
 static VTOLLinkConnectionData_t vtolLinkConnection;
+/** Event queue used for periodic updates */
+static EventQueue_t periodic_event_queue;
+/** Handle to the queue for periodic updates */
+static EventQueueHandle periodic_queue_handle;
+
 
 //////////////////////////////////////////////////////////////////////////
 // Private functions
 //////////////////////////////////////////////////////////////////////////
 
 static uint8_t transmit_data(uint8_t * data, int32_t length);
-static void telemetry_rx_task(void);
-static void telemetry_tx_task(void);
+static void telemetry_rx_task();
+static void telemetry_tx_task();
 static void register_object(VTOLObjHandle obj);
-static void process_obj_event(void);
-//static void registerObject(VTOLObjHandle obj);
-//static void updateObject(VTOLObjHandle obj);
-//static void addObject(VTOLObjHandle obj);
+static void process_obj_event();
+static void hw_settings_initialize();
+static void registerObject(VTOLObjHandle obj);
+static int8_t updateObject(VTOLObjHandle obj, int32_t eventType);
+static int8_t addObject(VTOLObjHandle obj);
 //static void setUpdatePeriod(VTOLObjHandle obj, uint32_t updatePeriodMs);
 
 
@@ -38,8 +44,11 @@ static void process_obj_event(void);
 * \return 0		Success.
 * \return -1	Error.
 ************************************************************************/
-uint8_t telemetry_init(void)
+uint8_t telemetry_init()
 {
+	// TODO: Read telemetry settings from VTOL object and initialize the hardware
+	//hw_settings_initialize();
+	
 	// Enable the system clock for the serial interface
 	sysclk_enable_peripheral_clock(TELEMETRY_USART_INTERFACE);
 	
@@ -53,8 +62,6 @@ uint8_t telemetry_init(void)
 	
 	// Enable RXC interrupt
 	USART_RxdInterruptLevel_Set(telemetry_usart_data.usart, USART_RXCINTLVL_HI_gc);
-	
-	// TODO: Read telemetry settings from VTOL object
 	
 	// Set baudrate to 9600 bps; scale factor is set to zero
 	// BSEL = ((I/O clock frequency)/(2^(ScaleFactor)*16*Baudrate))-1
@@ -75,7 +82,13 @@ uint8_t telemetry_init(void)
 	if (res < 0)
 		return -1;
 		
-	// TODO: Register VTOL objects for telemetry updates (eventdispatcher)
+	// Event queue
+	periodic_event_queue.head = 0;
+	periodic_event_queue.tail = 0;
+	periodic_queue_handle = &periodic_event_queue;
+		
+	// Register VTOL objects for periodic updates
+	vtol_obj_iterate(&register_object);
 	
 	// Enable both RX and TX
 	USART_Rx_Enable(telemetry_usart_data.usart);
@@ -84,10 +97,18 @@ uint8_t telemetry_init(void)
 	return 0;
 }
 
+/************************************************************************/
+/* \brief Initialize the hardware settings for the UART.                                                                     */
+/************************************************************************/
+static void hw_settings_initialize()
+{
+	// TODO
+}
+
 /************************************************************************
 * \brief Main telemetry task.
 ************************************************************************/
-void telemetry_task(void)
+void telemetry_task()
 {
 	telemetry_rx_task();
 	telemetry_tx_task();
@@ -96,7 +117,7 @@ void telemetry_task(void)
 /************************************************************************
 * \brief Telemetry RX task.
 ************************************************************************/
-static void telemetry_rx_task(void)
+static void telemetry_rx_task()
 {
 	uint8_t received_byte;
 	
@@ -112,10 +133,14 @@ static void telemetry_rx_task(void)
 /************************************************************************
 * \brief Telemetry RX task.
 ************************************************************************/
-static void telemetry_tx_task(void)
+static void telemetry_tx_task()
 {
-	// TODO: Wait for events and sends objects
-	// If event -> process_obj_event();
+	// Check if one or more events are waiting
+	if (event_queue_event_available(periodic_queue_handle))
+	{
+		// Process events
+		process_obj_event();
+	}
 }
 
 /************************************************************************
@@ -132,6 +157,93 @@ static uint8_t transmit_data(uint8_t * data, int32_t length)
 	}
 	
 	return i;
+}
+
+/************************************************************************/
+/* \brief	Registers the given VTOL object for periodic updates (if update
+			mode is periodic.
+*
+* \param obj	The object handle.
+/************************************************************************/
+static void register_object(VTOLObjHandle obj)
+{
+	if (obj == NULL)
+		return;
+		
+	// Only register object if update mode is periodic
+	// Note: This can be changed in the future!
+	VTOLObjMetaData metadata;
+	VTOLObjUpdateMode updateMode;
+	vtol_get_metadata(obj, &metadata);
+	updateMode = vtol_get_telemetry_update_mode(&metadata);
+	
+	if (updateMode == UPDATE_MODE_PERIODIC)
+	{
+		// Register object for periodic updates
+		addObject(obj);
+		
+		// Setup object for telemetry updates (set timers, etc)
+		updateObject(obj, EV_NONE);
+	}
+}
+
+/************************************************************************/
+/* \brief Register object for periodic updates.
+*	
+* \param obj	VTOL object handle.
+* \return 0		Success
+* \return -1	Error
+/************************************************************************/
+static int8_t addObject(VTOLObjHandle obj)
+{
+	VTOLObjEvent ev;
+	
+	// Add object for periodic updates
+	ev.obj = obj;
+	ev.instId = 0;
+	ev.event = EV_UPDATED_PERIODIC;
+	return event_dispatcher_create_periodic_queue(&ev, periodic_queue_handle, 0);
+}
+
+/************************************************************************/
+/* \brief Update object's timers, depending on object's settings.
+*
+* \param obj		VTOL object handle.
+* \param eventType	Event type.
+* \return 0			Success
+* \return -1		Error
+/************************************************************************/
+static int8_t updateObject(VTOLObjHandle obj, int32_t eventType)
+{
+	VTOLObjMetaData metadata;
+	VTOLObjUpdateMode updateMode;
+	
+	// Get metadata
+	vtol_get_metadata(obj, &metadata);
+	updateMode = vtol_get_telemetry_update_mode(&metadata);
+	
+	// Currently only periodic update mode is supported
+	// Set the timer only if the update mode is periodic
+	if (updateMode == UPDATE_MODE_PERIODIC)
+	{
+		VTOLObjEvent ev;
+		ev.obj = obj;
+		ev.instId = 0;
+		ev.event = EV_UPDATED_PERIODIC;
+		
+		// Set update period
+		event_dispatcher_update_periodic_queue(&ev, periodic_queue_handle, metadata.telemetryUpdatePeriod);
+	}
+	
+	return 0;
+}
+
+/************************************************************************/
+/* \brief Process object events.
+/************************************************************************/
+static void process_obj_event()
+{
+	// TODO
 }
 
 /*! \brief Receive complete interrupt service routine.

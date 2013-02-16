@@ -11,8 +11,10 @@
 #ifndef VTOL_OBJECT_MANAGER_H_
 #define VTOL_OBJECT_MANAGER_H_
 
+#include <asf.h>
+
 // Defines
-#define NUMBER_OF_VTOL_OBJECTS 100
+#define VTOLOBJ_NUMBER_OF_VTOL_OBJECTS 100
 
 /*
  * Shifts and masks used to read/write metadata flags.
@@ -136,7 +138,7 @@ struct VTOLObjectSingle {
 * \brief VTOL object list data structure.
 **************************************************************************/
 typedef struct {
-	VTOLObjHandle vtolo_list[NUMBER_OF_VTOL_OBJECTS]; /** Pointers to the VTOL objects*/
+	VTOLObjHandle vtolo_list[VTOLOBJ_NUMBER_OF_VTOL_OBJECTS]; /** Pointers to the VTOL objects*/
 	uint8_t index; /** Index of the last inserted object */
 } VTOLObjectList_t;
 
@@ -144,6 +146,9 @@ typedef struct {
  * Callback used to initialize the object fields to their default values.
  **************************************************************************/
 typedef void (*VTOLObjInitializeCallback)(VTOLObjHandle obj_handle);
+
+
+// Function decelerations
 
 uint8_t vtol_init(void);
 uint8_t vtol_obj_register(VTOLObjHandle obj, uint16_t id, uint8_t isSingle,
@@ -157,19 +162,20 @@ bool vtol_read_only(VTOLObjHandle obj);
 bool vtol_is_meta_object(VTOLObjHandle obj);
 bool vtol_is_meta_object(VTOLObjHandle obj);
 VTOLObjAccessType vtol_get_access(const VTOLObjMetaData* metadata);
-uint16_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn);
-uint16_t vtol_pack(VTOLObjHandle obj, void* dataOut);
-uint16_t vtol_save(VTOLObjHandle obj, uint8_t instId);
-uint16_t vtol_load(VTOLObjHandle obj, uint8_t instId);
-uint16_t vtol_delete(VTOLObjHandle obj);
-uint16_t vtol_save_settings(void);
-uint16_t vtol_load_settings(void);
-uint16_t vtol_delete_settings(void);
-uint16_t vtol_set_data(VTOLObjHandle obj, const uint8_t* dataIn);
-uint16_t vtol_set_data_field(VTOLObjHandle obj, const void* dataIn, uint16_t offset, uint16_t size);
-uint16_t vtol_get_data(VTOLObjHandle obj, void* dataOut);
-uint16_t vtol_get_data_field(VTOLObjHandle obj, void* dataOut, uint16_t offset, uint16_t size);
-VTOLObjAccessType vtol_get_access(const VTOLObjMetaData* dataOut);
+int8_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn);
+int8_t vtol_pack(VTOLObjHandle obj, void* dataOut);
+int8_t vtol_save(VTOLObjHandle obj, uint8_t instId);
+int8_t vtol_load(VTOLObjHandle obj, uint8_t instId);
+int8_t vtol_delete(VTOLObjHandle obj);
+int8_t vtol_save_settings(void);
+int8_t vtol_load_settings(void);
+int8_t vtol_delete_settings(void);
+int8_t vtol_set_data(VTOLObjHandle obj, const uint8_t* dataIn);
+int8_t vtol_set_data_field(VTOLObjHandle obj, const void* dataIn, uint16_t offset, uint16_t size);
+int8_t vtol_get_data(VTOLObjHandle obj, void* dataOut);
+int8_t vtol_get_data_field(VTOLObjHandle obj, void* dataOut, uint16_t offset, uint16_t size);
+VTOLObjAccessType vtol_get_access(const VTOLObjMetaData* metadata);
+VTOLObjUpdateMode vtol_get_telemetry_update_mode(const VTOLObjMetaData* metadata);
 void vtol_set_access(VTOLObjMetaData* dataOut, VTOLObjAccessType type);
 void vtol_object_updated(VTOLObjHandle obj);
 void vtol_get_metadata(VTOLObjHandle obj, struct VTOLObjectMeta* dataOut);

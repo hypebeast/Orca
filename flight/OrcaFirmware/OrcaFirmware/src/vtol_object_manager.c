@@ -88,9 +88,9 @@ uint8_t vtol_obj_register(VTOLObjHandle obj, uint16_t id, uint8_t isSingle,
 	vtolo_base->flags.isSingle = isSingle;
 	vtolo_base->flags.isSettings = isSettings;
 	
-	// TODO: Attempt to load settings object from flash -> vtol_object_load()
+	// TODO: Attempt to load settings object from flash -> vtol_object_load() (only if settings object)
 	
-	// Initialize object fields and metadata to default values
+	// Initialize object fields and metadata to the default values
 	if (initCb)
 		initCb(obj);
 	 
@@ -105,7 +105,7 @@ uint8_t vtol_obj_register(VTOLObjHandle obj, uint16_t id, uint8_t isSingle,
 **************************************************************************/
 VTOLObjHandle vtol_obj_get_by_id(uint16_t id)
 {
-	for (int i = 0; i < NUMBER_OF_VTOL_OBJECTS; i++)
+	for (int i = 0; i < VTOLOBJ_NUMBER_OF_VTOL_OBJECTS; i++)
 	{
 		struct VTOLObjectData* obj = (struct VTOLObjectData*)vtolo_list.vtolo_list[i];
 		if (obj->id == id)
@@ -176,21 +176,7 @@ bool vtol_read_only(VTOLObjHandle obj)
 {
 	// Get metadata
 	VTOLObjMetaData *metadata = MetaDataPtr((struct VTOLObjectData*)obj);
-	
-	return (vtol_get_access(metadata) == ACCESS_READONLY)
-}
-
-/**************************************************************************
-* \brief Returns if the object is a metadata object.
-*
-* \param metadata	VTOL object handle.
-* \return			True, if it's a metadata object; otherwise false.
-**************************************************************************/
-bool vtol_is_meta_object(VTOLObjHandle obj)
-{
-	// Recover base object header
-	struct VTOLObjectBase* header = (struct VTOLObjectBase*)obj;
-	return (header->flags.isMeta);
+	return (vtol_get_access(metadata) == ACCESS_READONLY);
 }
 
 /**************************************************************************
@@ -201,7 +187,18 @@ bool vtol_is_meta_object(VTOLObjHandle obj)
 **************************************************************************/
 VTOLObjAccessType vtol_get_access(const VTOLObjMetaData* metadata)
 {
-	return (metadata->flags >> VTOLOBJ_ACCESS_SHIFT) & 1;
+	return ((metadata->flags >> VTOLOBJ_ACCESS_SHIFT) & 1);
+}
+
+/************************************************************************/
+/* \brief Get the telemetry update mode.
+*
+* \param metadata	The metadata object.
+* \return The telemetry update mode.
+/************************************************************************/
+VTOLObjUpdateMode vtol_get_telemetry_update_mode(const VTOLObjMetaData* metadata)
+{
+	return ((metadata->flags >> VTOLOBJ_TELEMETRY_UPDATE_MODE_SHIFT) & VTOLOBJ_UPDATE_MODE_MASK);
 }
 
 /**************************************************************************
@@ -227,7 +224,7 @@ bool vtol_is_meta_object(VTOLObjHandle obj)
 * \return 0 Success
 * \return -1 Error
 **************************************************************************/
-uint16_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn)
+int8_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn)
 {
 	uint8_t ret = 0;
 	
@@ -262,7 +259,7 @@ uint16_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn)
 * \return 0			Success
 * \return -1		Error
 **************************************************************************/
-uint16_t vtol_pack(VTOLObjHandle obj, void* dataOut)
+int8_t vtol_pack(VTOLObjHandle obj, void* dataOut)
 {
 	// Cast handle to object
 	struct VTOLObjectData* vtol_obj = (struct VTOLObjectData*)obj;
@@ -314,9 +311,9 @@ void vtol_set_metadata(VTOLObjHandle obj, const struct VTOLObjectMeta* dataIn)
 * \return 0		Success
 * \return -1	Error
 **************************************************************************/
-uint16_t vtol_set_data(VTOLObjHandle obj, const uint8_t* dataIn)
+int8_t vtol_set_data(VTOLObjHandle obj, const uint8_t* dataIn)
 {
-	// TODO: Handle Metadata object
+	// TODO: Handle metadata object
 	
 	struct VTOLObjectData *vtol_obj;
 	ObjectInstanceHandle instanceHandle;
@@ -351,7 +348,7 @@ uint16_t vtol_set_data(VTOLObjHandle obj, const uint8_t* dataIn)
 * \return 0		No error
 * \return -1	Error
 **************************************************************************/
-uint16_t vtol_set_data_field(VTOLObjHandle obj, const void* dataIn, uint16_t offset, uint16_t size)
+int8_t vtol_set_data_field(VTOLObjHandle obj, const void* dataIn, uint16_t offset, uint16_t size)
 {
 	struct VTOLObjectData *data;
 	
@@ -371,13 +368,12 @@ uint16_t vtol_set_data_field(VTOLObjHandle obj, const void* dataIn, uint16_t off
 }
 
 /**************************************************************************
-* \brief Creates an instance of the VTOL object. Used for creating a new
-*        instance of multi instance data VTOLO.
+* \brief Get the object data for the given object handle.
 *
 * \param obj	The VTOL object handle.
 * \param iniCb	Callback function that's called after object is initialized.
 **************************************************************************/
-uint16_t vtol_get_data(VTOLObjHandle obj, void* dataOut)
+int8_t vtol_get_data(VTOLObjHandle obj, void* dataOut)
 {
 	if (vtol_is_meta_object(obj))
 	{
@@ -408,7 +404,7 @@ uint16_t vtol_get_data(VTOLObjHandle obj, void* dataOut)
 * \return 0			Success
 * \return -1		Error
 **************************************************************************/
-uint16_t vtol_get_data_field(VTOLObjHandle obj, void* dataOut, uint16_t offset, uint16_t size)
+int8_t vtol_get_data_field(VTOLObjHandle obj, void* dataOut, uint16_t offset, uint16_t size)
 {
 	// Check for meta data object
 	if (vtol_is_meta_object(obj))
@@ -446,7 +442,7 @@ uint16_t vtol_get_data_field(VTOLObjHandle obj, void* dataOut, uint16_t offset, 
 * \param instId	Instance ID. Not yet used!
 * \return 0	if success; otherwise -1.
 **************************************************************************/
-uint16_t vtol_save(VTOLObjHandle obj, uint8_t instId)
+int8_t vtol_save(VTOLObjHandle obj, uint8_t instId)
 {
 	// TODO
 	return 0;
@@ -459,7 +455,7 @@ uint16_t vtol_save(VTOLObjHandle obj, uint8_t instId)
 * \param instId	Instance ID. Not yet used!
 * \return 0	if success; otherwise -1.
 **************************************************************************/
-uint16_t vtol_load(VTOLObjHandle obj, uint8_t instId)
+int8_t vtol_load(VTOLObjHandle obj, uint8_t instId)
 {
 	// TODO
 	return 0;
@@ -470,7 +466,7 @@ uint16_t vtol_load(VTOLObjHandle obj, uint8_t instId)
 *
 * \return 0	if success; otherwise -1.
 **************************************************************************/
-uint16_t vtol_save_settings(void)
+int8_t vtol_save_settings(void)
 {
 	// TODO
 	return 0;
@@ -481,7 +477,7 @@ uint16_t vtol_save_settings(void)
 *
 * \return 0	if success; otherwise -1.
 **************************************************************************/
-uint16_t vtol_load_settings(void)
+int8_t vtol_load_settings(void)
 {
 	// TODO
 	return 0;
@@ -492,7 +488,7 @@ uint16_t vtol_load_settings(void)
 *
 * \return 0	if success; otherwise -1.
 **************************************************************************/
-uint16_t vtol_delete_settings(void)
+int8_t vtol_delete_settings(void)
 {
 	// TODO
 	return 0;
@@ -507,7 +503,7 @@ uint16_t vtol_delete_settings(void)
 **************************************************************************/
 void vtol_obj_iterate(void (*iterator)(VTOLObjHandle obj))
 {
-	for (int i = 0; i < NUMBER_OF_VTOL_OBJECTS; i++)
+	for (int i = 0; i < VTOLOBJ_NUMBER_OF_VTOL_OBJECTS; i++)
 	{
 		(*iterator)((VTOLObjHandle)vtolo_list.vtolo_list[i]);
 	}

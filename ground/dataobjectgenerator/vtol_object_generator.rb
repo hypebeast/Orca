@@ -284,6 +284,8 @@ class FmuCodeGenerator
           end
         end
 
+        # TODO: Initialize metadata fields
+
         # <% setgetfunctions %> tag
         setgetfunctions = []
         obj.each_element("field") do |field|
@@ -311,7 +313,7 @@ class FmuCodeGenerator
         setgetfunctionsextern = []
         obj.each_element("field") do |field|
           objectname = name.downcase
-          fieldname = field.attributes()['name']
+          fieldname = field.attributes()['name'].downcase
           fieldnamecp = field.attributes()['name'].capitalize
           fieldtype = @typeMappings[field.attributes()['type']]
 

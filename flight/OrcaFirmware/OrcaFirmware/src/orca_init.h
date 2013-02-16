@@ -9,8 +9,8 @@
 #ifndef ORCA_INIT_H_
 #define ORCA_INIT_H_
 
-#include<stdint.h>
-#include"user_board.h"
+#include <stdint.h>
+#include "user_board.h"
 
 void orca_board_init(BOARD_CONFIG_t *board);
 
