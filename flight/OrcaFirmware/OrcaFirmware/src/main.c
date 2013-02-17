@@ -105,7 +105,7 @@ void orca_init(void)
 	/* Disable all interrupts */
 	cpu_irq_disable();
 	
-	/* Initialize clock */	
+	/* Initialize the clock system */	
 	sysclk_init();	
 	
 	osc_enable(OSC_ID_RC32MHZ);

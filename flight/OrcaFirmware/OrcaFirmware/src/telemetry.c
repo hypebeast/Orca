@@ -31,7 +31,7 @@ static uint8_t transmit_data(uint8_t * data, int32_t length);
 static void telemetry_rx_task();
 static void telemetry_tx_task();
 static void register_object(VTOLObjHandle obj);
-static void process_obj_event();
+static void process_obj_event(VTOLObjEvent* ev);
 static void hw_settings_initialize();
 static void registerObject(VTOLObjHandle obj);
 static int8_t updateObject(VTOLObjHandle obj, int32_t eventType);
@@ -136,10 +136,11 @@ static void telemetry_rx_task()
 static void telemetry_tx_task()
 {
 	// Check if one or more events are waiting
-	if (event_queue_event_available(periodic_queue_handle))
+	while (event_queue_event_available(periodic_queue_handle))
 	{
-		// Process events
-		process_obj_event();
+		VTOLObjEvent* vtolEv;
+		event_queue_receive(periodic_queue_handle, vtolEv);
+		process_obj_event(vtolEv);
 	}
 }
 
@@ -241,7 +242,7 @@ static int8_t updateObject(VTOLObjHandle obj, int32_t eventType)
 /************************************************************************/
 /* \brief Process object events.
 /************************************************************************/
-static void process_obj_event()
+static void process_obj_event(VTOLObjEvent* ev)
 {
 	// TODO
 }

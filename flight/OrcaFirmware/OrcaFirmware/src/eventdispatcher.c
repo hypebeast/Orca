@@ -8,6 +8,7 @@
  **************************************************************************/
 
 #include "eventdispatcher.h"
+#include "system_time.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -82,7 +83,7 @@ int8_t event_dispatcher_init()
 	queue_handle = &queue;
 	
 	// Initialize variables
-	timeToNextUpdateMs = 0;
+	timeToNextUpdateMs = system_time_get_ticks() * SYSTEM_TIME_TICK_RATE_MS;
 	
 	// Done
 	return 0;
@@ -107,9 +108,10 @@ int8_t event_dispatcher_init()
 ************************************************************************/
 int8_t event_dispatcher_task()
 {
-	int32_t currentTime = 0; // TODO: Get the current system time
+	// Get the current time
+	int32_t currentTime = system_time_get_ticks() * SYSTEM_TIME_TICK_RATE_MS;
 	
-	// TODO: Dispatch events for non-periodic events (-> queue)
+	// TODO: Dispatch events for non-periodic events (-> local queue)
 	
 	// Process periodic events
 	if (currentTime >= timeToNextUpdateMs)
@@ -204,12 +206,12 @@ static int8_t process_periodic_updates()
 	// Iterate through each object and updates its timer, if zero then
 	// add object to event queue and/or call the callback function. Also
 	// calculate smallest delay to next update.
-	timeToNextUpdateMs = 0 + MAX_UPDATE_PERIOD; // TODO: Get system time
+	timeToNextUpdateMs = (system_time_get_ticks() * SYSTEM_TIME_TICK_RATE_MS) + MAX_UPDATE_PERIOD; // TODO: Get system time
 	for (int i = 0; i < periodicObjectList.index; i++)
 	{
 		PeriodicObject_t objEntry = periodicObjectList.list[i];
 		// Check if time for the next update
-		timeNow = 0; // TODO: Get system time
+		timeNow = system_time_get_ticks() * SYSTEM_TIME_TICK_RATE_MS;
 		if (objEntry.timeToNextUpdateMs <= timeNow)
 		{
 			// Reset timer
