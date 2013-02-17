@@ -681,12 +681,6 @@
     <Compile Include="src\servo.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\serial_api.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\serial_api.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="src\main.c">
       <SubType>compile</SubType>
     </Compile>

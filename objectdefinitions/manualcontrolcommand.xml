@@ -1,6 +1,6 @@
 <xml>
     <object name="ManualControlCommand" singleinstance="true" settings="false">
-        <description>Manual control commands.</description>
+        <description>Manual control commands for the input channel.</description>
     	<field name="Throttle" units="%" type="FLOAT32"/>
     	<field name="Roll" units="%" type="FLOAT32"/>
         <field name="Pitch" units="%" type="FLOAT32"/>
@@ -11,10 +11,10 @@
         <field name="channel3" units="us" type="UINT16"/>
         <field name="channel4" units="us" type="UINT16"/>
         <field name="channel5" units="us" type="UINT16"/>
-    	<field name="channel6" units="us" type="UINT16"/>
+        <field name="channel6" units="us" type="UINT16"/>
     	<access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
-        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <telemetryflight acked="false" updatemode="periodic" period="500"/>
         <logging updatemode="manual" period="0"/>
     </object>
 </xml>

@@ -1,13 +1,13 @@
 <xml>
     <object name="ActutatorCommand" singleinstance="true" settings="false">
-        <description>Actuator command.</description>
+        <description>Actuator command send to the output channels.</description>
         <field name="channel0" units="us" type="UINT16"/>
         <field name="channel1" units="us" type="UINT16"/>
         <field name="channel2" units="us" type="UINT16"/>
         <field name="channel3" units="us" type="UINT16"/>
         <field name="channel4" units="us" type="UINT16"/>
     	<field name="channel5" units="us" type="UINT16"/>
-    	<access gcs="readwrite" flight="readwrite"/>
+    	<access gcs="read" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>
         <logging updatemode="manual" period="0"/>

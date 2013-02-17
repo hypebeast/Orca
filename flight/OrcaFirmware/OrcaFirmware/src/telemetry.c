@@ -245,6 +245,12 @@ static int8_t updateObject(VTOLObjHandle obj, int32_t eventType)
 static void process_obj_event(VTOLObjEvent* ev)
 {
 	// TODO
+	
+	// Check if connection is established
+	
+	// Check which event type we got
+	
+	// Send VTOL object to GCS
 }
 
 /*! \brief Receive complete interrupt service routine.

@@ -2,5 +2,9 @@
     <object name="SystemStats" singleinstance="true" settings="false">
         <description>System status.</description>
         <field name="FlightTime" units="ms" type="INT32" elements="1"/>
+        <access gcs="readonly" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging period="0"/>
     </object>
 </xml>

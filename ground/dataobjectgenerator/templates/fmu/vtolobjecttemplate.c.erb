@@ -80,12 +80,20 @@ void <%= objnamelc %>_set_defaults(VTOLObjHandle obj)
 	
 	<% end %>
 
-	// TODO: Initialize object metadata fields to their default values
-	//metadata.flags = 
-	//metadata.telemetryUpdatePeriod =
-	//metadata.gcsTelemetryUpdatePeriod =
-	//metadata.loggingUpdatePeriod =
-	// TODO: UAVObjSetMetadata(obj, &metadata);
+	// Initialize object metadata fields to their default values
+	metadata.flags =
+		<%= flightaccess %> << VTOLOBJ_ACCESS_SHIFT |
+		<%= gcsaccess %> << VTOLOBJ_GCS_ACCESS_SHIFT |
+		<%= teleacked %> << VTOLOBJ_TELEMETRY_ACKED_SHIFT |
+		<%= gcsteleacked %> << VTOLOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		<%= teleupdatemode %> << VTOLOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		<%= gcsteleupdatemode %> << VTOLOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT; 	
+	metadata.telemetryUpdatePeriod = <%= flighttele_updateperiod %>;
+	metadata.gcsTelemetryUpdatePeriod = <%= gcstele_updateperiod %>;
+	metadata.loggingUpdatePeriod = <%= logging_updateperiod %>;
+	
+	// Set the metadata
+	vtol_set_metadata(obj, &metadata);
 }
 
 /**************************************************************************

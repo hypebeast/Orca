@@ -195,6 +195,17 @@ class FmuCodeGenerator
 
     @FIELDTYPE_FLOAT = "FLOAT32"
 
+    @accessTypeMappings = {
+      'readonly' => 'ACCESS_READONLY',
+      'readwrite' => 'ACCESS_READWRITE'
+    }
+
+    @updateModeMappings = {
+      'manual' => 'UPDATE_MODE_MANUAL',
+      'periodic' => 'UPDATE_MODE_PERIODIC',
+      'onchange' => 'UPDATE_MODE_ONCHANGE'
+    }
+
     puts "Generating FMU code..."
 
     # Find all object definition files
@@ -233,7 +244,7 @@ class FmuCodeGenerator
 
       doc = REXML::Document.new(File.open(file))
       doc.root.each_element("object") do |obj|
-        # Get all info from the specification
+        # Common tags
         xmlfile = File.basename(file)
         name = obj.attributes()['name']
         objnamecp = obj.attributes()['name'] + "Object"
@@ -242,7 +253,25 @@ class FmuCodeGenerator
         issingleinst = (obj.attributes()['singleinstance'] == "true") ? 1 : 0
         issettings = (obj.attributes()['settings'] == "true") ? 1 : 0 
         description = obj.elements["description"].get_text.value
-        
+        # <% flightaccess %>
+        flightaccess = @accessTypeMappings[obj.elements['access'].attributes()['flight']]
+        # <% gcsaccess %>
+        gcsaccess = @accessTypeMappings[obj.elements['access'].attributes()['gcs']]
+        # <% teleacked %>
+        teleacked = (obj.elements['telemetryflight'].attributes()['acked'] == "true") ? 1 : 0
+        # <% gcsteleacked %>
+        gcsteleacked = (obj.elements['telemetrygcs'].attributes()['acked'] == "true") ? 1 : 0
+        # <% teleupdatemode %>
+        teleupdatemode = @updateModeMappings[obj.elements['telemetryflight'].attributes()['updatemode']]
+        # <% gcsteleupdatemode %>
+        gcsteleupdatemode = @updateModeMappings[obj.elements['telemetrygcs'].attributes()['updatemode']]
+        # <% flighttele_updateperiod %>
+        flighttele_updateperiod = obj.elements['telemetryflight'].attributes()['period']
+        # <% gcstele_updateperiod %>
+        gcstele_updateperiod = obj.elements['telemetrygcs'].attributes()['period']
+        # <% logging_updateperiod %>
+        logging_updateperiod = obj.elements['logging'].attributes()['period']
+
         # <% numbytes %> tag
         numbytes = 0
         obj.each_element("field") do |field|
@@ -283,8 +312,6 @@ class FmuCodeGenerator
             initfields.push(data)
           end
         end
-
-        # TODO: Initialize metadata fields
 
         # <% setgetfunctions %> tag
         setgetfunctions = []

@@ -20,7 +20,6 @@
 #include "orca.h"
 #include "system_info.h"
 #include "user_board.h"
-#include "serial_api.h"
 #include "orca_init.h"
 #include "servo_in.h"
 #include "servo.h"
@@ -77,10 +76,7 @@ int main (void)
 	// Loop forever
 	while(1)
 	{
-		// Process incoming API messages from the USB USART
-		//serial_api_task();
-		
-		// Telemetry module.
+		// Telemetry module
 		telemetry_task();
 		
 		// Event dispatcher
@@ -100,8 +96,6 @@ int main (void)
  */
 void orca_init(void)
 {
-	//struct pll_config pcfg;
-	
 	/* Disable all interrupts */
 	cpu_irq_disable();
 	
@@ -110,13 +104,7 @@ void orca_init(void)
 	
 	osc_enable(OSC_ID_RC32MHZ);
 	osc_enable(OSC_ID_RC32KHZ);
-    osc_wait_ready(OSC_ID_RC32MHZ); 	
-	
-	//pll_config_init(&pcfg, PLL_SRC_RC32MHZ, 4, 4);
-	//pll_enable(&pcfg, 0);
-	//do {} while (!pll_is_locked(0));
-	//sysclk_set_prescalers(SYSCLK_PSADIV_1, SYSCLK_PSBCDIV_1_1);
-	//sysclk_set_source(SYSCLK_SRC_PLL);
+    osc_wait_ready(OSC_ID_RC32MHZ);
 	
 	/* Initialize delay functions */
 	delay_init(sysclk_get_cpu_hz());
@@ -265,10 +253,4 @@ void system_timer(uint32_t time)
 	//ioport_set_pin_low(BOARD_SPARE_PIN_2_GPIO);
 	rtc_set_alarm(1);
 	rtc_set_time(0);
-}
-
-
-ISR(PORTA_INT0_vect)
-{
-	//isr_servo_in(&servoIn);
 }
