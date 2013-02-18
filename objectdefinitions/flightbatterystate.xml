@@ -1,6 +1,6 @@
 <xml>
     <object name="FlightBatteryState" singleinstance="true" settings="false">
-        <description>Battery status information.</description>
+        <description>Cotains battery status information. Updated by the Battery module. Can be used by different modules.</description>
         <field name="Voltage" units="V" type="FLOAT32" defaultvalue="0.0"/>
         <field name="Current" units="A" type="FLOAT32" defaultvalue="0.0"/>
         <field name="PeakCurrent" units="A" type="FLOAT32" defaultvalue="0.0"/>

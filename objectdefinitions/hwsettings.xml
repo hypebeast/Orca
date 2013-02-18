@@ -1,0 +1,11 @@
+<xml>
+    <object name="HwSettings" singleinstance="true" settings="true">
+        <description>Hardware configuration.</description>
+        <field name="TelemetrySpeed" units="bps" type="ENUM" options="9600,19200,38400,57600,115200" defaultvalue="57600"/>
+        <field name="GpsSpeed" units="bps" type="ENUM" options="9600,19200,38400,57600,115200" defaultvalue="57600"/>
+    	<access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="manual" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

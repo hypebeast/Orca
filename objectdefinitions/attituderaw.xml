@@ -1,0 +1,13 @@
+<xml>
+    <object name="AttitudeRaw" singleinstance="true" settings="false">
+        <description>Raw attitude angles from the Attitude module (converted raw sensor values). Currently only used for debugging purpose. Comes from the Attitude module.</description>
+        <field name="Roll" units="degrees" type="FLOAT32"/>
+        <field name="Pitch" units="degrees" type="FLOAT32"/>
+        <field name="Yaw" units="degrees" type="FLOAT32"/>
+        <field name="Throttle" units="%" type="FLOAT32"/>
+    	<access gcs="readonly" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="500"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

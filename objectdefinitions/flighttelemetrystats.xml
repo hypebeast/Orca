@@ -1,6 +1,6 @@
 <xml>
     <object name="FlightTelemetryStats" singleinstance="true" settings="false">
-        <description>Telemetry statistics from the Orca flight management unit.</description>
+        <description>Telemetry statistics from the Orca flight management unit. Updated by the telemetry module.</description>
         <!-- <field name="Status" units="" type="ENUM" options="Disconnected,Connected"/> -->
         <field name="TxDataRate" units="bytes/sec" type="FLOAT32"/>
         <field name="RxDataRate" units="bytes/sec" type="FLOAT32"/>

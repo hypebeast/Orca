@@ -1,6 +1,6 @@
 <xml>
     <object name="Accels" singleinstance="true" settings="false">
-        <description>Values from the acceleration sensor.</description>
+        <description>Raw values from the acceleration sensor. Updated and used by the Attitude module.</description>
     	<field name="x" units="m/s^2" type="FLOAT32"/>
     	<field name="y" units="m/s^2" type="FLOAT32"/>
     	<field name="z" units="m/s^2" type="FLOAT32"/>

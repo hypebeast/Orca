@@ -735,6 +735,60 @@
     <Compile Include="src\vtol_objects\manualcontrolcommand_object.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\vtol_objects\actutatordesired_object.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\actutatordesired_object.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\attitudeactual_object.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\attitudeactual_object.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\attitudedesired_object.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\attitudedesired_object.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\attituderaw_object.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\attituderaw_object.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\attitudesettings_object.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\attitudesettings_object.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\flightbatterysettings_object.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\flightbatterysettings_object.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\flightstatus_object.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\flightstatus_object.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\hwsettings_object.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\hwsettings_object.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\stabilizationsettings_object.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\vtol_objects\stabilizationsettings_object.c">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
@@ -775,6 +829,19 @@
     <Folder Include="src\asf\xmega\utils\bit_handling\" />
     <Folder Include="src\asf\xmega\utils\preprocessor\" />
     <Folder Include="src\config\" />
+    <Folder Include="src\Libraries\VTOLLink" />
+    <Folder Include="src\Libraries\VTOLObjects" />
+    <Folder Include="src\Modules" />
+    <Folder Include="src\Libraries" />
+    <Folder Include="src\Modules\Actuator" />
+    <Folder Include="src\Modules\Battery" />
+    <Folder Include="src\Modules\Attitude" />
+    <Folder Include="src\Modules\ManualControl" />
+    <Folder Include="src\Modules\System" />
+    <Folder Include="src\Modules\Telemetry" />
+    <Folder Include="src\Modules\Stabilization" />
+    <Folder Include="src\Modules\Sensors" />
+    <Folder Include="src\OrcaOS" />
     <Folder Include="src\vtol_objects\" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\AvrGCC.targets" />

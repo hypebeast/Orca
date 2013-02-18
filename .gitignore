@@ -15,5 +15,4 @@ dist
 *.user
 flight/OrcaFirmware/OrcaFirmware/doxygen
 flight/OrcaFirmware/OrcaFirmware/src/vtol_objects
-doc/
 *.sublime*

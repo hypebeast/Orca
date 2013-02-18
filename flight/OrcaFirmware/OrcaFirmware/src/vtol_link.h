@@ -22,7 +22,7 @@
 // Public defines
 //////////////////////////////////////////////////////////////////////////
 
-#define VTOL_LINK_MAX_PAYLOAD_LENGTH 2^8-1	/** Max payload length */
+#define VTOL_LINK_MAX_PAYLOAD_LENGTH 2^8	/** Max payload length */
 #define VTOL_LINK_MAX_MESSAGE_LENGTH (1+1+2+2+1+VTOL_LINK_MAX_PAYLOAD_LENGTH+1) /** Max message length */
 #define VTOL_LINK_HEADER_LENGTH 7	/** Length of the message header */
 #define VTOL_LINK_START_BYTE 0x8D	/** Start byte */

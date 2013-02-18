@@ -1,0 +1,13 @@
+<xml>
+    <object name="AttitudeDesired" singleinstance="true" settings="false">
+        <description>The desired attitude that the Stabilization module will try if flight mode is stabilized. Comes from the ManualCommand module.</description>
+        <field name="Roll" units="degrees" type="FLOAT32"/>
+        <field name="Pitch" units="degrees" type="FLOAT32"/>
+        <field name="Yaw" units="degrees" type="FLOAT32"/>
+        <field name="Throttle" units="%" type="FLOAT32"/>
+    	<access gcs="readonly" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="100"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

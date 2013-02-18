@@ -1,0 +1,12 @@
+<xml>
+    <object name="AttitudeActual" singleinstance="true" settings="false">
+        <description>The updated attitude estimation by the Attitude module. Used by the Stabilization module.</description>
+        <field name="Roll" units="degrees" type="FLOAT32"/>
+        <field name="Pitch" units="degrees" type="FLOAT32"/>
+        <field name="Yaw" units="degrees" type="FLOAT32"/>
+    	<access gcs="readonly" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="100"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

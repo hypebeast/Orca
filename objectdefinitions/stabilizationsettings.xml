@@ -1,0 +1,21 @@
+<xml>
+    <object name="StabilizationSettings" singleinstance="true" settings="true">
+        <description>PID settings used by the Stabilization module to combine the AttitudeActual (from the Attitude module) and AttitudeDesired (from the ManualCommand module) to compute ActuatorDesired.</description>
+        <field name="RollKp" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="RollKi" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="RollKd" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="RollILimit" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="PitchKp" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="PitchKi" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="PitchKd" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="PitchILimit" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="YawKp" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="YawKi" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="YawKd" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="YawILimit" units="" type="FLOAT32" defaultvalue="0.00"/>
+    	<access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="manual" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

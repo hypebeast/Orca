@@ -1,0 +1,13 @@
+<xml>
+    <object name="ActutatorDesired" singleinstance="true" settings="false">
+        <description>Desired roll, pitch, yaw and throttle settings. Comes from the Stabilization module and its mainly used by the Actuator module to update the output channels.</description>
+        <field name="Roll" units="%" type="FLOAT32"/>
+        <field name="Pitch" units="%" type="FLOAT32"/>
+        <field name="Yaw" units="%" type="FLOAT32"/>
+        <field name="Throttle" units="%" type="FLOAT32"/>
+    	<access gcs="readonly" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

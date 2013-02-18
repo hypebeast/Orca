@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<module licenseRequired="false" uid="01ec07a4-0000-129e-0000-000000000000" name="ModelingWizard" version="4.0.08.8021" class="org.modelio.modelingwizard.impl.ModelingWizardMdac" binaryversion="2.2.01.8021">
+    <classpath>
+        <entry path="lib/modelingwizard-4.0.08.jar"/>
+    </classpath>
+</module>

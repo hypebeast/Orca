@@ -1,0 +1,15 @@
+<xml>
+    <object name="AttitudeSettings" singleinstance="true" settings="true">
+        <description>Settings for the Attitude module.</description>
+        <field name="RollKp" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="RollKi" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="PitchKp" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="PitchKi" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="YawKp" units="" type="FLOAT32" defaultvalue="0.00"/>
+        <field name="YawKi" units="" type="FLOAT32" defaultvalue="0.00"/>
+    	<access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="manual" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

@@ -30,6 +30,7 @@
 // Private variables
 //////////////////////////////////////////////////////////////////////////
 
+/** List that contains all VTOL objects. */
 static VTOLObjectList_t vtolo_list;
 
 /* Pointer to the instance data of an VTOL object */

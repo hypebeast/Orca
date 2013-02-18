@@ -173,6 +173,7 @@ class FmuCodeGenerator
 
     # Type sizes (in bytes)
     @typeSizes = {
+      'ENUM' => 4,
       'INT8' => 1,
       'INT16' => 2,
       'INT32' => 4,
@@ -184,6 +185,7 @@ class FmuCodeGenerator
 
     # Type mappings
     @typeMappings = {
+      'ENUM' => 'enum',
       'INT8' => 'int8_t',
       'INT16' => 'int16_t',
       'INT32' => 'int',

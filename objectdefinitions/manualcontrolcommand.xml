@@ -1,6 +1,6 @@
 <xml>
     <object name="ManualControlCommand" singleinstance="true" settings="false">
-        <description>Manual control commands for the input channel.</description>
+        <description>Manual control commands from the receiver. Updated and used by the ManualControl module.</description>
     	<field name="Throttle" units="%" type="FLOAT32"/>
     	<field name="Roll" units="%" type="FLOAT32"/>
         <field name="Pitch" units="%" type="FLOAT32"/>
