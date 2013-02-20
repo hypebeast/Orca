@@ -81,11 +81,14 @@ class App
     if parsed_options? && arguments_valid?
       puts "Start at #{DateTime.now}"    
 
+      # Generating IDs
+      ids = generateIDs()
+
       # Create VTOL objects for the GCS
-      GcsCodeGenerator.new(@options.outputDir)   
+      GcsCodeGenerator.new(@options.outputDir, ids)   
 
       # Create VTOL objects for the FMU
-      FmuCodeGenerator.new(@options.outputDir, @options.modifyFMUProject)
+      FmuCodeGenerator.new(@options.outputDir, ids, @options.modifyFMUProject)
     else
       exit 0
     end
@@ -138,12 +141,29 @@ class App
 
 end
 
+# This function generates for each specification file an unique ID. It returns an
+# hash where the IDs are mapped to the VTOL object names.
+def generateIDs()
+  # Get all specification files
+  pattern = File.join(OBJECT_DEFINITON_FILES_DIR, "*.xml")
+  specFiles = Dir.glob(pattern)
+
+  # Generate IDs and start with zero
+  id = 0
+  idHash = Hash.new
+  specFiles.each do |file|
+    idHash[file] = id
+    id += 1
+  end
+  idHash
+end
+
 
 # Generates code for the FMU
 class FmuCodeGenerator
   TARGET_FOLDER = "vtol_objects"
 
-  def initialize(outputDir="", modifyFMUProject)
+  def initialize(outputDir="", ids, modifyFMUProject)
     if outputDir == ""
       # Use the default output directory
       @outputDir = File.join("..", "..", "flight", "OrcaFirmware", "OrcaFirmware", "src", TARGET_FOLDER)
@@ -155,12 +175,18 @@ class FmuCodeGenerator
       Dir.mkdir(@outputDir)
     end
 
-    # Directory and file definitions
-    vtolObjectTemplateHFile = File.join(BASE_TEMPLATE_DIR, "fmu", "vtolobjecttemplate.h.erb")
-    vtolObjectTemplateCFile = File.join(BASE_TEMPLATE_DIR, "fmu", "vtolobjecttemplate.c.erb")
+    # Object IDs
+    @ids = ids
+
+    # Define directories
+    fmuTemplateFolder = File.join(BASE_TEMPLATE_DIR, "fmu")
+
+    # Template files
+    vtolObjectTemplateHFile = File.join(fmuTemplateFolder, "vtolobjecttemplate.h.erb")
+    vtolObjectTemplateCFile = File.join(fmuTemplateFolder, "vtolobjecttemplate.c.erb")
     @objectTemplateFiles = [vtolObjectTemplateHFile, vtolObjectTemplateCFile]
-    vtolObjectsInitTemplateHFile = File.join(BASE_TEMPLATE_DIR, "fmu", "vtolobjectsinittemplate.h.erb")
-    vtolObjectsInitTemplateCFile = File.join(BASE_TEMPLATE_DIR, "fmu", "vtolobjectsinittemplate.c.erb")
+    vtolObjectsInitTemplateHFile = File.join(fmuTemplateFolder, "vtolobjectsinittemplate.h.erb")
+    vtolObjectsInitTemplateCFile = File.join(fmuTemplateFolder, "vtolobjectsinittemplate.c.erb")
     @objectInitTemplateFiles = {
                       vtolObjectsInitTemplateHFile => "vtol_object_init.h" ,
                       vtolObjectsInitTemplateCFile => "vtol_object_init.c"
@@ -239,16 +265,27 @@ class FmuCodeGenerator
   # This function generates all VTOL object files. For every VTOL object
   # definition file
   def generateObjectFiles(specFiles)
-    obj_id = 1
-
     specFiles.each do |file|
       puts "Processing \"#{File.basename(file)}\"..."
 
       doc = REXML::Document.new(File.open(file))
       doc.root.each_element("object") do |obj|
+        ####
         # Common tags
+        ####
+
+        # Try to find the right ID for this specification file
+        if !@ids.has_key?(file)
+          puts "Can't find ID for " + file
+          exit(-1)
+        end
+        obj_id = @ids[file]
+
         xmlfile = File.basename(file)
         name = obj.attributes()['name']
+        namecp = name.capitalize
+        nameuc = name.upcase
+        namelc = name.downcase
         objnamecp = obj.attributes()['name'] + "Object"
         objnameuc = objnamecp.upcase
         objnamelc = obj.attributes()['name'].downcase + "_object"
@@ -283,34 +320,56 @@ class FmuCodeGenerator
         # <% datafields %> tag
         datafields = []
         obj.each_element("field") do |field|
-          data = {
-            'name' => field.attributes()['name'].downcase,
-            'type' => @typeMappings[field.attributes()['type']]
-          }
+          fieldname = field.attributes()['name']
+          if field.attributes()['type'] == "ENUM"
+            data = {
+              'name' => fieldname.downcase,
+              'type' => "#{namecp}#{fieldname}Options"
+            }
+          else
+            data = {
+              'name' => fieldname.downcase,
+              'type' => @typeMappings[field.attributes()['type']]
+            }
+          end
           datafields.push(data)
         end
 
         # <% enums %> tag
-        # TODO: Needs rework!!
         enums = []
-        m = 1
         obj.each_element("field") do |field|
-          if field.attributes()['type'] == "enum"
-            data = {
-              'start' => "typedef enum {",
-              'stop' => "} #{name}#{field.attributes()['name']}Options;"
-            }
-            enums.push(data)
-            m = m +1
+          if field.attributes()['type'] == "ENUM"
+            fieldname = field.attributes()['name']
+            enumStr = "typedef enum {\n"
+            # Go through each option
+            options = field.attributes()['options'].split(',')
+            m = 0
+            options.each do |option|
+              enumStr += "\t#{nameuc}_#{fieldname.upcase}_#{option.upcase} = #{m},"
+              m += 1
+              if m >= options.length
+                enumStr = enumStr.chop
+              end
+              enumStr += "\n"
+            end
+            enumStr += "} #{namecp}#{fieldname}Options;"
+            enums.push(enumStr)
           end
         end 
 
         # <% initfields %> tag
         initfields = []
         obj.each_element("field") do |field|
+          fieldname = field.attributes()['name'].downcase
           if field.attributes()['defaultvalue'] != nil
-            dataname = field.attributes()['name'].downcase
-            data = "data->#{dataname} = #{field.attributes()['defaultvalue']};"
+            defaultvalue = field.attributes()['defaultvalue']
+            # Handle ENUM types
+            if field.attributes()['type'] == "ENUM"
+              value = "#{nameuc}_#{fieldname.upcase}_#{defaultvalue.upcase}"
+            else
+              value = defaultvalue
+            end
+            data = "data->#{fieldname} = #{value};"
             initfields.push(data)
           end
         end
@@ -321,19 +380,25 @@ class FmuCodeGenerator
           objectname = name.downcase
           fieldname = field.attributes()['name'].downcase
           fieldnamecp = field.attributes()['name'].capitalize
-          fieldtype = @typeMappings[field.attributes()['type']]
+
+          # Handle enum types for the field type
+          if field.attributes()['type'] == "ENUM"
+            fieldtype = "#{namecp}#{field.attributes()['name']}Options"
+          else
+            fieldtype = @typeMappings[field.attributes()['type']]
+          end
 
           # Create setter
           setString = "void #{objectname}_#{fieldname}_set(#{fieldtype} *new#{fieldnamecp})\n"
           setString += "{\n"
-          setString += "\tvtol_set_data_field(#{objnamelc}_handle(), (void*)new#{fieldnamecp}, offsetof(#{objnamecp}Data_t, #{fieldname}), sizeof(#{fieldtype}));\n"
+          setString += "\tvtol_set_data_field(#{objnamelc}_handle(), (void*)new#{fieldnamecp}, offsetof(#{namecp}Data_t, #{fieldname}), sizeof(#{fieldtype}));\n"
           setString += "}\n"
           setgetfunctions.push(setString)
 
           # Create getter
           getString = "void #{objectname}_#{fieldname}_get(#{fieldtype} *new#{fieldnamecp})\n"
           getString += "{\n"
-          getString += "\tvtol_get_data_field(#{objnamelc}_handle(), (void*)new#{fieldnamecp}, offsetof(#{objnamecp}Data_t, #{fieldname}), sizeof(#{fieldtype}));\n"
+          getString += "\tvtol_get_data_field(#{objnamelc}_handle(), (void*)new#{fieldnamecp}, offsetof(#{namecp}Data_t, #{fieldname}), sizeof(#{fieldtype}));\n"
           getString += "}\n"
           setgetfunctions.push(getString)
         end
@@ -344,7 +409,13 @@ class FmuCodeGenerator
           objectname = name.downcase
           fieldname = field.attributes()['name'].downcase
           fieldnamecp = field.attributes()['name'].capitalize
-          fieldtype = @typeMappings[field.attributes()['type']]
+          
+          # Handle enum types for the field type
+          if field.attributes()['type'] == "ENUM"
+            fieldtype = "#{namecp}#{field.attributes()['name']}Options"
+          else
+            fieldtype = @typeMappings[field.attributes()['type']]
+          end
 
           # Create setter
           setString = "void #{objectname}_#{fieldname}_set(#{fieldtype} *new#{fieldnamecp});"
@@ -355,11 +426,13 @@ class FmuCodeGenerator
           setgetfunctionsextern.push(getString)
         end
 
+        # Save the initialize function name for the initialization file
         @object_init_functions.push("#{objnamelc}_initialize();")
 
+        # Generate all code files from the template files
         @objectTemplateFiles.each do |template|
           # Build filename
-          filename = name.downcase + "_" + "object"
+          filename = namelc + "_" + "object"
           if template.include? ".h"
             filename = filename + ".h"
           elsif template.include? ".c"
@@ -385,9 +458,12 @@ class FmuCodeGenerator
 
   end
 
+  # This function generates the initialization files
   def generateObjectInitFiles(specFiles)
     @objectInitTemplateFiles.each do |template, outputfile|
+      # Header names
       headers = @header_files.uniq
+      # Initialization function names
       init_functions = @object_init_functions.uniq
       filename = outputfile
       erb = ERB.new(File.open(template).read)
@@ -527,7 +603,7 @@ class GcsCodeGenerator
   # outputDir - The directory where the generated code files will be put
   #
   # Returns an instance of GcsCodeGenerator.
-  def initialize(outputDir="")
+  def initialize(outputDir="", ids)
     if outputDir == ""
       # Use default output directory
       @outputDir = File.join("..", "Matunus", "src", "vtolobjects")
@@ -538,6 +614,8 @@ class GcsCodeGenerator
     if not File.exists? @outputDir
       Dir.mkdir(@outputDir)
     end
+
+    @ids = ids
 
     # Directory and files definitions
     @templateFile = File.join(BASE_TEMPLATE_DIR, "gcs", "vtolobjecttemplate.py.erb")
@@ -566,14 +644,23 @@ class GcsCodeGenerator
   end
 
   def generateObjectFiles(files)
-
-    obj_id = 1
     module_names = []
     files.each do |file|
       puts "Processing \"#{File.basename(file)}\"..."
 
       doc = REXML::Document.new(File.open(file))
       doc.root.each_element("object") do |obj|
+        ####
+        # Common tags
+        ####
+
+        # Try to find the right ID for this specification file
+        if !@ids.has_key?(file)
+          puts "Can't find ID for " + file
+          exit(-1)
+        end
+        obj_id = @ids[file]
+
         xmlfile = File.basename(file)
         name = obj.attributes()['name']
         obj_name = obj.attributes()['name'] + "Object"
@@ -600,7 +687,6 @@ class GcsCodeGenerator
         puts "Done"
 
         module_names.push("#{obj_name}")
-        obj_id += 1
       end
     end
 

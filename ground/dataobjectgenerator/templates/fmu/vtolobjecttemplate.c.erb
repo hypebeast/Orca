@@ -35,7 +35,7 @@
 static VTOLObjHandle handle = NULL;
 
 // The VTOL object
-static <%= objnamecp %>Data_t <%= objnamelc %>_data;
+static <%= namecp %>Data_t <%= namelc %>_data;
 
 /**************************************************************************
 * \brief Initializes this object
@@ -51,7 +51,7 @@ uint8_t <%= objnamelc %>_initialize(void)
 	}
 
 	// Save object handle
-	handle = &<%= objnamelc %>_data;
+	handle = &<%= namelc %>_data;
 
 	// Register object with the VTOL object manager
 	uint8_t res = vtol_obj_register(handle, <%= objnameuc %>_OBJID,
@@ -71,13 +71,12 @@ uint8_t <%= objnamelc %>_initialize(void)
 **************************************************************************/
 void <%= objnamelc %>_set_defaults(VTOLObjHandle obj)
 {
-	<%= objnamecp %>Data_t* data = &<%= objnamelc %>_data;
+	<%= namecp %>Data_t* data = &<%= namelc %>_data;
 	VTOLObjMetaData metadata;
 
 	// Initialize object fields to their default values
 	<% initfields.each do |field| %>
 	<%= field %>
-	
 	<% end %>
 
 	// Initialize object metadata fields to their default values
@@ -105,7 +104,6 @@ VTOLObjHandle <%= objnamelc %>_handle(void)
 }
 
 // Getter and setter object functions
-
 <% setgetfunctions.each do |function| %>
 <%= function %>
 <% end %>

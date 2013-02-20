@@ -37,7 +37,7 @@
 #define <%= objnameuc %>_OBJID <%= obj_id %>
 #define <%= objnameuc %>_ISSINGLEINST <%= issingleinst %>
 #define <%= objnameuc %>_ISSETTINGS <%= issettings %>
-#define <%= objnameuc %>_NUMBYTES <%= numbytes %> // Size of the VTOLO without the the generic VTOLO header
+#define <%= objnameuc %>_NUMBYTES <%= numbytes %> // Size of the VTOLO without the generic VTOLO header
 
 // Object access macros
 /***************************************************************************
@@ -52,20 +52,18 @@
 #define <%= objnamecp %>GetMetadata(dataOut) vtol_get_metadata(<%= objnamelc %>_handle(), dataOut)
 #define <%= objnamecp %>SetMetadata(dataIn) vtol_set_metadata(<%= objnamelc %>_handle(), dataIn)
 
+// Field information
+<% enums.each do |enum| %>
+<%= enum %>
+<% end %>
+
 // Object data
 typedef struct {
 	struct VTOLObjectData vtolo;
 	<% datafields.each do |field| %>
 	<%=field['type']%> <%=field['name']%>;
 	<% end %>
-} __attribute__((packed)) <%= objnamecp %>Data_t;
-
-// Field information
-
-// TODO: Add support for enums
-<% enums.each do |field| %>
-<%= field %>
-<% end %>
+} __attribute__((packed)) <%= namecp %>Data_t;
 
 // Generic interface functions
 uint8_t <%= objnamelc %>_initialize(void);
