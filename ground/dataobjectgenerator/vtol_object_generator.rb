@@ -19,7 +19,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 # == Synopsis 
-#   This application generates the data object code for the FMU and GCS from the
+#   This application generates the VTOL object code for the FMU and GCS from
 #   object definition files.
 #
 # == Examples
@@ -58,6 +58,7 @@ PROJECT_ROOT_FOLDER = File.join("..", "..")
 FMU_VS_PROJECT_FILE = File.join(PROJECT_ROOT_FOLDER, "flight", "OrcaFirmware", "OrcaFirmware", "OrcaFirmware.cproj")
 
 
+# Application class. Handles the startup and arguments parsing.
 class App
   VERSION = '0.0.1'
   
@@ -286,9 +287,9 @@ class FmuCodeGenerator
         namecp = name.capitalize
         nameuc = name.upcase
         namelc = name.downcase
-        objnamecp = obj.attributes()['name'] + "Object"
+        objnamecp = name + "Object"
         objnameuc = objnamecp.upcase
-        objnamelc = obj.attributes()['name'].downcase + "_object"
+        objnamelc = namelc + "_object"
         issingleinst = (obj.attributes()['singleinstance'] == "true") ? 1 : 0
         issettings = (obj.attributes()['settings'] == "true") ? 1 : 0 
         description = obj.elements["description"].get_text.value
@@ -311,35 +312,40 @@ class FmuCodeGenerator
         # <% logging_updateperiod %>
         logging_updateperiod = obj.elements['logging'].attributes()['period']
 
-        # <% numbytes %> tag
-        numbytes = 0
-        obj.each_element("field") do |field|
-          numbytes += @typeSizes[field.attributes()['type']]
-        end
 
-        # <% datafields %> tag
+        # Tags that will be replaced in the next loop
+        numbytes = 0
         datafields = []
+        enums = []
+        initfields = []
+        setgetfunctions = []
+        setgetfunctionsextern = []
+
+        # Parse all field elements and replace all template tags
         obj.each_element("field") do |field|
           fieldname = field.attributes()['name']
+          fieldnamecp = fieldname.capitalize
+          fieldnamedc = fieldname.downcase
+
+          # <% numbytes %> tag
+          numbytes += @typeSizes[field.attributes()['type']]
+
+          # <% datafields %> tag
           if field.attributes()['type'] == "ENUM"
             data = {
-              'name' => fieldname.downcase,
+              'name' => fieldnamedc,
               'type' => "#{namecp}#{fieldname}Options"
             }
           else
             data = {
-              'name' => fieldname.downcase,
+              'name' => fieldnamedc,
               'type' => @typeMappings[field.attributes()['type']]
             }
           end
           datafields.push(data)
-        end
 
-        # <% enums %> tag
-        enums = []
-        obj.each_element("field") do |field|
+          # <% enums %> tag
           if field.attributes()['type'] == "ENUM"
-            fieldname = field.attributes()['name']
             enumStr = "typedef enum {\n"
             # Go through each option
             options = field.attributes()['options'].split(',')
@@ -355,12 +361,8 @@ class FmuCodeGenerator
             enumStr += "} #{namecp}#{fieldname}Options;"
             enums.push(enumStr)
           end
-        end 
 
-        # <% initfields %> tag
-        initfields = []
-        obj.each_element("field") do |field|
-          fieldname = field.attributes()['name'].downcase
+          # <% initfields %> tag
           if field.attributes()['defaultvalue'] != nil
             defaultvalue = field.attributes()['defaultvalue']
             # Handle ENUM types
@@ -369,18 +371,11 @@ class FmuCodeGenerator
             else
               value = defaultvalue
             end
-            data = "data->#{fieldname} = #{value};"
+            data = "data->#{fieldnamedc} = #{value};"
             initfields.push(data)
           end
-        end
 
-        # <% setgetfunctions %> tag
-        setgetfunctions = []
-        obj.each_element("field") do |field|
-          objectname = name.downcase
-          fieldname = field.attributes()['name'].downcase
-          fieldnamecp = field.attributes()['name'].capitalize
-
+          # <% setgetfunctions %> tag
           # Handle enum types for the field type
           if field.attributes()['type'] == "ENUM"
             fieldtype = "#{namecp}#{field.attributes()['name']}Options"
@@ -389,27 +384,20 @@ class FmuCodeGenerator
           end
 
           # Create setter
-          setString = "void #{objectname}_#{fieldname}_set(#{fieldtype} *new#{fieldnamecp})\n"
+          setString = "void #{namelc}_#{fieldname}_set(#{fieldtype} *new#{fieldnamecp})\n"
           setString += "{\n"
-          setString += "\tvtol_set_data_field(#{objnamelc}_handle(), (void*)new#{fieldnamecp}, offsetof(#{namecp}Data_t, #{fieldname}), sizeof(#{fieldtype}));\n"
+          setString += "\tvtol_set_data_field(#{objnamelc}_handle(), (void*)new#{fieldnamecp}, offsetof(#{namecp}Data_t, #{fieldnamedc}), sizeof(#{fieldtype}));\n"
           setString += "}\n"
           setgetfunctions.push(setString)
 
           # Create getter
-          getString = "void #{objectname}_#{fieldname}_get(#{fieldtype} *new#{fieldnamecp})\n"
+          getString = "void #{namelc}_#{fieldname}_get(#{fieldtype} *new#{fieldnamecp})\n"
           getString += "{\n"
-          getString += "\tvtol_get_data_field(#{objnamelc}_handle(), (void*)new#{fieldnamecp}, offsetof(#{namecp}Data_t, #{fieldname}), sizeof(#{fieldtype}));\n"
+          getString += "\tvtol_get_data_field(#{objnamelc}_handle(), (void*)new#{fieldnamecp}, offsetof(#{namecp}Data_t, #{fieldnamedc}), sizeof(#{fieldtype}));\n"
           getString += "}\n"
           setgetfunctions.push(getString)
-        end
 
-        # <% setgetfunctionsextern %> tag
-        setgetfunctionsextern = []
-        obj.each_element("field") do |field|
-          objectname = name.downcase
-          fieldname = field.attributes()['name'].downcase
-          fieldnamecp = field.attributes()['name'].capitalize
-          
+          # <% setgetfunctionsextern %> tag
           # Handle enum types for the field type
           if field.attributes()['type'] == "ENUM"
             fieldtype = "#{namecp}#{field.attributes()['name']}Options"
@@ -418,21 +406,22 @@ class FmuCodeGenerator
           end
 
           # Create setter
-          setString = "void #{objectname}_#{fieldname}_set(#{fieldtype} *new#{fieldnamecp});"
+          setString = "void #{namelc}_#{fieldname}_set(#{fieldtype} *new#{fieldnamecp});"
           setgetfunctionsextern.push(setString)
 
           # Create getter
-          getString = "void #{objectname}_#{fieldname}_get(#{fieldtype} *new#{fieldnamecp});"
+          getString = "void #{namelc}_#{fieldname}_get(#{fieldtype} *new#{fieldnamecp});"
           setgetfunctionsextern.push(getString)
-        end
 
+        end
+       
         # Save the initialize function name for the initialization file
         @object_init_functions.push("#{objnamelc}_initialize();")
 
         # Generate all code files from the template files
         @objectTemplateFiles.each do |template|
           # Build filename
-          filename = namelc + "_" + "object"
+          filename = namelc
           if template.include? ".h"
             filename = filename + ".h"
           elsif template.include? ".c"
@@ -440,7 +429,7 @@ class FmuCodeGenerator
           end
 
           # Header file name
-          headerfile = name.downcase + "_" + "object" + ".h"
+          headerfile = name.downcase + ".h"
           @header_files.push(headerfile)
           # Name of the include define
           incdefine = name.upcase + "_" + "OBJECT"
@@ -461,10 +450,19 @@ class FmuCodeGenerator
   # This function generates the initialization files
   def generateObjectInitFiles(specFiles)
     @objectInitTemplateFiles.each do |template, outputfile|
-      # Header names
-      headers = @header_files.uniq
+      # Header files
+      headers = ""
+      @header_files.uniq.each do |file|
+        headers += "#include \"" + file + "\"\n"
+      end
+
       # Initialization function names
-      init_functions = @object_init_functions.uniq
+      init_functions = ""
+      @object_init_functions.each do |func|
+        init_functions += "\t" + func + "\n"
+      end
+      init_functions = init_functions.chop
+
       filename = outputfile
       erb = ERB.new(File.open(template).read)
       new_code = erb.result(binding)

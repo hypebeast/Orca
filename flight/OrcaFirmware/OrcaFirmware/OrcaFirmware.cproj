@@ -687,106 +687,106 @@
     <None Include='src\asf\common\utils\make\Makefile.avr.in'>
       <SubType>compile</SubType>
     </None>
-    <Compile Include='src\vtol_objects\accels_object.h'>
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include='src\vtol_objects\accels_object.c'>
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include='src\vtol_objects\gyros_object.h'>
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include='src\vtol_objects\gyros_object.c'>
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include='src\vtol_objects\systemstats_object.h'>
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include='src\vtol_objects\systemstats_object.c'>
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include='src\vtol_objects\vtol_object_init.h'>
       <SubType>compile</SubType>
     </Compile>
     <Compile Include='src\vtol_objects\vtol_object_init.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\actutatorcommand_object.h'>
+    <Compile Include='src\vtol_objects\accels.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\actutatorcommand_object.c'>
+    <Compile Include='src\vtol_objects\accels.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\flightbatterystate_object.h'>
+    <Compile Include='src\vtol_objects\actutatorcommand.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\flightbatterystate_object.c'>
+    <Compile Include='src\vtol_objects\actutatorcommand.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\flighttelemetrystats_object.h'>
+    <Compile Include='src\vtol_objects\actutatordesired.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\flighttelemetrystats_object.c'>
+    <Compile Include='src\vtol_objects\actutatordesired.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\manualcontrolcommand_object.h'>
+    <Compile Include='src\vtol_objects\attitudeactual.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\manualcontrolcommand_object.c'>
+    <Compile Include='src\vtol_objects\attitudeactual.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\actutatordesired_object.h'>
+    <Compile Include='src\vtol_objects\attitudedesired.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\actutatordesired_object.c'>
+    <Compile Include='src\vtol_objects\attitudedesired.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\attitudeactual_object.h'>
+    <Compile Include='src\vtol_objects\attituderaw.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\attitudeactual_object.c'>
+    <Compile Include='src\vtol_objects\attituderaw.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\attitudedesired_object.h'>
+    <Compile Include='src\vtol_objects\attitudesettings.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\attitudedesired_object.c'>
+    <Compile Include='src\vtol_objects\attitudesettings.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\attituderaw_object.h'>
+    <Compile Include='src\vtol_objects\flightbatterysettings.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\attituderaw_object.c'>
+    <Compile Include='src\vtol_objects\flightbatterysettings.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\attitudesettings_object.h'>
+    <Compile Include='src\vtol_objects\flightbatterystate.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\attitudesettings_object.c'>
+    <Compile Include='src\vtol_objects\flightbatterystate.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\flightbatterysettings_object.h'>
+    <Compile Include='src\vtol_objects\flightstatus.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\flightbatterysettings_object.c'>
+    <Compile Include='src\vtol_objects\flightstatus.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\flightstatus_object.h'>
+    <Compile Include='src\vtol_objects\flighttelemetrystats.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\flightstatus_object.c'>
+    <Compile Include='src\vtol_objects\flighttelemetrystats.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\hwsettings_object.h'>
+    <Compile Include='src\vtol_objects\gyros.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\hwsettings_object.c'>
+    <Compile Include='src\vtol_objects\gyros.c'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\stabilizationsettings_object.h'>
+    <Compile Include='src\vtol_objects\hwsettings.h'>
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include='src\vtol_objects\stabilizationsettings_object.c'>
+    <Compile Include='src\vtol_objects\hwsettings.c'>
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include='src\vtol_objects\manualcontrolcommand.h'>
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include='src\vtol_objects\manualcontrolcommand.c'>
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include='src\vtol_objects\stabilizationsettings.h'>
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include='src\vtol_objects\stabilizationsettings.c'>
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include='src\vtol_objects\systemstats.h'>
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include='src\vtol_objects\systemstats.c'>
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

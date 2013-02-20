@@ -25,10 +25,8 @@
 **************************************************************************/
 
 #include "orca.h"
-<% headers.each do |header| %>
-#include "<%= header %>"
-<% end %>
 
+<%= headers %>
 
 /**************************************************************************
 * \brief Function used to initialize a instance of every VTOL object. This
@@ -37,7 +35,5 @@
 void vtol_objects_initialize_all(void)
 {
 	// VTOL object initialize functions
-	<% init_functions.each do |function| %>
-	<%= function %>
-	<% end %>
+<%= init_functions %>
 }
