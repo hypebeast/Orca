@@ -312,10 +312,13 @@ class FmuCodeGenerator
         # <% logging_updateperiod %>
         logging_updateperiod = obj.elements['logging'].attributes()['period']
 
+        ####
+        # Field tags
+        ####
 
-        # Tags that will be replaced in the next loop
+        # Tags that will be replaced in the loop
         numbytes = 0
-        datafields = []
+        datafields = ""
         enums = []
         initfields = []
         setgetfunctions = []
@@ -332,17 +335,10 @@ class FmuCodeGenerator
 
           # <% datafields %> tag
           if field.attributes()['type'] == "ENUM"
-            data = {
-              'name' => fieldnamedc,
-              'type' => "#{namecp}#{fieldname}Options"
-            }
+            datafields += "\t#{namecp}#{fieldname}Options #{fieldnamedc};\n"
           else
-            data = {
-              'name' => fieldnamedc,
-              'type' => @typeMappings[field.attributes()['type']]
-            }
+            datafields += "\t" + @typeMappings[field.attributes()['type']] + " #{fieldnamedc};\n"
           end
-          datafields.push(data)
 
           # <% enums %> tag
           if field.attributes()['type'] == "ENUM"
@@ -418,7 +414,7 @@ class FmuCodeGenerator
         # Save the initialize function name for the initialization file
         @object_init_functions.push("#{objnamelc}_initialize();")
 
-        # Generate all code files from the template files
+        # Generate all source code files from the template files
         @objectTemplateFiles.each do |template|
           # Build filename
           filename = namelc
@@ -474,7 +470,7 @@ class FmuCodeGenerator
     end
   end
 
-  # This function adds all genreated FMU code to the Visual Studio project
+  # This function adds all genreated VTOL object code to the Visual Studio project
   def modifyVisualStudioProject()
     doc = REXML::Document.new(File.open(FMU_VS_PROJECT_FILE))
 

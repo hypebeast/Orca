@@ -1,6 +1,6 @@
 # Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
-# This file is part of the Matunus project (part of the orcacopter project)
+# This file is part of the Matunus project (part of the Orcacopter project)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,25 +16,33 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-app_defs = None
+__author__ = 'Sebastian Ruml'
 
 
-class _AppDefs:
-    AppPath = ""
-    DataPath = ""
-    IconsPath = ""
-    ArtworkPath = ""
-    SrcPath = ""
-    QmlPath = ""
-    StylesheetPath = ""
+class VTOLLinkRxState:
+    SYNC = 0
+    TYPE = 1
+    LENGTH = 2
+    ID = 3
+    INSTID = 4
+    DATA = 5
+    CRC = 6
+    COMPLETE = 7
+    ERROR = 8
 
+
+class VTOLLinkMessageType:
+    OBJECT = 0x20
+    OBJECT_REQ = 0x21
+    OBJECT_ACK = 0x22
+    ACK = 0x23
+
+
+class VTOLMessageData(object):
     def __init__(self):
         pass
 
 
-def AppDefs():
-    global app_defs
-
-    if not app_defs:
-        app_defs = _AppDefs()
-    return app_defs
+class VTOLLink(object):
+    def __init__(self):
+        pass

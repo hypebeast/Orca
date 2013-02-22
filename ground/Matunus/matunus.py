@@ -42,6 +42,7 @@ if sys.version_info < (2, 6, 0):
     #print ('Mac OS X are supported!')
     #sys.exit(1)
 
+
 def main():
     """
     Everything dispatches from this main function.
@@ -72,7 +73,7 @@ def main():
 
     # Set new AppUserModelID
     # TODO: Only required for Windows
-    myappid = 'sr.orca.matunus.002' # arbitrary string
+    myappid = 'sr.orca.matunus.002'  # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # Start the application

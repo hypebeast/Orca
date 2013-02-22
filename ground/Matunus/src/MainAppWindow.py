@@ -30,6 +30,7 @@ except ImportError:
 import os
 import sys
 
+from vtolobjects import vtolobjectmanager
 from WelcomePage import WelcomePage
 from InfoPanel import InfoPanel
 from ConfigurationPage import ConfigurationPage
@@ -134,6 +135,9 @@ class MainAppWindow(QtGui.QMainWindow):
 
         # Provides methods for working with the flight management unit
         self.fmuManager = FMUManager()
+
+        # VTOL object Manager
+        self._objectManager = vtolobjectmanager.VTOLObjectManager()
 
         # Create UI
         self._createUi()

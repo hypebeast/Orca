@@ -60,9 +60,8 @@
 // Object data
 typedef struct {
 	struct VTOLObjectData vtolo;
-	<% datafields.each do |field| %>
-	<%=field['type']%> <%=field['name']%>;
-	<% end %>
+
+<%= datafields %>
 } __attribute__((packed)) <%= namecp %>Data_t;
 
 // Generic interface functions
