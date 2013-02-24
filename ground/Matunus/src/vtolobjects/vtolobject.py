@@ -1,4 +1,4 @@
-# Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
+# Copyright (C) 2012-2013 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
 # This file is part of the Matunus project (part of the Orcacopter project)
 #
@@ -22,18 +22,30 @@ from vtolobjectmetadata import VTOLObjectMetadata
 from vtolobjectfield import VTOLObjectField
 
 
-class VTOLObject:
+class VTOLObject(object):
     """
     Base VTOL object implementation. Every VTOL object needs to derive this
     from this class.
     """
+
+    class TypeSizes:
+        """Type sizes in bytes"""
+        ENUM = 4
+        INT8 = 1
+        INT16 = 2
+        INT32 = 4
+        UINT8 = 1
+        UINT16 = 2
+        UINT32 = 4
+        FLOAT = 4
+
     def __init__(self, objId, name, description):
-        self.metadata = VTOLObjectMetadata(objId)
-        self.objId = objId
-        self.name = name
-        self.description = description
-        self.instId = 0
-        self.fields = []
+        self._metadata = VTOLObjectMetadata(objId)
+        self._objId = objId
+        self._name = name
+        self._description = description
+        self._instId = 0
+        self._fields = []
 
     def addField(self, field):
         """Adds a data field to this VTOL object."""
@@ -50,26 +62,30 @@ class VTOLObject:
 
         return None
 
-    def write(self):
-        pass
+    def setField(self, fieldName, value):
+        """Sets a field with the given name to the given value."""
+        for field in self.fields:
+            if field.name == fieldName:
+                field.value = value
 
-    def read(self):
-        pass
-
-    def pack(self):
-        """
-        Packs this object to a byte array.
-        """
-        pass
-
-    def unpack(self, data):
-        """
-        Unpacks this object from an byte array.
-        """
-        pass
+    def getFields(self):
+        """Return all data fields."""
+        return self._fields
 
     def load(self, file):
         pass
 
     def save(self, file):
         pass
+
+    def getMetadata(self):
+        return self._metadata
+
+    def id():
+        def fget(self):
+            return self._objId
+
+        def fset(self, value):
+            self._objId = value
+        return locals()
+    id = property(**id())

@@ -1,4 +1,4 @@
-# Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
+# Copyright (C) 2012-2013 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
 # This file is part of the Matunus project (part of the Orcacopter project)
 #
@@ -19,7 +19,7 @@
 __author__ = 'Sebastian Ruml'
 
 
-class VTOLObjectMetadata:
+class VTOLObjectMetadata(object):
     class UpdateMode:
         PERIODIC = 0
         ONCHANGE = 1
@@ -42,7 +42,6 @@ class VTOLObjectMetadata:
         self.loggingUpdateMode = 0
         self.loggingUpdatePeriod = VTOLObjectMetadata.UpdateMode.MANUAL
         self.objId = objId
-        self.read()
 
     def read(self):
         pass

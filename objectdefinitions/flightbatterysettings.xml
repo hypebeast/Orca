@@ -1,7 +1,7 @@
 <xml>
     <object name="FlightBatterySettings" singleinstance="true" settings="true">
         <description>Battery configuration.</description>
-        <field name="Type" units="" type="ENUM" options="LiPo,A123,LiCo,LiFeSO4,None" defaultvalue="LiPo"/>
+        <field name="Type" units="" type="ENUM" options="LiPo,A123,LiCo,LiFeSO4,Undefined" defaultvalue="LiPo"/>
         <field name="Cells" units=""  type="UINT8" defaultvalue="3"/>
         <field name="Capacity" units="mAh"  type="UINT32" defaultvalue="2200"/>
         <field name="VoltageThreshold" units="V"  type="FLOAT32" defaultvalue="9.8"/>

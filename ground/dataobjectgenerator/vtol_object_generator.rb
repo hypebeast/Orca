@@ -207,7 +207,7 @@ class FmuCodeGenerator
       'UINT8' => 1,
       'UINT16' => 2,
       'UINT32' => 4,
-      'FLOAT32' => 8
+      'FLOAT32' => 4
     }
 
     # Type mappings
@@ -221,8 +221,6 @@ class FmuCodeGenerator
       'UINT32' => 'uint32_t',
       'FLOAT32' => 'float' 
     }
-
-    @FIELDTYPE_FLOAT = "FLOAT32"
 
     @accessTypeMappings = {
       'readonly' => 'ACCESS_READONLY',
@@ -622,12 +620,24 @@ class GcsCodeGenerator
       'UINT8' => 3,
       'UINT16' => 4,
       'UINT32' => 5,
-      'FLOAT32' => 6
+      'FLOAT32' => 6,
+      'ENUM' => 7
+    }
+
+    @accessTypeMappings = {
+      'readonly' => 'VTOLObjectMetadata.Access.READONLY',
+      'readwrite' => 'VTOLObjectMetadata.Access.READWRITE'
+    }
+
+    @updateModeMappings = {
+      'manual' => 'VTOLObjectMetadata.UpdateMode.MANUAL',
+      'periodic' => 'VTOLObjectMetadata.UpdateMode.PERIODIC',
+      'onchange' => 'VTOLObjectMetadata.UpdateMode.ONCHANGE'
     }
 
     # Find all object definition files
     specFiles = findSpecificationFiles(OBJECT_DEFINITON_FILES_DIR)
-    # Process all definitions files
+    # Generates object code files
     generateObjectFiles(specFiles)
   end
 
@@ -657,30 +667,120 @@ class GcsCodeGenerator
 
         xmlfile = File.basename(file)
         name = obj.attributes()['name']
-        obj_name = obj.attributes()['name'] + "Object"
-        singleinstance = obj.attributes()['singleinstance']
-        settings = obj.attributes()['settings']
+        namecp = name.capitalize
+        nameuc = name.upcase
+        namelc = name.downcase
+        objnamecp = name + "Object"
+        objnameuc = objnamecp.upcase
+        objnamelc = namelc + "_object"
+        # <% issingleinst %>
+        issingleinst = (obj.attributes()['singleinstance'] == "true") ? "True" : "False"
+        # <% issettings %>
+        issettings = (obj.attributes()['settings'] == "true") ? "True" : "False"
+        # <% description %>
         description = obj.elements["description"].get_text.value
+        # <% flightaccess %>
+        flightaccess = @accessTypeMappings[obj.elements['access'].attributes()['flight']]
+        # <% gcsaccess %>
+        gcsaccess = @accessTypeMappings[obj.elements['access'].attributes()['gcs']]
+        # <% teleacked %>
+        teleacked = (obj.elements['telemetryflight'].attributes()['acked'] == "true") ? "True" : "False"
+        # <% gcsteleacked %>
+        gcsteleacked = (obj.elements['telemetrygcs'].attributes()['acked'] == "true") ? "True" : "False"
+        # <% teleupdatemode %>
+        teleupdatemode = @updateModeMappings[obj.elements['telemetryflight'].attributes()['updatemode']]
+        # <% gcsteleupdatemode %>
+        gcsteleupdatemode = @updateModeMappings[obj.elements['telemetrygcs'].attributes()['updatemode']]
+        # <% flighttele_updateperiod %>
+        flighttele_updateperiod = obj.elements['telemetryflight'].attributes()['period']
+        # <% gcstele_updateperiod %>
+        gcstele_updateperiod = obj.elements['telemetrygcs'].attributes()['period']
+        # <% logging_updateperiod %>
+        logging_updateperiod = obj.elements['logging'].attributes()['period']
 
-        fields = []
+        ####
+        # Field tags
+        ####
+
+        datafields = []
+        getterfunctions = []
+        setterfunctions = []
+        initfields = []
+        enums = []
+
         obj.each_element("field") do |field|
-          field = {
+          fieldname = field.attributes()['name']
+          fieldnamecp = fieldname.capitalize
+          fieldnamedc = fieldname.downcase
+          fieldnameuc = fieldname.upcase
+
+          # Object fields
+          datafield = {
             'name' => field.attributes()['name'],
             'units' => field.attributes()['units'],
             'type' => @typeDefinitions[field.attributes()['type']]
           }
-          fields.push(field)
+          datafields.push(datafield)
+
+           # <% enums %> tag
+          if field.attributes()['type'] == "ENUM"
+            enumStr = "class #{fieldname}Options:\n"
+            # Go through each option
+            options = field.attributes()['options'].split(',')
+            m = 0
+            options.each do |option|
+              if isnumeric?(option)
+                enumStr += "        #{fieldnameuc}_#{option} = #{m}\n"
+              else
+                enumStr += "        #{option} = #{m}\n"
+              end
+              
+              m += 1
+              if m >= options.length
+                enumStr = enumStr.chop
+              end
+            end
+            enums.push(enumStr)
+          end
+
+          # <% initfields %> tag
+          if field.attributes()['defaultvalue'] != nil
+            defaultvalue = field.attributes()['defaultvalue']
+            # Handle ENUM types
+            if field.attributes()['type'] == "ENUM"
+              if isnumeric?(defaultvalue)
+                value = "#{fieldname}Options.#{fieldnameuc}_#{defaultvalue}"
+              else
+                value = "#{defaultvalue}"
+              end
+            else
+              value = defaultvalue
+            end
+            data = "self.set#{fieldname}(#{value})"
+            initfields.push(data)
+          end
+
+          # Getter functions
+          getterStr  = "def get#{fieldname}(self):\n"
+          getterStr += "        return self.getField(\"#{fieldname}\")"
+          getterfunctions.push(getterStr)
+
+          # Setter functions
+          setterStr = "def set#{fieldname}(self, value):\n"
+          setterStr += "        self.setField(\"#{fieldname}\", value)"
+          setterfunctions.push(setterStr)
+
         end
 
         erb = ERB.new(File.open(@templateFile).read)
         new_code = erb.result(binding)
-        fileName = "#{obj_name}.py"
+        fileName = "#{objnamecp}.py"
         puts "Creating #{fileName}"
-        outputFileName = File.join(@outputDir, "#{obj_name}.py")
+        outputFileName = File.join(@outputDir, fileName)
         File.open(outputFileName, "w").write(new_code)
         puts "Done"
 
-        module_names.push("#{obj_name}")
+        module_names.push("#{objnamecp}")
       end
     end
 
@@ -690,6 +790,11 @@ class GcsCodeGenerator
         f.puts line
       end
     end
+  end
+
+  # Helper method to check if a string is number
+  def isnumeric?(str)
+    Float(str) != nil rescue false
   end
 
 end

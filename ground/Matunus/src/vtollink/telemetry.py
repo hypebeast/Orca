@@ -20,9 +20,9 @@ __author__ = 'Sebastian Ruml'
 
 
 class Telemetry:
-	"""Responsible for managing the updates of VTOL object. It handles the
-	receiving and transmitting of VTOL objects. It decides when to update a Moreover, it collects some stats
-	about the VTOL object communication (e.g. number of objects received or
-	transmitted)."""
-	def __init__(self):
-		pass
+    """Responsible for managing the updates of VTOL object. It handles the
+    receiving and transmitting of VTOL objects. It decides when to update a Moreover, it collects some stats
+    about the VTOL object communication (e.g. number of objects received or
+    transmitted)."""
+    def __init__(self):
+        pass

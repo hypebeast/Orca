@@ -1,4 +1,4 @@
-# Copyright (C) 2012 Sebastian Ruml <sebastian.ruml@gmail.com>
+# Copyright (C) 2012-2013 Sebastian Ruml <sebastian.ruml@gmail.com>
 #
 # This file is part of the Matunus project (part of the Orcacopter project)
 #
@@ -19,7 +19,7 @@
 __author__ = 'Sebastian Ruml'
 
 
-class VTOLObjectField:
+class VTOLObjectField(object):
     class FType:
         INT8 = 0
         INT16 = 1

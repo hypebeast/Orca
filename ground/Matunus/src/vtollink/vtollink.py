@@ -18,6 +18,8 @@
 
 __author__ = 'Sebastian Ruml'
 
+from ..vtolobjects import vtolobjectmanager
+
 
 class VTOLLinkRxState:
     SYNC = 0
@@ -38,11 +40,55 @@ class VTOLLinkMessageType:
     ACK = 0x23
 
 
-class VTOLMessageData(object):
+class VTOLLinkStats:
     def __init__(self):
         pass
 
 
-class VTOLLink(object):
+class VTOLMessageData(object):
     def __init__(self):
+        self.rxPacketLength = 0
+        self.txPacketLength = 0
+        self.rxBytes = []
+        self.txBytes = []
+        self.rxState = VTOLLinkRxState.SYNC
+        self.type = 0
+        self.rxCount = 0
+        self.rxPacketSize = 0
+        self.objId = -1
+        self.obj = None
+        self.objLength = 0
+
+
+class VTOLLink(object):
+    MAX_PAYLOAD_LENGTH = 256
+    MAX_MESSAGE_LENGTH = 1 + 1 + 2 + 2 + 1 + MAX_PAYLOAD_LENGTH + 1
+    HEADER_LENGTH = 7
+    START_BYTE = 0x8D
+    CHECKSUM_LENGTH = 1
+
+    def __init__(self):
+        self._messageData = VTOLMessageData()
+        self._objectManager = vtolobjectmanager.VTOLObjectManager()
+
+    def sendObject(self, obj, instId=0, ackReq=False, timeoutMs=500):
+        """Sends an VTOL object"""
+        pass
+
+    def processInputStream(self, rxByte):
+        """"Processes the received byte stream."""
+        pass
+
+    def _processInputByte(self, rxByte):
+        """"Processes an received byte."""
+        pass
+
+    def _receiveObject(self, type, objId, instId, data, length):
+        """"Processes an received object."""
+        pass
+
+    def _sendObject(self):
+        pass
+
+    def _sendSingleObject(self):
         pass

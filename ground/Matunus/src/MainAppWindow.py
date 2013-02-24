@@ -139,6 +139,8 @@ class MainAppWindow(QtGui.QMainWindow):
         # VTOL object Manager
         self._objectManager = vtolobjectmanager.VTOLObjectManager()
 
+        # TODO: Create Telemetry
+
         # Create UI
         self._createUi()
         self._createActions()
