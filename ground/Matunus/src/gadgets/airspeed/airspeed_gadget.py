@@ -45,7 +45,7 @@ class AirspeedGadget(QtGui.QWidget):
         mainLayout.setMargin(0)
 
         # QML stuff
-        self.mainViewFile = os.path.join(self.app_defs.SrcPath, "gadgets", "airspeed","airspeed.qml")
+        self.mainViewFile = os.path.join(self.app_defs.SrcPath, "gadgets", "airspeed", "airspeed.qml")
         self.mainView = QtDeclarative.QDeclarativeView()
         self.mainView.setSource(QUrl(self.mainViewFile))
         self.mainView.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)

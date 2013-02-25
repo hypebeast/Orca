@@ -19,10 +19,19 @@
 __author__ = 'Sebastian Ruml'
 
 
+import sys
 import os
 import struct
+
+try:
+    from PyQt4.QtCore import pyqtSignal, QObject
+except ImportError:
+    print "No PyQt found!"
+    sys.exit(2)
+
 from ..logger import Logger
 from vtolobject import VTOLObject
+from vtolobjectfield import VTOLObjectField
 
 
 OBJECT_MODULES_DEFINITION_FILE = "objectmodules.txt"
@@ -48,16 +57,18 @@ class _VTOLObjectManager:
     def __init__(self):
         self._objects = list()
         self._logger = Logger()
+
+        # Maps the field types to their format character
         self.formatCharacterTable = {
-                                        0: 'c',
-                                        1: 'h',
-                                        2: 'i',
-                                        3: 'B',
-                                        4: 'H',
-                                        5: 'I',
-                                        6: 'f',
-                                        7: 'i',
-                                    }
+                            VTOLObjectField.FType.INT8: 'c',
+                            VTOLObjectField.FType.INT16: 'h',
+                            2: 'i',
+                            3: 'B',
+                            4: 'H',
+                            5: 'I',
+                            6: 'f',
+                            7: 'i',
+                        }
         self.typeSizesTable = {
                                 0: 1,
                                 1: 2,

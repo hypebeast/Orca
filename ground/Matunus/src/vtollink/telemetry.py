@@ -19,10 +19,142 @@
 __author__ = 'Sebastian Ruml'
 
 
+import serial
+import threading
+
+from ..logger import Logger
+from vtollink import VTOLLink
+
+
+DEFAULT_PORT = 0
+DEFAULT_BAUDRATE = 57600
+DEFAULT_PARITY = serial.PARITY_NONE
+DEFAULT_BYTESIZE = serial.EIGHTBITS
+DEFAULT_STOPBITS = serial.STOPBITS_ONE
+DEFAULT_XONXOFF = False
+DEFAULT_RTS = None
+DEFUALT_DTR = None
+
+
+class TelemetryException(Exception):
+    def __init__(self, msg):
+        Exception.__init__(self)
+        self.msg = msg
+
+
 class Telemetry:
-    """Responsible for managing the updates of VTOL object. It handles the
-    receiving and transmitting of VTOL objects. It decides when to update a Moreover, it collects some stats
-    about the VTOL object communication (e.g. number of objects received or
-    transmitted)."""
-    def __init__(self):
-        pass
+    """Sends and retreives bytes over a serial connection."""
+    def __init__(self, port=DEFAULT_PORT,
+                 baudrate=DEFAULT_BAUDRATE,
+                 parity=DEFAULT_PARITY,
+                 bytesize=DEFAULT_BYTESIZE,
+                 stopbits=DEFAULT_STOPBITS,
+                 xonxoff=DEFAULT_XONXOFF):
+        self.serial_connection = None
+        self.port = port
+        self.baudrate = baudrate
+        self.parity = parity
+        self.bytesize = bytesize
+        self.stopbits = stopbits
+        self.xonxoff = xonxoff
+        self.connected = False
+
+         # Logger
+        self._logger = Logger()
+
+        # VTOL Link
+        self._vtolLink = VTOLLink()
+
+        # Create RX task
+        self.rx_thread = None
+        self.rx_thread_alive = False
+        self.rx_thread_interval = 0.01  # Update interval in seconds
+
+    def connect(self):
+        """"Connects to the FMU."""
+        if self.serial_connection is not None:
+            self.serial_connection.close()
+            self.serial_connection = None
+
+        try:
+            self.serial_connection = serial.serial_for_url(self.port,
+                                            self.baudrate,
+                                            parity=self.parity,
+                                            bytesize=self.bytesize,
+                                            xonxoff=self.xonxoff,
+                                            rtscts=False,
+                                            dsrdtr=False,
+                                            timeout=1)
+            self.connected = True
+        except serial.SerialException as ex:
+            raise TelemetryException("Could not connect to COM Port %s: %s" % (self.port, ex.strerror))
+
+        # Start RX task
+        self._start_rx_thread()
+
+    def disconnect(self):
+        """"Disconnects from the FMU."""
+        if self.serial_connection is not None:
+            # Stop RX task
+            self._stop_rx_thread()
+
+            self.serial_connection.close()
+            self.serial_connection = None
+            self.connected = False
+
+    def set_port(self, port):
+        if port is None:
+            return
+
+        self.port = port
+
+    def set_baudrate(self, baudrate):
+        if baudrate is None or baudrate < 0:
+            return
+
+        self.baudrate = baudrate
+
+    def set_update_rate(self, interval):
+        if interval <= 0.0:
+            return
+
+        self.rx_thread_interval = interval
+
+    def transmitData(self, data):
+        """Transmit the given data. The data parameter needs to be an byte array."""
+        try:
+            self.serial_connection.write(data)
+        except serial.SerialException as ex:
+            self._logger(ex.value)
+
+    def _start_rx_thread(self):
+        """"Starts the RX task"""
+        self.rx_thread_alive = True
+        self.rx_thread = threading.Thread(target=self._rx_task)
+        self.rx_thread.setDaemon(True)
+        self.rx_thread.start()
+
+    def _stop_rx_thread(self):
+        """"Stops the RX task, wait for clean exit of thread."""
+        self.rx_thread_alive = False
+        self.rx_thread.join()
+
+    def _rx_task(self):
+        """The RX task reads data from the serial connection."""
+        try:
+            while self.connected and self.rx_thread_alive:
+                # Read one byte, blocking
+                data = self.serial_connection.read(1)
+                # Look if there is more
+                n = self.serial_connection.inWaiting()
+                if n:
+                    data = data + self.serial_connection.read(n)
+
+                if data is not None and len(data) > 0:
+                    for rxByte in data:
+                        self._vtolLink.processInputStream(rxByte)
+
+                # Wait for some time
+                #time.sleep(self.reader_interval)
+        except serial.SerialException as ex:
+            self._logger(ex.value)

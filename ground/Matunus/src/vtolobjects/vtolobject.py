@@ -19,7 +19,6 @@
 __author__ = 'Sebastian Ruml'
 
 from vtolobjectmetadata import VTOLObjectMetadata
-from vtolobjectfield import VTOLObjectField
 
 
 class VTOLObject(object):
@@ -79,6 +78,7 @@ class VTOLObject(object):
         pass
 
     def getMetadata(self):
+        """"Gets the metadata."""
         return self._metadata
 
     def id():
