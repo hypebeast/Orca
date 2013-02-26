@@ -62,22 +62,24 @@ class _VTOLObjectManager:
         self.formatCharacterTable = {
                             VTOLObjectField.FType.INT8: 'c',
                             VTOLObjectField.FType.INT16: 'h',
-                            2: 'i',
-                            3: 'B',
-                            4: 'H',
-                            5: 'I',
-                            6: 'f',
-                            7: 'i',
+                            VTOLObjectField.FType.INT32: 'i',
+                            VTOLObjectField.FType.UINT8: 'B',
+                            VTOLObjectField.FType.UINT16: 'H',
+                            VTOLObjectField.FType.UINT32: 'I',
+                            VTOLObjectField.FType.FLOAT32: 'f',
+                            VTOLObjectField.FType.ENUM: 'i',
                         }
+
+        # Maps the type sizes to the field types
         self.typeSizesTable = {
-                                0: 1,
-                                1: 2,
-                                2: 4,
-                                3: 1,
-                                4: 2,
-                                5: 4,
-                                6: 4,
-                                7: 4
+                                VTOLObjectField.FType.INT8: 1,
+                                VTOLObjectField.FType.INT16: 2,
+                                VTOLObjectField.FType.INT32: 4,
+                                VTOLObjectField.FType.UINT8: 1,
+                                VTOLObjectField.FType.UINT16: 2,
+                                VTOLObjectField.FType.UINT32: 4,
+                                VTOLObjectField.FType.FLOAT32: 4,
+                                VTOLObjectField.FType.ENUM: 4
                             }
 
         # Register all VTOL objects
@@ -189,6 +191,17 @@ class _VTOLObjectManager:
         return data
 
         return object.pack()
+
+    def getObjectSize(self, obj):
+        """Returns the size of the VTOL object (without header)."""
+        if not obj:
+            return 0
+
+        length = 0
+        for field in obj.fields:
+            length += self.typeSizesTable[field.ftype]
+
+        return length
 
     def _objectExists(self, id):
         """Returns True if the object with the given ID exists. Otherwise, False."""

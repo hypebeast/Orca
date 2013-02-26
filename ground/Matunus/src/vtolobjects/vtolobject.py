@@ -44,6 +44,7 @@ class VTOLObject(object):
         self._name = name
         self._description = description
         self._instId = 0
+        # Actual data
         self._fields = []
 
     def addField(self, field):
