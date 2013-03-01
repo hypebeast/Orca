@@ -18,6 +18,8 @@
 
 __author__ = 'Sebastian Ruml'
 
+import struct
+
 from ..vtolobjects import vtolobjectmanager
 
 
@@ -57,7 +59,6 @@ class VTOLMessageData(object):
         self.rxPacketLength = 0
         self.txPacketLength = 0
         self.rxBytes = []
-        self.txBytes = []
         self.rxState = VTOLLinkRxState.SYNC
         self.type = 0
         self.rxCount = 0
@@ -83,9 +84,14 @@ class VTOLLink(object):
         self._messageData = VTOLMessageData()
         self._objectManager = vtolobjectmanager.VTOLObjectManager()
 
-    def sendObject(self, obj, instId=0, ackReq=False, timeoutMs=500):
-        """Sends an VTOL object"""
-        pass
+    def sendObject(self, obj, callback, instId=0, req=False, ackReq=False, timeoutMs=500):
+        """Sends an VTOL object."""
+        if ackReq:
+            self._sendObject(obj, callback, instId, VTOLLinkMessageType.OBJECT_ACK, timeoutMs)
+        elif req:
+            self._sendObject(obj, callback, instId, VTOLLinkMessageType.OBJECT_REQ, timeoutMs)
+        else:
+            self._sendObject(obj, callback, instId, VTOLLinkMessageType.OBJECT, timeoutMs)
 
     def processInputStream(self, rxByte):
         """"Processes the received byte stream."""
@@ -175,21 +181,43 @@ class VTOLLink(object):
             self._messageData.stats.rxErrors += 1
             self._messageData.rxState = VTOLLinkRxState.ERROR
 
-    def _receiveObject(self, type, objId, instId, data, length):
-        """"Processes an received object."""
+    def _receiveObject(self):
+        """"Processes an received VTOL object."""
         # Get VTOL object
         self._objectManager.getObjectById(self._messageData.objId)
 
         type = self._messageData.type
         if type == VTOLLinkMessageType.OBJECT:
-            pass
+            self._objectManager.unpack(self._messageData.objId, self._messageData.rxBytes)
         elif type == VTOLLinkMessageType.OBJECT_ACK:
-            pass
+            self._objectManager.unpack(self._messageData.objId, self._messageData.rxBytes)
+            #self.sendObject()
         elif type == VTOLLinkMessageType.OBJECT_REQ:
             pass
 
-    def _sendObject(self):
-        pass
+    def _sendObject(self, obj, callback, instId, type, timeoutMs):
+        """Sends an VTOL object."""
+        self._sendSingleObject(obj, callback, type)
 
-    def _sendSingleObject(self):
-        pass
+    def _sendSingleObject(self, obj, callback, type):
+        """Sends an single VTOL object."""
+        if not callback or not obj or not type:
+            return
+
+        if (type != VTOLLinkMessageType.OBJECT or
+                type != VTOLLinkMessageType.OBJECT_ACK or
+                type != VTOLLinkMessageType.OBJECT_REQ or
+                type != VTOLLinkMessageType.ACK):
+            return
+
+        data = bytearray()
+
+        # Add the start byte
+        data.extend(struct.pack('B', self.START_BYTE))
+        # Add the message type
+        data.extend(struct.pack('B', type))
+        # Add the payload length
+        # TODO
+
+        # Add the object ID
+        data.extend(struct.pack('H', obj.id))

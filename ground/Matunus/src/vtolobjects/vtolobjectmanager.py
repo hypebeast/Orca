@@ -190,8 +190,6 @@ class _VTOLObjectManager:
 
         return data
 
-        return object.pack()
-
     def getObjectSize(self, obj):
         """Returns the size of the VTOL object (without header)."""
         if not obj:

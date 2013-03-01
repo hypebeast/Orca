@@ -206,7 +206,7 @@ static int8_t process_periodic_updates()
 	// Iterate through each object and updates its timer, if zero then
 	// add object to event queue and/or call the callback function. Also
 	// calculate smallest delay to next update.
-	timeToNextUpdateMs = (system_time_get_ticks() * SYSTEM_TIME_TICK_RATE_MS) + MAX_UPDATE_PERIOD; // TODO: Get system time
+	timeToNextUpdateMs = (system_time_get_ticks() * SYSTEM_TIME_TICK_RATE_MS) + MAX_UPDATE_PERIOD;
 	for (int i = 0; i < periodicObjectList.index; i++)
 	{
 		PeriodicObject_t objEntry = periodicObjectList.list[i];
