@@ -345,8 +345,10 @@ static uint8_t sendSingleObject(VTOLLinkConnectionData_t *connection,
 	// Data length will be inserted later
 	connection->tx_buffer[4] = (uint8_t)(objId & 0xFF);
 	connection->tx_buffer[5] = (uint8_t)((objId >> 8) & 0xFF);
+	// Add a fake instance id => 0
+	connection->tx_buffer[6] = 0;
 	
-	uint8_t data_offset = 6;
+	uint8_t data_offset = 7;
 	
 	// Get the object data length
 	uint16_t length;
@@ -360,7 +362,7 @@ static uint8_t sendSingleObject(VTOLLinkConnectionData_t *connection,
 		length = vtol_obj_get_num_bytes(obj);	
 	}
 	
-	if (length >= VTOL_LINK_MAX_PAYLOAD_LENGTH)
+	if (length > VTOL_LINK_MAX_PAYLOAD_LENGTH)
 	{
 		return -1;
 	}
@@ -375,6 +377,7 @@ static uint8_t sendSingleObject(VTOLLinkConnectionData_t *connection,
 	}
 	
 	// Store the packet length
+	length += length + VTOL_LINK_HEADER_LENGTH;
 	connection->tx_buffer[2] = (uint8_t)(length & 0xFF);
 	connection->tx_buffer[3] = (uint8_t)((length >> 8) & 0xFF);
 	

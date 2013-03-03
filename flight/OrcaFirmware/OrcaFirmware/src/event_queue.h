@@ -49,7 +49,7 @@ typedef struct {
 
 
 /************************************************************************
-/* \brief Event queue structure.
+* \brief Event queue structure.
 ************************************************************************/
 typedef struct {
 	VTOLObjEvent* list[EVENT_QUEUE_SIZE];

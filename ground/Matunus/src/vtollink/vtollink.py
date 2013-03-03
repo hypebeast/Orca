@@ -76,7 +76,7 @@ class VTOLLink(object):
     """
     MAX_PAYLOAD_LENGTH = 256
     MAX_MESSAGE_LENGTH = 1 + 1 + 2 + 2 + 1 + MAX_PAYLOAD_LENGTH + 1
-    HEADER_LENGTH = 7
+    HEADER_LENGTH = 1 + 1 + 2 + 2 + 1
     START_BYTE = 0x8D
     CHECKSUM_LENGTH = 1
 
@@ -151,7 +151,7 @@ class VTOLLink(object):
                 # Check length
                 if self._messageData.objLength <= self.MAX_PAYLOAD_LENGTH:
                     # Check if lengths match
-                    if self._messageData.objLength + self.HEADER_LENGTH != self._messageData.rxPacketSize:
+                    if (self._messageData.objLength + self.HEADER_LENGTH) != self._messageData.rxPacketSize:
                         self._messageData.stats.rxErrors += 1
                         self._messageData.state = VTOLLinkRxState.ERROR
                     else:
@@ -204,20 +204,44 @@ class VTOLLink(object):
         if not callback or not obj or not type:
             return
 
+        # Check if we got a valid message type
         if (type != VTOLLinkMessageType.OBJECT or
                 type != VTOLLinkMessageType.OBJECT_ACK or
                 type != VTOLLinkMessageType.OBJECT_REQ or
                 type != VTOLLinkMessageType.ACK):
             return
 
+        # Create a new byte array that holds the message
         data = bytearray()
 
         # Add the start byte
-        data.extend(struct.pack('B', self.START_BYTE))
+        data.extend(struct.pack('<B', self.START_BYTE))
         # Add the message type
-        data.extend(struct.pack('B', type))
-        # Add the payload length
-        # TODO
+        data.extend(struct.pack('<B', type))
+        # Add the message length
+        length = 0
+        if type == VTOLLinkMessageType.OBJECT_REQ or type == VTOLLinkMessageType.ACK:
+            length = 0
+        else:
+            length = self._objectManager.getObjectSize(obj)
+
+        if length > self.MAX_PAYLOAD_LENGTH:
+            return
+
+        data.extend(struct.pack('<H', length + self.HEADER_LENGTH))
 
         # Add the object ID
-        data.extend(struct.pack('H', obj.id))
+        data.extend(struct.pack('<H', obj.id))
+
+        # Add a fake instance id => 0
+        data.extend(struct.pack('<B', 0))
+
+        # Add data if any
+        if length > 0:
+            data.extend(self._objectManager.pack(obj))
+
+        # Checksum
+        data.extend(struct.pack('<B', 0xFF))
+
+        # Call the callback function with the message data
+        callback(data)
