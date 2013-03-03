@@ -30,14 +30,14 @@ from ServoControlWidget import ServoControlWidget
 
 
 class OutputPage(QtGui.QWidget):
-    def __init__(self, controller=None):
+    def __init__(self, fmu=None):
         super(OutputPage, self).__init__()
 
-        if controller is None:
+        if fmu is None:
             raise Exception
-            
-        self.controller = controller
-        self.controller.board_status_updated.connect(self._onStatusUpdated)
+
+        self._fmu = fmu
+        self._fmu.vtol_object_received.connect(self._onObjectReceived)
         self.createUi()
 
     def createUi(self):
@@ -49,7 +49,7 @@ class OutputPage(QtGui.QWidget):
         # Channel 1
         groupBox1 = QtGui.QGroupBox("Channel 1")
         groupBox1.setMinimumHeight(70)
-        self.channel1Control = ServoControlWidget(self.controller, servo_nr=1)
+        self.channel1Control = ServoControlWidget(self._fmu, servo_nr=1)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.channel1Control)
@@ -59,7 +59,7 @@ class OutputPage(QtGui.QWidget):
         # Channel 2
         groupBox2 = QtGui.QGroupBox("Channel 2")
         groupBox2.setMinimumHeight(70)
-        self.channel2Control = ServoControlWidget(self.controller, servo_nr=2)
+        self.channel2Control = ServoControlWidget(self._fmu, servo_nr=2)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.channel2Control)
@@ -69,7 +69,7 @@ class OutputPage(QtGui.QWidget):
         # Channel 3
         groupBox = QtGui.QGroupBox("Channel 3")
         groupBox.setMinimumHeight(70)
-        self.channel3Control = ServoControlWidget(self.controller, servo_nr=3)
+        self.channel3Control = ServoControlWidget(self._fmu, servo_nr=3)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.channel3Control)
@@ -79,7 +79,7 @@ class OutputPage(QtGui.QWidget):
         # Channel 4
         groupBox = QtGui.QGroupBox("Channel 4")
         groupBox.setMinimumHeight(70)
-        self.channel4Control = ServoControlWidget(self.controller, servo_nr=4)
+        self.channel4Control = ServoControlWidget(self._fmu, servo_nr=4)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.channel4Control)
@@ -89,7 +89,7 @@ class OutputPage(QtGui.QWidget):
         # Channel 5
         groupBox = QtGui.QGroupBox("Channel 5")
         groupBox.setMinimumHeight(70)
-        self.channel5Control = ServoControlWidget(self.controller, servo_nr=5)
+        self.channel5Control = ServoControlWidget(self._fmu, servo_nr=5)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.channel5Control)
@@ -99,7 +99,7 @@ class OutputPage(QtGui.QWidget):
         # Channel 6
         groupBox = QtGui.QGroupBox("Channel 6")
         groupBox.setMinimumHeight(70)
-        self.channel6Control = ServoControlWidget(self.controller, servo_nr=6)
+        self.channel6Control = ServoControlWidget(self._fmu, servo_nr=6)
         hBox = QtGui.QHBoxLayout()
         hBox.setMargin(2)
         hBox.addWidget(self.channel6Control)
@@ -110,7 +110,7 @@ class OutputPage(QtGui.QWidget):
         #groupBox3 = QtGui.QGroupBox("Configuration")
         #groupBox3.setMinimumHeight(200)
         #mainLayout.addWidget(groupBox3)
-        
+
         mainLayout.addStretch()
         self.setLayout(mainLayout)
 
@@ -127,10 +127,11 @@ class OutputPage(QtGui.QWidget):
     def update(self, data):
         pass
 
-    def _onStatusUpdated(self):
-        self.channel1Control.updateServoPosition(self.controller.boardStatus.outputChannel1)
-        self.channel2Control.updateServoPosition(self.controller.boardStatus.outputChannel2)
-        self.channel3Control.updateServoPosition(self.controller.boardStatus.outputChannel3)
-        self.channel4Control.updateServoPosition(self.controller.boardStatus.outputChannel4)
-        self.channel5Control.updateServoPosition(self.controller.boardStatus.outputChannel5)
-        self.channel6Control.updateServoPosition(self.controller.boardStatus.outputChannel6)
+    def _onObjectReceived(self, obj):
+        pass
+        # self.channel1Control.updateServoPosition(self._fmu.boardStatus.outputChannel1)
+        # self.channel2Control.updateServoPosition(self._fmu.boardStatus.outputChannel2)
+        # self.channel3Control.updateServoPosition(self._fmu.boardStatus.outputChannel3)
+        # self.channel4Control.updateServoPosition(self._fmu.boardStatus.outputChannel4)
+        # self.channel5Control.updateServoPosition(self._fmu.boardStatus.outputChannel5)
+        # self.channel6Control.updateServoPosition(self._fmu.boardStatus.outputChannel6)

@@ -31,6 +31,7 @@ import os
 import sys
 
 from vtolobjects import vtolobjectmanager
+from vtollink import telemetry
 from WelcomePage import WelcomePage
 from InfoPanel import InfoPanel
 from ConfigurationPage import ConfigurationPage
@@ -139,7 +140,8 @@ class MainAppWindow(QtGui.QMainWindow):
         # VTOL object Manager
         self._objectManager = vtolobjectmanager.VTOLObjectManager()
 
-        # TODO: Create Telemetry
+        # Create Telemetry
+        self._telemetry = telemetry.Telemetry()
 
         # Create UI
         self._createUi()

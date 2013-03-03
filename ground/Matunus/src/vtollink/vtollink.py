@@ -20,7 +20,15 @@ __author__ = 'Sebastian Ruml'
 
 import struct
 
+try:
+    from PyQt4.QtCore import pyqtSignal, QObject
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
+
 from ..vtolobjects import vtolobjectmanager
+from ..vtolobjects import vtolobject
 
 
 class VTOLLinkRxState:
@@ -69,7 +77,7 @@ class VTOLMessageData(object):
         self.stats = VTOLLinkStats()
 
 
-class VTOLLink(object):
+class VTOLLink(QObject):
     """
     Implements the VTOL Link protocol. It handles the de- and encoding from VTOL
     messages.
@@ -80,7 +88,12 @@ class VTOLLink(object):
     START_BYTE = 0x8D
     CHECKSUM_LENGTH = 1
 
+    # This signal is emitted if a new VTOL object is received
+    vtol_object_received = pyqtSignal(vtolobject.VTOLObject)
+
     def __init__(self):
+        QObject.__init__(self)
+
         self._messageData = VTOLMessageData()
         self._objectManager = vtolobjectmanager.VTOLObjectManager()
 
@@ -104,6 +117,8 @@ class VTOLLink(object):
         """"Processes an received byte."""
         if not rxByte:
             return
+
+        self._messageData.stats.rxBytes += 1
 
         if (self._messageData.rxState == VTOLLinkRxState.ERROR or
                 self._messageData.rxState == VTOLLinkRxState.COMPLETE):
@@ -194,6 +209,10 @@ class VTOLLink(object):
             #self.sendObject()
         elif type == VTOLLinkMessageType.OBJECT_REQ:
             pass
+
+        # Emit signal that a new VTOL object was received
+        obj = self._objectManager.getObjectById(self._messageData.objId)
+        self.vtol_object_received.emit(obj)
 
     def _sendObject(self, obj, callback, instId, type, timeoutMs):
         """Sends an VTOL object."""

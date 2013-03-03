@@ -22,8 +22,16 @@ __author__ = 'Sebastian Ruml'
 import serial
 import threading
 
+try:
+    from PyQt4.QtCore import pyqtSignal, QObject
+except ImportError:
+    print "No PyQt found!"
+    import sys
+    sys.exit(2)
+
 from ..logger import Logger
 from vtollink import VTOLLink
+from ..vtolobjects import vtolobject
 
 
 DEFAULT_PORT = 0
@@ -36,20 +44,30 @@ DEFAULT_RTS = None
 DEFUALT_DTR = None
 
 
+# Global telemetry object
+telemetry_object = None
+
+
 class TelemetryException(Exception):
     def __init__(self, msg):
         Exception.__init__(self)
         self.msg = msg
 
 
-class Telemetry:
+class _Telemetry(QObject):
     """Sends and retreives bytes over a serial connection."""
+
+    # This signal is emitted if a new VTOL object is received
+    vtol_object_received = pyqtSignal(vtolobject.VTOLObject)
+
     def __init__(self, port=DEFAULT_PORT,
                  baudrate=DEFAULT_BAUDRATE,
                  parity=DEFAULT_PARITY,
                  bytesize=DEFAULT_BYTESIZE,
                  stopbits=DEFAULT_STOPBITS,
                  xonxoff=DEFAULT_XONXOFF):
+        QObject.__init__(self)
+
         self.serial_connection = None
         self.port = port
         self.baudrate = baudrate
@@ -64,6 +82,7 @@ class Telemetry:
 
         # VTOL Link
         self._vtolLink = VTOLLink()
+        self._vtolLink.vtol_object_received.connect(self._onObjectRecveived)
 
         # Create RX task
         self.rx_thread = None
@@ -127,6 +146,12 @@ class Telemetry:
         except serial.SerialException as ex:
             self._logger(ex.value)
 
+    def sendObject(self, obj, req, ackReq):
+        self._sendObject(obj, 1, req, ackReq, 1000)
+
+    def _sendObject(self, obj, instId, req, ackReq, timeoutMs):
+        self._vtolLink.sendObject(obj, self.transmitData, instId, req, ackReq, timeoutMs)
+
     def _start_rx_thread(self):
         """"Starts the RX task"""
         self.rx_thread_alive = True
@@ -158,3 +183,18 @@ class Telemetry:
                 #time.sleep(self.reader_interval)
         except serial.SerialException as ex:
             self._logger(ex.value)
+
+    def _onObjectRecveived(self, obj):
+        if not obj:
+            return
+
+        # Emit signal that a new VTOL object was received
+        self.vtol_object_received.emit(obj)
+
+
+def Telemetry():
+    global telemetry_object
+    if telemetry_object == None:
+        telemetry_object = _Telemetry()
+
+    return telemetry_object

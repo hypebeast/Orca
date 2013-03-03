@@ -93,8 +93,7 @@ class _VTOLObjectManager:
 
         dir = os.path.dirname(os.path.realpath(__file__))
         with open(os.path.join(dir, OBJECT_MODULES_DEFINITION_FILE), 'r') as f:
-            modules = f.readlines()
-            modules = [mod.rstrip("\n") for mod in modules]
+            modules = [mod.rstrip("\n") for mod in f.readlines()]
             for module in modules:
                 classname = module
                 self._logger.info("Register object: %s" % (module))

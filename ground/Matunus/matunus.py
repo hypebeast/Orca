@@ -77,7 +77,7 @@ def main():
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     # Start the application
-    app = MainAppWindow.App(options, args)
+    MainAppWindow.App(options, args)
 
 
 if __name__ == '__main__':

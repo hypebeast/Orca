@@ -253,7 +253,8 @@ static uint8_t receiveObject(VTOLLinkConnectionData_t *connection, uint8_t type,
 			break;
 		
 		case VTOL_LINK_MESSAGE_TYPE_OBJECT_REQUEST:
-			// TODO: Send requested VTOL object
+			// Send requested VTOL object
+			sendObject(connection, obj, 0, VTOL_LINK_MESSAGE_TYPE_OBJECT);
 			break;
 			
 		default:
