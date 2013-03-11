@@ -89,10 +89,10 @@ class ScopePage(QtGui.QWidget):
                                 'fieldNames': ("Sensor Input", " Output")})
         self.dataObjects.append({'groupName': "DCM Pitch",
                                 'fields': ("sensorPitchAngle", "dcmOutputPitch"),
-                                'fieldNames': ("Sensor Input", " Output")})   
+                                'fieldNames': ("Sensor Input", " Output")})
         self.dataObjects.append({'groupName': "DCM Yaw",
                                 'fields': ("sensorYawAngle", "dcmOutputYaw"),
-                                'fieldNames': ("Sensor Input", " Output")})     
+                                'fieldNames': ("Sensor Input", " Output")})
 
         # Create the UI
         self._createUi()
@@ -100,9 +100,9 @@ class ScopePage(QtGui.QWidget):
     def _createUi(self):
         """Initializes the UI."""
         mainLayout = QtGui.QVBoxLayout()
-        
+
         # Palette for the headers
-        palette =  QtGui.QPalette()
+        palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Background, QtGui.QColor(91, 91, 91))
         palette.setColor(QtGui.QPalette.WindowText, QtGui.QColor(255, 0, 0))
 
@@ -156,7 +156,7 @@ class ScopePage(QtGui.QWidget):
         layout.addWidget(self.cbdataObjects2)
         layout.addStretch()
         mainLayout.addWidget(header)
-        
+
         # Scope 2
         self.scope2 = ScopeWidget(self._fmuManager, self.dataObjects[0])
         mainLayout.addWidget(self.scope2)
@@ -232,7 +232,7 @@ class ScopePage(QtGui.QWidget):
 
             dataNames = "Timestamp,"
             dataNames += ','.join(dataFields['fieldNames'])
-            f.write(dataNames+'\n')
+            f.write(dataNames + '\n')
             dataLength = len(curves[0].xData)
             for i in range(0, dataLength):
                 line = str(curves[0].xData[i])

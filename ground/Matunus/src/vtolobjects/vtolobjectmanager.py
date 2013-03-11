@@ -19,18 +19,10 @@
 __author__ = 'Sebastian Ruml'
 
 
-import sys
 import os
 import struct
 
-try:
-    from PyQt4.QtCore import pyqtSignal, QObject
-except ImportError:
-    print "No PyQt found!"
-    sys.exit(2)
-
 from ..logger import Logger
-from vtolobject import VTOLObject
 from vtolobjectfield import VTOLObjectField
 
 
@@ -159,7 +151,7 @@ class _VTOLObjectManager:
         """Unpacks the object with the given id from the given byte array."""
         object = self.getObjectById(id)
 
-        if object == None:
+        if object is None:
             return
 
         dataFields = object.getFields()
@@ -176,7 +168,7 @@ class _VTOLObjectManager:
         """Packs the object with the given id to an byte array."""
         object = self.getObjectById(id)
 
-        if object == None:
+        if object is None:
             return None
 
         data = bytearray()

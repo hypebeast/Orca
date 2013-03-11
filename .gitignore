@@ -16,3 +16,4 @@ dist
 flight/OrcaFirmware/OrcaFirmware/doxygen
 flight/OrcaFirmware/OrcaFirmware/src/vtol_objects
 *.sublime*
+ground/Matunus/src/vtolobjects/*Object.py
