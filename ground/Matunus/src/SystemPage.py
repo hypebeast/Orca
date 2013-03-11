@@ -26,13 +26,14 @@ except ImportError:
     import sys
     sys.exit(2)
 
+from vtolobjects import vtolobjectmanager
 from logger import Logger
 import defs
 import random
 
 
 class SystemPage(QtGui.QWidget):
-    def __init__(self, fmu=None):
+    def __init__(self, fmu):
         super(SystemPage, self).__init__()
 
         if not fmu:
@@ -43,6 +44,7 @@ class SystemPage(QtGui.QWidget):
 
         self._fmu = fmu
         self._fmu.vtol_object_received.connect(self._onObjectReceived)
+        self._vtolo_manager = vtolobjectmanager.VTOLObjectManager()
         self._app_defs = defs.AppDefs()
         self._logger = Logger()
         self._createUi()
@@ -65,7 +67,7 @@ class SystemPage(QtGui.QWidget):
         self._tree.setColumnCount(3)
         self._tree.setColumnWidth(0, 250)
         self._tree.setColumnWidth(1, 200)
-        self._tree.setHeaderLabels(QtCore.QStringList(["Property", "Value", "Unit"]))
+        self._tree.setHeaderLabels(QtCore.QStringList(["Property", "Value", "Unit", "Description"]))
         mainLayout.addWidget(self._tree)
 
         self.setLayout(mainLayout)
@@ -73,25 +75,35 @@ class SystemPage(QtGui.QWidget):
     def _addDataObjects(self):
         data = QtGui.QTreeWidgetItem(self._tree)
         data.setText(0, "Data Objects")
-        # for field in self._fmu.boardStatus.dataFields:
-        #     item = QtGui.QTreeWidgetItem(data)
-        #     item.setText(0, field.name)
-        #     item.setText(1, str(field.value))
-        #     item.setText(2, field.units)
+        dataObjects = self._vtolo_manager.getDataObjects()
+        for obj in dataObjects:
+            item = QtGui.QTreeWidgetItem(data)
+            item.setText(0, obj.getName())
+            item.setText(3, obj.getDescription())
+            for field in obj.getFields():
+                fieldItem = QtGui.QTreeWidgetItem(item)
+                fieldItem.setText(0, field.name)
+                fieldItem.setText(1, str(field.value))
+                fieldItem.setText(2, field.units)
 
-            #self._dataTreeItems.append(item)
+            self._dataTreeItems.append(item)
 
     def _addSettingObjects(self):
         settings = QtGui.QTreeWidgetItem(self._tree)
-        settings.setText(0, "Settings")
-        # Add some dummy data
-        # for field in self._fmu.fmuSettings.dataFields:
-        #     item = QtGui.QTreeWidgetItem(settings)
-        #     item.setText(0, field.name)
-        #     item.setText(1, str(field.value))
-        #     item.setText(2, field.units)
+        settings.setText(0, "Setting Objects")
+        settingObjects = self._vtolo_manager.getSettingsObjects()
+        for obj in settingObjects:
+            print obj
+            item = QtGui.QTreeWidgetItem(settings)
+            item.setText(0, obj.getName())
+            item.setText(3, obj.getDescription())
+            for field in obj.getFields():
+                fieldItem = QtGui.QTreeWidgetItem(item)
+                fieldItem.setText(0, field.name)
+                fieldItem.setText(1, str(field.value))
+                fieldItem.setText(2, field.units)
 
-        #     self._settingsTreeItems.append(item)
+            self._settingsTreeItems.append(item)
 
     def _onObjectReceived(self, obj):
         pass

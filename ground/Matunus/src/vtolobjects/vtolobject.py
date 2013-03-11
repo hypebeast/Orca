@@ -49,14 +49,14 @@ class VTOLObject(object):
 
     def addField(self, field):
         """Adds a data field to this VTOL object."""
-        self.fields.append(field)
+        self._fields.append(field)
 
     def getField(self, fieldName):
         """
         Returns the field for the given name. Otherwise, none if field was not
         found.
         """
-        for field in self.fields:
+        for field in self._fields:
             if fieldName == field.name:
                 return field
 
@@ -64,13 +64,19 @@ class VTOLObject(object):
 
     def setField(self, fieldName, value):
         """Sets a field with the given name to the given value."""
-        for field in self.fields:
+        for field in self._fields:
             if field.name == fieldName:
                 field.value = value
 
     def getFields(self):
         """Return all data fields."""
         return self._fields
+
+    def getName(self):
+        return self._name
+
+    def getDescription(self):
+        return self._description
 
     def load(self, file):
         pass

@@ -749,9 +749,9 @@ class GcsCodeGenerator
             # Handle ENUM types
             if field.attributes()['type'] == "ENUM"
               if isnumeric?(defaultvalue)
-                value = "#{fieldname}Options.#{fieldnameuc}_#{defaultvalue}"
+                value = "self.#{fieldname}Options.#{fieldnameuc}_#{defaultvalue}"
               else
-                value = "#{defaultvalue}"
+                value = "self.#{fieldname}Options.#{defaultvalue}"
               end
             else
               value = defaultvalue

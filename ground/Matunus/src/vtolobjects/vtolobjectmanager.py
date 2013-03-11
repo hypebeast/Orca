@@ -52,15 +52,15 @@ class _VTOLObjectManager:
 
         # Maps the field types to their format character
         self.formatCharacterTable = {
-                            VTOLObjectField.FType.INT8: 'c',
-                            VTOLObjectField.FType.INT16: 'h',
-                            VTOLObjectField.FType.INT32: 'i',
-                            VTOLObjectField.FType.UINT8: 'B',
-                            VTOLObjectField.FType.UINT16: 'H',
-                            VTOLObjectField.FType.UINT32: 'I',
-                            VTOLObjectField.FType.FLOAT32: 'f',
-                            VTOLObjectField.FType.ENUM: 'i',
-                        }
+                                        VTOLObjectField.FType.INT8: 'c',
+                                        VTOLObjectField.FType.INT16: 'h',
+                                        VTOLObjectField.FType.INT32: 'i',
+                                        VTOLObjectField.FType.UINT8: 'B',
+                                        VTOLObjectField.FType.UINT16: 'H',
+                                        VTOLObjectField.FType.UINT32: 'I',
+                                        VTOLObjectField.FType.FLOAT32: 'f',
+                                        VTOLObjectField.FType.ENUM: 'i',
+                                    }
 
         # Maps the type sizes to the field types
         self.typeSizesTable = {
@@ -72,7 +72,7 @@ class _VTOLObjectManager:
                                 VTOLObjectField.FType.UINT32: 4,
                                 VTOLObjectField.FType.FLOAT32: 4,
                                 VTOLObjectField.FType.ENUM: 4
-                            }
+                                }
 
         # Register all VTOL objects
         self._registerObjects()
@@ -92,7 +92,7 @@ class _VTOLObjectManager:
                 mod = __import__(module, globals(), locals(), [classname], -1)
                 try:
                     vtolObject = getattr(mod, classname)
-                    self.addObject(vtolObject)
+                    self.addObject(vtolObject())
                 except AttributeError as ex:
                     print ex.message
                     raise
@@ -121,6 +121,24 @@ class _VTOLObjectManager:
     def getObjects(self):
         """"Returns all available VTOL objects."""
         return self._objects
+
+    def getSettingsObjects(self):
+        """Returns all settings objects."""
+        objects = []
+        for object in self._objects:
+            if object.ISSETTINGS:
+                objects.append(object)
+
+        return objects
+
+    def getDataObjects(self):
+        """Returns all data objects."""
+        objects = []
+        for object in self._objects:
+            if not object.ISSETTINGS:
+                objects.append(object)
+
+        return objects
 
     def getObjectById(self, id):
         """Returns the object with the given ID. Otherwise, false."""
