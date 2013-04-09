@@ -1,7 +1,8 @@
 /**************************************************************************
  * \file eventdispatcher.c
  *
- * \brief Event dispatcher.
+ * \brief The event dispatcher handles periodic updates of VTOL objects.
+ *		  Moreover, it's responsible for manually updated objects.
  *
  * Created: 03.02.2013 12:10:45
  * Author: Sebastian Ruml <sebastian.ruml@gmail.com>
@@ -24,7 +25,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 /************************************************************************/
-/* \brief This struct defines properties needed for periodic updates.
+/* \brief This struct defines properties needed for handling periodic
+ *        updates.
 /************************************************************************/
 typedef struct {
 	EventCallbackInfo_t evInfo; /** Event info. */
@@ -95,13 +97,8 @@ int8_t event_dispatcher_init()
 * This function dispatches all events. There are two different main events:
 * periodic and non-periodic. Periodic events are handled either with a callback
 * function or an external event queue. The non-periodic events are handled with
-* a local event queue and they are add with the \ref event_dispatcher_callback_dispatch
+* a local event queue added by the \ref event_dispatcher_callback_dispatch
 * function.
-* Right now the periodic event queue is implemented in this file. In the future
-* it should be possible to specify an external event queue (e.g. in the telemetry
-* module.
-* Currently, it's not possible to add non-periodic events. This'll be implemented
-* in the future.
 *
 * \return 0		Success
 * \return -1	Error
@@ -112,6 +109,17 @@ int8_t event_dispatcher_task()
 	int32_t currentTime = system_time_get_ticks() * SYSTEM_TIME_TICK_RATE_MS;
 	
 	// TODO: Dispatch events for non-periodic events (-> local queue)
+	if (event_queue_event_available(queue_handle))
+	{
+		VTOLObjEvent* vtolEv;
+		event_queue_receive(queue_handle, vtolEv);
+		
+		//VTOLObjectData obj = (VTOLObjectData*)vtolEv->obj;
+		// TODO: Find the callback and execute it
+		//if ()
+		//{
+		//}
+	}
 	
 	// Process periodic events
 	if (currentTime >= timeToNextUpdateMs)
@@ -124,9 +132,7 @@ int8_t event_dispatcher_task()
 
 /************************************************************************/
 /* \brief Dispatch an event by invoking the supplied callback. The function
-*		  returns immediately, the callback is invoked from the event task.
-*
-* \note			This function is not yet implemented!
+*		  returns immediately, the callback is invoked by the event task.
 *
 * \param ev		The event to be dispatched.
 * \param cb		The callback function.
@@ -139,16 +145,25 @@ int8_t event_dispatcher_callback_dispatch(VTOLObjEvent* ev, VTOLObjEventCallback
 	evInfo.cb = cb;
 	evInfo.queue = 0;
 	
-	// Add to event queue (queue for non-periodic updates)
+	// Add new periodic event
+	//PeriodicObject_t periodicObj = periodicObjectList.list[periodicObjectList.index++];
+	//periodicObj.evInfo = evInfo;
+	//periodicObj.timeToNextUpdateMs = 0;
+	//periodicObj.updatePeriodeMs = 0;
+	
+	// Add object event to event queue (queue for non-periodic updates)
 	event_queue_send(queue_handle, &evInfo.ev);
 	
 	return 0;
 }
 
 /************************************************************************
-* \brief TODO
+* \brief Adds the given VTOL object to the periodic update queue.
 *
-* \note			This function is not yet implemented!
+* \param ev			TODO
+* \param cb			TODO
+* \param periodMs	TODO
+* \note				This function is not yet implemented!
 ************************************************************************/
 int8_t event_dispatcher_create_periodic_callback(VTOLObjEvent* ev, VTOLObjEventCallback cb, uint16_t periodMs)
 {
@@ -249,7 +264,7 @@ static int8_t process_periodic_updates()
 * \param queue		Event queue to use.
 * \param periodMs	Update period.
 * \return 0			Success
-* \return -1		Error
+* \return -1		Error or VTOL object is already connected
 /************************************************************************/
 static int8_t event_periodic_create(VTOLObjEvent* ev, VTOLObjEventCallback cb, EventQueueHandle queue, uint16_t periodMs)
 {

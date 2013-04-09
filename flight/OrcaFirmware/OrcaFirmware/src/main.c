@@ -1,7 +1,7 @@
 /**
  * \file main.c
  *
- * \brief Entry point for the Orca firmware program.
+ * \brief Entry point for the FMU.
  *
  */
 

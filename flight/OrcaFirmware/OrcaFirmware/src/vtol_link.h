@@ -19,7 +19,7 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-// Public defines
+// Public definitions
 //////////////////////////////////////////////////////////////////////////
 
 #define VTOL_LINK_MAX_PAYLOAD_LENGTH 2^8	/** Max payload length */
@@ -37,7 +37,7 @@ typedef void* VTOLLinkConnection;
 typedef uint8_t (*VTOLLinkOutputStream)(uint8_t* data, int32_t length);
 
 /************************************************************************
-* \brief VTOL RX state.                                                  
+* \brief VTOL RX state.                                        
 ************************************************************************/
 typedef enum {
 	VTOLLINK_STATE_SYNC = 0,

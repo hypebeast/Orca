@@ -222,7 +222,7 @@ class _VTOLObjectManager:
 def VTOLObjectManager():
     global vtolObjectManager
 
-    if vtolObjectManager == None:
+    if vtolObjectManager is None:
         vtolObjectManager = _VTOLObjectManager()
 
     return vtolObjectManager

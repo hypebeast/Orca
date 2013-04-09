@@ -98,7 +98,7 @@ typedef void (*VTOLObjEventCallback)(VTOLObjEvent* ev);
 **************************************************************************/
 struct VTOLObjectBase {
 	/* Describe the type of object that follows this header */
-	struct UAVOInfo {
+	struct VTOLOInfo {
 		bool isMeta        : 1;
 		bool isSingle      : 1;
 		bool isSettings    : 1;
@@ -161,6 +161,7 @@ bool vtol_is_settings(VTOLObjHandle obj);
 bool vtol_read_only(VTOLObjHandle obj);
 bool vtol_is_meta_object(VTOLObjHandle obj);
 bool vtol_is_meta_object(VTOLObjHandle obj);
+bool vtol_get_ack_required(VTOLObjMetaData const *metadata);
 VTOLObjAccessType vtol_get_access(const VTOLObjMetaData* metadata);
 int8_t vtol_unpack(VTOLObjHandle obj, uint8_t instId, const uint8_t* dataIn);
 int8_t vtol_pack(VTOLObjHandle obj, void* dataOut);

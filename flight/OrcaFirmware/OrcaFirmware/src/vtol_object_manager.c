@@ -202,6 +202,17 @@ VTOLObjUpdateMode vtol_get_telemetry_update_mode(const VTOLObjMetaData* metadata
 	return ((metadata->flags >> VTOLOBJ_TELEMETRY_UPDATE_MODE_SHIFT) & VTOLOBJ_UPDATE_MODE_MASK);
 }
 
+/************************************************************************/
+/* \brief Returns if the VTOL object requires an acknowledge.
+*
+* \param metadata	The metadata object.
+* \return True, if yes. Otherwise, false.
+/************************************************************************/
+bool vtol_get_ack_required(VTOLObjMetaData const *metadata)
+{
+	return ((metadata->flags >> VTOLOBJ_TELEMETRY_ACKED_SHIFT) & 1);
+}
+
 /**************************************************************************
 * \brief Checks if the object is a meta object.
 *
@@ -504,7 +515,7 @@ int8_t vtol_delete_settings(void)
 **************************************************************************/
 void vtol_obj_iterate(void (*iterator)(VTOLObjHandle obj))
 {
-	for (int i = 0; i < VTOLOBJ_NUMBER_OF_VTOL_OBJECTS; i++)
+	for (int i = 0; i < vtolo_list.index; i++)
 	{
 		(*iterator)((VTOLObjHandle)vtolo_list.vtolo_list[i]);
 	}

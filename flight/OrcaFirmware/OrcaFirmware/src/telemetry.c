@@ -85,6 +85,7 @@ uint8_t telemetry_init()
 	// Event queue
 	periodic_event_queue.head = 0;
 	periodic_event_queue.tail = 0;
+	// Save the handle to the event queue
 	periodic_queue_handle = &periodic_event_queue;
 		
 	// Register VTOL objects for periodic updates
@@ -244,13 +245,17 @@ static int8_t updateObject(VTOLObjHandle obj, int32_t eventType)
 /************************************************************************/
 static void process_obj_event(VTOLObjEvent* ev)
 {
-	// TODO
-	
 	// Check if connection is established
 	
 	// Check which event type we got
-	
-	// Send VTOL object to GCS
+	if (ev->event == EV_UPDATED_PERIODIC)
+	{
+		struct VTOLObjectMeta meta;
+		vtol_get_metadata(ev->obj, &meta);
+		VTOLObjMetaData *metaData = &meta.instance;
+		uint8_t ack = vtol_get_ack_required(metaData);
+		vtol_link_send_object((VTOLLinkConnection)&vtolLinkConnection, ev->obj, 0, ack, 1000);
+	}
 }
 
 /*! \brief Receive complete interrupt service routine.

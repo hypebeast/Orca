@@ -64,7 +64,7 @@ class SystemPage(QtGui.QWidget):
 
         # Tree View
         self._tree = QtGui.QTreeWidget()
-        self._tree.setColumnCount(3)
+        self._tree.setColumnCount(4)
         self._tree.setColumnWidth(0, 250)
         self._tree.setColumnWidth(1, 200)
         self._tree.setHeaderLabels(QtCore.QStringList(["Property", "Value", "Unit", "Description"]))

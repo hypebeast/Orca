@@ -194,7 +194,7 @@ class _Telemetry(QObject):
 
 def Telemetry():
     global telemetry_object
-    if telemetry_object == None:
+    if telemetry_object is None:
         telemetry_object = _Telemetry()
 
     return telemetry_object
